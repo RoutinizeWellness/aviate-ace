@@ -691,7 +691,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
+      is_premium: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       activity_type:

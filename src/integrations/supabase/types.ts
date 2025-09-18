@@ -691,6 +691,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_user_level: {
+        Args: { points: number }
+        Returns: number
+      }
+      check_and_award_achievements: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      get_random_exam_questions: {
+        Args: { p_exam_id: string; p_limit?: number; p_user_id?: string }
+        Returns: {
+          category: string
+          correct_answer: number
+          explanation: string
+          id: string
+          options: Json
+          question: string
+          reference: string
+          tier: Database["public"]["Enums"]["question_tier"]
+        }[]
+      }
       is_admin: {
         Args: { user_id: string }
         Returns: boolean

@@ -71,31 +71,3 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-
-## Authentication Setup
-
-This project uses Convex for backend services. To fully utilize the authentication features:
-
-1. Create a Convex account at [convex.dev](https://convex.dev)
-2. Create a new Convex project
-3. Add your Convex project URL to the `.env` file:
-
-```env
-VITE_CONVEX_URL=your-convex-project-url
-```
-
-4. For production use, consider implementing proper authentication with Convex Auth:
-
-```bash
-npm install convex-auth
-```
-
-Then follow the Convex Auth setup guide at [https://docs.convex.dev/auth](https://docs.convex.dev/auth)
-
-## Troubleshooting
-
-If you encounter ID validation errors:
-
-1. Run the clear-mock-auth.js script in your browser console
-2. Refresh the page to generate new valid IDs
-3. For permanent solution, set up proper Convex authentication

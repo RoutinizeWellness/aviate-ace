@@ -5,37 +5,15 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Plane, Mail, Lock, AlertCircle } from "lucide-react";
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/hooks/useConvexAuth";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { signIn, isLoading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
 
-  const from = location.state?.from?.pathname || '/dashboard';
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    
-    try {
-      const user = await signIn(email, password);
-      
-      if (user) {
-        navigate(from, { replace: true });
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión. Verifica tus credenciales.');
-      console.error('Login error:', err);
-    }
-    
-    setIsLoading(false);
+    // TODO: Implement login with Supabase
+    console.log("Login attempt:", { email, password });
   };
 
   return (
@@ -122,8 +100,8 @@ const Login = () => {
                 </a>
               </div>
 
-              <Button type="submit" className="w-full" size="lg" disabled={isLoading || authLoading}>
-                {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+              <Button type="submit" className="w-full" size="lg">
+                Iniciar Sesión
               </Button>
             </form>
 
@@ -154,15 +132,26 @@ const Login = () => {
 
             <div className="text-center text-sm text-muted-foreground">
               ¿No tienes cuenta?{" "}
-              <button 
-                onClick={() => navigate('/register')}
-                className="text-primary hover:text-primary-bright font-medium"
-              >
+              <a href="/register" className="text-primary hover:text-primary-bright font-medium">
                 Regístrate aquí
-              </button>
+              </a>
             </div>
           </CardContent>
         </Card>
+
+        {/* Backend Notice */}
+        <div className="mt-6 p-4 surface-light rounded-lg border border-warning/20 bg-warning/5">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-warning mb-1">Funcionalidad Backend Requerida</p>
+              <p className="text-muted-foreground">
+                Para activar el login y todas las funciones de la plataforma, necesitas conectar 
+                este proyecto con Supabase. Haz clic en el botón verde de Supabase en la parte superior.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

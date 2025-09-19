@@ -24,3 +24,11 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+
+# Run post-deployment verification
+[[plugins]]
+  package = "@netlify/plugin-functions-core"
+
+# Set environment variables for production
+[context.production.environment]
+  VITE_CONVEX_URL = "https://accomplished-swordfish-668.convex.cloud"

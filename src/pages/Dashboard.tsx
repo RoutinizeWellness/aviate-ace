@@ -30,6 +30,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
+import { ConvexStatusIndicator } from "@/components/ConvexStatusIndicator";
 import type { Id } from "../../convex/_generated/dataModel";
 
 // Helper function to validate Convex IDs
@@ -200,6 +201,40 @@ const Dashboard = () => {
       courses: { title: 'A320 Type Rating' }
     }
   ];
+
+  const mockUserCourses = [
+    {
+      id: '1',
+      title: 'A320 Type Rating',
+      description: 'Curso completo de preparación para A320',
+      progress: 75,
+      totalLessons: 20,
+      completedLessons: 15,
+      aircraftType: 'A320_FAMILY',
+      subscriptionRequired: true
+    },
+    {
+      id: '2',
+      title: 'B737 Type Rating',
+      description: 'Curso completo de preparación para B737',
+      progress: 45,
+      totalLessons: 18,
+      completedLessons: 8,
+      aircraftType: 'BOEING_737',
+      subscriptionRequired: true
+    },
+    {
+      id: '3',
+      title: 'General Aviation Knowledge',
+      description: 'Fundamentos de aviación general',
+      progress: 90,
+      totalLessons: 12,
+      completedLessons: 11,
+      aircraftType: 'GENERAL',
+      subscriptionRequired: false
+    }
+  ];
+
   const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
@@ -227,101 +262,93 @@ const Dashboard = () => {
   // Use mock data when Convex data is not available
   const examStats = mockExamStats;
   const recentProgress = mockRecentProgress;
+  const userCoursesData = userCourses || mockUserCourses;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar - Hidden on mobile */}
-      {!isMobile && (
-        <aside className="fixed left-0 top-0 h-full w-64 surface-dark border-r border-border z-40">
-          <div className="p-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Plane className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-                <p className="text-xs text-muted-foreground">Dashboard</p>
-              </div>
-            </div>
-
-            {/* User Profile */}
-            <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-              <UserAvatar 
-                avatarUrl={userProfile?.profile?.avatarUrl} 
-                displayName={displayName}
-                size="md"
-              />
-              <div>
-                <h2 className="font-medium text-sm">{displayName}</h2>
-                <p className="text-xs text-muted-foreground">
-                  Nivel {currentLevel} • {totalPoints} puntos
-                </p>
+      <div className="flex">
+        {/* Sidebar - hidden on mobile */}
+        <div className="hidden md:block w-64 border-r bg-background">
+          <div className="flex flex-col h-full">
+            <div className="p-6 border-b">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground">
+                  <Plane className="w-6 h-6" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-bold">PilotPrepFlightX</h1>
+                  <p className="text-xs text-muted-foreground">Professional Training</p>
+                </div>
               </div>
             </div>
-
-            {/* Navigation */}
-            <nav className="space-y-2">
-              <Button variant="default" className="w-full justify-start gap-3 h-12">
-                <BookOpen className="w-5 h-5" />
-                <span>Inicio</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/exams')}
-              >
-                <Target className="w-5 h-5" />
-                <span>Exámenes</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/type-rating')}
-              >
-                <Star className="w-5 h-5" />
-                <span>Type Rating</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/progress')}
-              >
-                <BarChart3 className="w-5 h-5" />
-                <span>Progreso</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/profile')}
-              >
-                <User className="w-5 h-5" />
-                <span>Perfil</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/settings')}
-              >
-                <Settings className="w-5 h-5" />
-                <span>Configuración</span>
-              </Button>
-              
-              {/* Admin Panel - Only show for admins */}
-              {isAdmin(user) && (
+            
+            <div className="flex-1 overflow-auto p-4">
+              <nav className="space-y-2">
+                <Button variant="default" className="w-full justify-start gap-3 h-12">
+                  <BookOpen className="w-5 h-5" />
+                  <span>Inicio</span>
+                </Button>
                 <Button 
                   variant="ghost" 
-                  className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
-                  onClick={() => navigate('/admin')}
+                  className="w-full justify-start gap-3 h-12"
+                  onClick={() => navigate('/exams')}
                 >
-                  <Shield className="w-5 h-5" />
-                  <span>Panel Admin</span>
+                  <Target className="w-5 h-5" />
+                  <span>Exámenes</span>
                 </Button>
-              )}
-            </nav>
-
-            {/* Logout */}
-            <div className="absolute bottom-6 left-6 right-6">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12"
+                  onClick={() => navigate('/type-rating')}
+                >
+                  <Star className="w-5 h-5" />
+                  <span>Type Rating</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12"
+                  onClick={() => navigate('/progress')}
+                >
+                  <BarChart3 className="w-5 h-5" />
+                  <span>Progreso</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12"
+                  onClick={() => navigate('/profile')}
+                >
+                  <User className="w-5 h-5" />
+                  <span>Perfil</span>
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12"
+                  onClick={() => navigate('/settings')}
+                >
+                  <Settings className="w-5 h-5" />
+                  <span>Configuración</span>
+                </Button>
+                
+                {/* Admin Panel - Only show for admins */}
+                {isAdmin(user) && (
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
+                    onClick={() => navigate('/admin')}
+                  >
+                    <Shield className="w-5 h-5" />
+                    <span>Panel Admin</span>
+                  </Button>
+                )}
+              </nav>
+            </div>
+            
+            <div className="p-4 border-t">
+              {/* Convex Status Indicator */}
+              <div className="mb-4">
+                <ConvexStatusIndicator />
+              </div>
+              
               <Button 
                 variant="outline" 
                 className="w-full justify-start gap-3 h-12"
@@ -332,92 +359,71 @@ const Dashboard = () => {
               </Button>
             </div>
           </div>
-        </aside>
-      )}
-
-      {/* Main Content */}
-      <main className={`${isMobile ? 'p-4' : 'ml-64 p-8'}`}>
-        {/* Mobile Header */}
-        {isMobile && (
-          <div className="flex items-center justify-between mb-6 bg-background/95 backdrop-blur sticky top-0 z-30 py-4 border-b">
-            <div className="flex items-center gap-3">
+        </div>
+        
+        {/* Main content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Mobile header */}
+          <header className="md:hidden border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+            <div className="flex items-center justify-between p-4">
               <MobileNavigation />
-              <div>
-                <h1 className="font-bold text-lg">Dashboard</h1>
-                <p className="text-xs text-muted-foreground">Welcome back!</p>
+              <div className="flex items-center gap-3">
+                <UserAvatar 
+                  avatarUrl={user?.avatarUrl}
+                  displayName={user?.displayName || user?.email?.split('@')[0]}
+                  size="sm" 
+                />
+                <div className="text-sm font-medium">
+                  {user?.displayName || user?.email?.split('@')[0] || 'User'}
+                </div>
               </div>
             </div>
-            <UserAvatar 
-              avatarUrl={userProfile?.profile?.avatarUrl} 
-              displayName={displayName}
-              size="sm"
-            />
-          </div>
-        )}
-        {/* Header - Desktop */}
-        {!isMobile && (
-          <header className="mb-8">
-            <h1 className="text-4xl font-bold mb-2">Panel de Control</h1>
-            <p className="text-muted-foreground">Bienvenido de vuelta, {displayName}. Continúa tu preparación para la certificación.</p>
-            
-            {/* Admin Setup Button for tiniboti@gmail.com */}
-            {user?.email === 'tiniboti@gmail.com' && !isAdmin(user) && (
-              <div className="mt-4">
-                <Button 
-                  onClick={() => navigate('/admin-setup')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
-                  size="sm"
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Configurar Permisos de Admin
-                </Button>
-              </div>
-            )}
           </header>
-        )}
-
-        {/* Header - Mobile */}
-        {isMobile && (
-          <header className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">Panel de Control</h1>
-            <p className="text-sm text-muted-foreground">Bienvenido de vuelta, {displayName}.</p>
-            
-            {/* Admin Setup Button for tiniboti@gmail.com */}
-            {user?.email === 'tiniboti@gmail.com' && !isAdmin(user) && (
-              <div className="mt-3">
-                <Button 
-                  onClick={() => navigate('/admin-setup')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white"
-                  size="sm"
-                >
-                  <Shield className="w-4 h-4 mr-2" />
-                  Configurar Admin
-                </Button>
+          
+          {/* Desktop header */}
+          <header className="hidden md:flex items-center justify-between p-6 border-b">
+            <div>
+              <h1 className="text-2xl font-bold">Panel de Control</h1>
+              <p className="text-muted-foreground">Bienvenido de vuelta, {user?.displayName || user?.email?.split('@')[0] || 'Piloto'}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <UserAvatar 
+                avatarUrl={user?.avatarUrl}
+                displayName={user?.displayName || user?.email?.split('@')[0]}
+              />
+              <div>
+                <div className="font-medium">{user?.displayName || user?.email?.split('@')[0] || 'User'}</div>
+                <div className="text-sm text-muted-foreground">{user?.email}</div>
               </div>
-            )}
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Salir
+              </Button>
+            </div>
           </header>
-        )}
+          
+          {/* Main content area */}
+          <main className="flex-1 overflow-auto p-4 md:p-6">
+            {/* Main Dashboard Tabs */}
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                <TabsTrigger value="overview" className={`${isMobile ? 'text-xs' : ''}`}>
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="gamification" className={`${isMobile ? 'text-xs' : ''}`}>
+                  <Gamepad2 className="w-4 h-4 mr-2" />
+                  Achievements
+                </TabsTrigger>
+                {!isMobile && (
+                  <TabsTrigger value="analytics">
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    Analytics
+                  </TabsTrigger>
+                )}
+              </TabsList>
 
-        {/* Main Dashboard Tabs */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
-            <TabsTrigger value="overview" className={`${isMobile ? 'text-xs' : ''}`}>
-              <BookOpen className="w-4 h-4 mr-2" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="gamification" className={`${isMobile ? 'text-xs' : ''}`}>
-              <Gamepad2 className="w-4 h-4 mr-2" />
-              Achievements
-            </TabsTrigger>
-            {!isMobile && (
-              <TabsTrigger value="analytics">
-                <BarChart3 className="w-4 h-4 mr-2" />
-                Analytics
-              </TabsTrigger>
-            )}
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-8">
+              <TabsContent value="overview" className="space-y-8">
 
         {/* Progress Overview */}
         <section className={`${isMobile ? 'mb-6' : 'mb-10'}`}>
@@ -458,20 +464,17 @@ const Dashboard = () => {
         <section className="mb-10">
           <h2 className="text-2xl font-bold mb-6">Mis Cursos</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {userCourses === undefined ? (
+            {userCoursesData === undefined ? (
               <div className="col-span-2 text-center py-8">
                 <div className="text-muted-foreground">Cargando cursos...</div>
               </div>
-            ) : userCourses && userCourses.length > 0 ? (
-              userCourses.map((userCourse) => {
-                const course = userCourse.course;
-                if (!course) return null;
-                
+            ) : userCoursesData && userCoursesData.length > 0 ? (
+              userCoursesData.map((course) => {
                 // Calculate course progress (mock calculation)
                 const courseProgress = Math.floor(Math.random() * 100); // Replace with real calculation
                 
                 return (
-                  <Card key={course._id} className="surface-mid border-border/50 hover-lift group cursor-pointer">
+                  <Card key={course.id} className="surface-mid border-border/50 hover-lift group cursor-pointer">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -481,12 +484,12 @@ const Dashboard = () => {
                           <div>
                             <h3 className="font-bold text-lg">{course.title}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {course.aircraftType.replace('_', ' ').toUpperCase()}
+                              {course.aircraftType?.replace('_', ' ')?.toUpperCase()}
                             </p>
                           </div>
                         </div>
-                        <Badge className={userCourse.completedAt ? "bg-success/10 text-success" : "bg-primary/10 text-primary"}>
-                          {userCourse.completedAt ? "Completado" : "Activo"}
+                        <Badge className="bg-primary/10 text-primary">
+                          Activo
                         </Badge>
                       </div>
                       <div className="space-y-3">
@@ -699,28 +702,30 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         </section>
-          </TabsContent>
+              </TabsContent>
 
-          <TabsContent value="gamification" className="space-y-6">
-            <GamificationDashboard isMobile={isMobile} />
-          </TabsContent>
+              <TabsContent value="gamification" className="space-y-6">
+                <GamificationDashboard isMobile={isMobile} />
+              </TabsContent>
 
-          {!isMobile && (
-            <TabsContent value="analytics" className="space-y-6">
-              <div className="text-center py-12">
-                <Award className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">Advanced Analytics</h3>
-                <p className="text-muted-foreground mb-4">
-                  Get detailed insights into your learning progress and performance.
-                </p>
-                <Button onClick={() => navigate('/analytics')}>
-                  View Full Analytics
-                </Button>
-              </div>
-            </TabsContent>
-          )}
-        </Tabs>
-      </main>
+              {!isMobile && (
+                <TabsContent value="analytics" className="space-y-6">
+                  <div className="text-center py-12">
+                    <Award className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Advanced Analytics</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Get detailed insights into your learning progress and performance.
+                    </p>
+                    <Button onClick={() => navigate('/analytics')}>
+                      View Full Analytics
+                    </Button>
+                  </div>
+                </TabsContent>
+              )}
+            </Tabs>
+          </main>
+        </div>
+      </div>
     </div>
   );
 };

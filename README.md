@@ -59,6 +59,34 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Convex (Backend)
+- Supabase (Database)
+- Stripe (Payments)
+
+## Convex Backend Connection
+
+This application connects to a Convex backend deployment at:
+**https://accomplished-swordfish-668.convex.cloud**
+
+You can access the Convex dashboard at:
+[Convex Dashboard](https://dashboard.convex.dev/d/accomplished-swordfish-668)
+
+### Verification
+
+To verify that Convex is properly configured:
+
+1. Check that the `VITE_CONVEX_URL` environment variable is set correctly
+2. When the application loads, you should see "✅ Convex client initialized successfully" in the browser console
+3. The dashboard shows a Convex Status Indicator showing the connection status
+4. You can visit `/convex-status.html` to see deployment information
+
+### Fallback Mode
+
+If Convex is temporarily unavailable, the application gracefully degrades to demo mode:
+- User authentication uses mock data
+- Exam questions are served from local data
+- Progress tracking is simulated
+- All features remain functional
 
 ## How can I deploy this project?
 

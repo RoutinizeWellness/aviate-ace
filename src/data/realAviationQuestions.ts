@@ -408,6 +408,614 @@ export const loadAccelerationLimitsQuestions: RealAviationQuestion[] = [
     regulationCode: "EASA CS-25.337"
   }
 ];
+
+/**
+ * ADDITIONAL A320 ELECTRICAL SYSTEM QUESTIONS
+ * Based on A320 FCOM Volume 2 - Electrical System
+ */
+export const additionalElectricalQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the normal AC power source priority sequence in the A320 electrical system?",
+    options: [
+      "Engine generators, APU generator, external power, RAT",
+      "External power, APU generator, engine generators, RAT",
+      "Engine generators, external power, APU generator, RAT",
+      "APU generator, engine generators, external power, RAT"
+    ],
+    correctAnswer: 0,
+    explanation: "The normal AC power source priority in A320 is: 1. Engine generators (GEN 1 and GEN 2), 2. APU generator, 3. External power, 4. RAT (Ram Air Turbine). This ensures continuous power supply with engine generators having the highest priority as they are the primary source during normal flight operations.",
+    aircraftType: "A320_FAMILY",
+    category: "Sistema Eléctrico",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.24.10 - Electrical Power Generation",
+    regulationCode: "EASA CS-25.1351"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During an electrical emergency with only the batteries powering the aircraft, which buses remain powered?",
+    options: [
+      "Only essential buses, AC ESS BUS and DC ESS BUS",
+      "All buses except galleys and entertainment systems",
+      "Only flight critical systems, no cabin systems",
+      "No buses powered, aircraft in complete electrical failure"
+    ],
+    correctAnswer: 0,
+    explanation: "In electrical emergency configuration with batteries only, the AC ESS BUS (Essential AC Bus) and DC ESS BUS (Essential DC Bus) remain powered. These buses supply critical flight instruments, flight controls, and essential navigation equipment needed for safe landing. Non-essential systems are shed to conserve battery power.",
+    aircraftType: "A320_FAMILY",
+    category: "Sistema Eléctrico",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.24.20 - Emergency Electrical Supply",
+    regulationCode: "EASA CS-25.1351"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum continuous load capacity of each engine-driven generator in the A320?",
+    options: [
+      "90 KVA continuous, 100 KVA peak for 10 minutes",
+      "80 KVA continuous, 90 KVA peak for 5 minutes",
+      "100 KVA continuous, 110 KVA peak for 15 minutes",
+      "75 KVA continuous, 85 KVA peak for 8 minutes"
+    ],
+    correctAnswer: 0,
+    explanation: "Each engine-driven generator (VFG - Variable Frequency Generator) in the A320 has a maximum continuous load capacity of 90 KVA. It can supply up to 100 KVA for short periods (10 minutes) during peak demand situations. This capacity is sufficient for normal aircraft operations with adequate margins for system redundancy.",
+    aircraftType: "A320_FAMILY",
+    category: "Sistema Eléctrico",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.24.10 - Electrical Power Generation",
+    regulationCode: "EASA CS-25.1351"
+  }
+];
+
+/**
+ * ADDITIONAL A320 HYDRAULIC SYSTEM QUESTIONS
+ * Based on A320 FCOM Volume 2 - Flight Controls & Hydraulics
+ */
+export const additionalHydraulicQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the function of the Power Transfer Unit (PTU) in the A320 hydraulic system?",
+    options: [
+      "Transfers hydraulic power between Green and Yellow systems automatically",
+      "Provides emergency hydraulic power from Blue system to all systems",
+      "Boosts engine-driven pump pressure during high demand",
+      "Converts electrical power to hydraulic power for backup operation"
+    ],
+    correctAnswer: 0,
+    explanation: "The PTU automatically transfers hydraulic power between the Green and Yellow systems when a pressure differential of more than 500 PSI is detected. It operates as a hydraulic motor-pump unit, using pressure from one system to drive a pump in the other system, ensuring adequate hydraulic power for flight controls and other critical systems.",
+    aircraftType: "A320_FAMILY",
+    category: "Sistema Hidráulico",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.10 - Hydraulic Systems",
+    regulationCode: "EASA CS-25.1309"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What happens to flight controls in case of total loss of all hydraulic systems?",
+    options: [
+      "Mechanical backup through cables for pitch and roll, rudder via mechanical backup",
+      "Complete loss of flight controls, aircraft uncontrollable",
+      "Electric backup for all flight controls with reduced authority",
+      "Autopilot takes over with emergency power supply"
+    ],
+    correctAnswer: 0,
+    explanation: "In case of total hydraulic failure, the A320 has a mechanical backup system. Pitch control is available through the trimmable horizontal stabilizer (THS) controlled by pitch trim wheels, and roll control is available through cables to the ailerons. The rudder has a mechanical backup via the rudder pedals, though with reduced authority. This ensures basic aircraft control for emergency landing.",
+    aircraftType: "A320_FAMILY",
+    category: "Sistema Hidráulico",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.40 - Backup Systems",
+    regulationCode: "EASA CS-25.1309"
+  }
+];
+
+/**
+ * ADDITIONAL A320 FLIGHT CONTROLS QUESTIONS
+ * Based on A320 FCOM Volume 2 - Flight Controls
+ */
+export const additionalFlightControlsQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum deflection angle of the A320 elevator in normal law?",
+    options: [
+      "±30° with speed protection limiting excessive inputs",
+      "±25° with no additional limitations",
+      "±35° with alpha protection preventing stall",
+      "±20° with automatic pitch trim assistance"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 elevator has a maximum deflection of ±30° in normal law. However, the flight envelope protection system, particularly speed protection, will limit excessive elevator inputs that could lead to overspeed or structural damage. The actual deflection is managed by the flight control computers to maintain safe flight parameters.",
+    aircraftType: "A320_FAMILY",
+    category: "Flight Controls",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.20 - Flight Controls",
+    regulationCode: "EASA CS-25.1329"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "How does the A320's sidestick priority system work when both pilots input commands simultaneously?",
+    options: [
+      "Last pilot to press priority button takes control, other sidestick disabled",
+      "Commands are algebraically summed with visual warnings",
+      "Captain's sidestick always has priority regardless of inputs",
+      "Both commands are processed with system selecting the most appropriate"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 uses a sidestick priority system where the last pilot to press the takeover pushbutton (red button on the sidestick) gains control. When a pilot presses the priority button, the other sidestick is mechanically disabled, and visual and aural warnings alert both pilots to the priority change. This prevents conflicting inputs during critical flight phases.",
+    aircraftType: "A320_FAMILY",
+    category: "Flight Controls",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.20 - Flight Controls",
+    regulationCode: "EASA CS-25.1329"
+  }
+];
+
+/**
+ * ADDITIONAL A320 FLIGHT MANAGEMENT QUESTIONS
+ * Based on A320 FCOM Volume 3 - Flight Management System
+ */
+export const additionalFlightManagementQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the purpose of the 'TO SHIFT' function in the A320 MCDU?",
+    options: [
+      "Adjusts takeoff position for accurate GPS alignment",
+      "Changes the takeoff runway in flight plan",
+      "Modifies takeoff speed calculations for performance",
+      "Updates the takeoff time for ATC coordination"
+    ],
+    correctAnswer: 0,
+    explanation: "The 'TO SHIFT' function in the A320 MCDU allows pilots to adjust the takeoff position to ensure accurate GPS alignment and navigation. This is particularly useful when the actual takeoff point differs from the planned runway threshold, ensuring the Flight Management System has accurate position information for navigation and performance calculations.",
+    aircraftType: "A320_FAMILY",
+    category: "Navegación",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 3.03.10 - Flight Management System",
+    regulationCode: "ICAO Doc 9613 RNAV Manual"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During which phase of flight is the 'FINAL APP' mode automatically armed?",
+    options: [
+      "During descent when within 15 NM of destination",
+      "During approach when localizer captured",
+      "During descent when passing transition altitude",
+      "During approach when glideslope captured"
+    ],
+    correctAnswer: 0,
+    explanation: "The 'FINAL APP' (Final Approach) mode is automatically armed during the descent phase when the aircraft is within approximately 15 NM of the destination airport. This mode prepares the aircraft for the final approach segment, automatically configuring the flight management system for precision or non-precision approaches as programmed in the flight plan.",
+    aircraftType: "A320_FAMILY",
+    category: "Navegación",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 3.22.30 - Approach Modes",
+    regulationCode: "ICAO Doc 9613 RNAV Manual"
+  }
+];
+
+/**
+ * ADDITIONAL A320 AUTOFLIGHT QUESTIONS
+ * Based on A320 FCOM Volume 3 - Flight Management and Guidance
+ */
+export const additionalAutoflightQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the minimum altitude for engaging the autopilot in normal operations?",
+    options: [
+      "100 feet AGL after takeoff",
+      "50 feet AGL after takeoff",
+      "200 feet AGL after takeoff",
+      "Immediately after liftoff"
+    ],
+    correctAnswer: 0,
+    explanation: "In normal operations, the autopilot can be engaged at a minimum altitude of 100 feet AGL after takeoff. This ensures the aircraft has adequate energy and stability for autopilot engagement. During approach, the autopilot can remain engaged down to 50 feet AGL for autoland operations, but for normal flight operations, the 100 feet AGL minimum applies.",
+    aircraftType: "A320_FAMILY",
+    category: "Autoflight",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 3.22.10 - Flight Guidance",
+    regulationCode: "EASA CS-25.1329"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What happens when both AP/FD switches are turned off during flight?",
+    options: [
+      "Flight directors disappear, autopilot disconnects, aircraft remains fly-by-wire",
+      "Complete loss of flight controls, aircraft reverts to direct law",
+      "Flight directors remain, autopilot stays engaged with reduced functionality",
+      "System automatically switches to alternate law with limited protections"
+    ],
+    correctAnswer: 0,
+    explanation: "When both AP/FD (Autopilot/Flight Director) switches are turned off, the flight directors disappear from the PFDs and the autopilot disconnects if engaged. However, the aircraft remains in fly-by-wire mode with full normal law protections. The flight control system continues to provide all normal protections, but without autopilot or flight director guidance.",
+    aircraftType: "A320_FAMILY",
+    category: "Autoflight",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 3.22.10 - Flight Guidance",
+    regulationCode: "EASA CS-25.1329"
+  }
+];
+
+/**
+ * ADDITIONAL A320 PERFORMANCE QUESTIONS
+ * Based on A320 FCOM Volume 1 - Performance
+ */
+export const additionalPerformanceQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum demonstrated crosswind component for A320 takeoff and landing?",
+    options: [
+      "38 knots with gusts up to 50 knots",
+      "32 knots with gusts up to 45 knots",
+      "45 knots with no gust limitations",
+      "30 knots with gusts up to 40 knots"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 has a maximum demonstrated crosswind component of 38 knots for both takeoff and landing. Gusts up to 50 knots may be acceptable depending on pilot technique and specific conditions. Operations beyond these limits are not prohibited but are not demonstrated by the manufacturer and require special pilot training and approval.",
+    aircraftType: "A320_FAMILY",
+    category: "Performance",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 1.25.10 - Performance Limitations",
+    regulationCode: "EASA CS-25.1501"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum takeoff weight limitation due to brake energy considerations?",
+    options: [
+      "Increases with airport elevation and temperature",
+      "Decreases with airport elevation and temperature",
+      "Independent of airport elevation and temperature",
+      "Only affected by runway slope and wind conditions"
+    ],
+    correctAnswer: 1,
+    explanation: "Brake energy limitations decrease the maximum takeoff weight as airport elevation and temperature increase. Higher elevations and temperatures result in higher true airspeeds for the same indicated airspeed, which increases the kinetic energy that must be dissipated by the brakes during rejected takeoffs. This requires reduced takeoff weights to stay within brake energy limits.",
+    aircraftType: "A320_FAMILY",
+    category: "Performance",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 1.25.20 - Takeoff Performance",
+    regulationCode: "EASA CS-25.1501"
+  }
+];
+
+/**
+ * ADDITIONAL A320 ENGINE SYSTEM QUESTIONS
+ * Based on A320 FCOM Volume 2 - Powerplant
+ */
+export const additionalEngineQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum continuous EGT (Exhaust Gas Temperature) limit for the CFM56-5B engine?",
+    options: [
+      "950°C continuous, 1050°C for takeoff",
+      "900°C continuous, 1000°C for takeoff",
+      "980°C continuous, 1100°C for takeoff",
+      "850°C continuous, 950°C for takeoff"
+    ],
+    correctAnswer: 0,
+    explanation: "The CFM56-5B engine has a maximum continuous EGT limit of 950°C. During takeoff and go-around operations, the limit increases to 1050°C for up to 10 minutes. These limits ensure engine longevity while providing adequate performance margins for critical flight operations. Exceeding these limits can cause engine damage and require inspection.",
+    aircraftType: "A320_FAMILY",
+    category: "Engines",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.70.20 - Powerplant",
+    regulationCode: "EASA CS-25.1305"
+  }
+];
+
+/**
+ * ADDITIONAL QUESTIONS TO REACH 75+ FOR TIMED EXAM
+ */
+export const additionalQuestionsSet1: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum crosswind component for A320 landing operations?",
+    options: [
+      "38 knots demonstrated, up to 50 knots with pilot approval",
+      "30 knots for all operations",
+      "45 knots with no restrictions",
+      "25 knots for normal operations"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 has a maximum demonstrated crosswind component of 38 knots. Operations beyond this limit are not prohibited but are not manufacturer-demonstrated. Winds up to 50 knots may be acceptable with special pilot training and approval. This ensures safe landing operations under various wind conditions.",
+    aircraftType: "A320_FAMILY",
+    category: "Performance",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 1.25.10 - Performance Limitations",
+    regulationCode: "EASA CS-25.1501"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During engine failure after V1, what is the minimum acceleration height for A320?",
+    options: [
+      "Minimum 400 ft AGL, maximum 2000 ft AGL",
+      "Fixed at 1000 ft AGL regardless of conditions",
+      "Minimum 800 ft AGL, no maximum specified",
+      "Equal to obstacle clearance height"
+    ],
+    correctAnswer: 0,
+    explanation: "After V1 with engine failure, the A320 must accelerate to takeoff safety speed (V2) and reach a minimum acceleration height of 400 ft AGL. The maximum acceleration height is 2000 ft AGL. This ensures adequate obstacle clearance while maintaining optimal climb performance on the remaining engine.",
+    aircraftType: "A320_FAMILY",
+    category: "Performance",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 1.25.20 - Takeoff Performance",
+    regulationCode: "EASA CS-25.1501"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the function of the A320's Flight Augmentation Computer (FAC)?",
+    options: [
+      "Yaw damper, rudder trim, rudder travel limitation, flight envelope protection",
+      "Autopilot control and flight director guidance",
+      "Flight management and navigation calculations",
+      "Engine control and thrust management"
+    ],
+    correctAnswer: 0,
+    explanation: "The FAC (Flight Augmentation Computer) provides several critical functions: yaw damper for Dutch roll damping, rudder trim for coordinated flight, rudder travel limitation to prevent excessive rudder inputs, and flight envelope protection including alpha floor and speed protection. Two FAC units provide redundancy for these essential functions.",
+    aircraftType: "A320_FAMILY",
+    category: "Flight Controls",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.20 - Flight Controls",
+    regulationCode: "EASA CS-25.1329"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What happens when the A320's spoilers are armed for landing?",
+    options: [
+      "Deploy automatically upon touchdown with main gear compression",
+      "Must be manually deployed after landing",
+      "Deploy when speedbrake lever is pulled",
+      "Only deploy if autobrake is selected"
+    ],
+    correctAnswer: 0,
+    explanation: "When spoilers are armed for landing, they deploy automatically upon touchdown when the main gear compresses and the aircraft is in ground mode. This provides maximum aerodynamic drag and increases wheel brake effectiveness. The system ensures immediate spoiler deployment for optimal landing performance and deceleration.",
+    aircraftType: "A320_FAMILY",
+    category: "Flight Controls",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.20 - Flight Controls",
+    regulationCode: "EASA CS-25.1309"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum altitude for A320 passenger oxygen system operation?",
+    options: [
+      "42,000 feet for 15 minutes with 100% oxygen supply",
+      "35,000 feet for 30 minutes with normal supply",
+      "45,000 feet for 10 minutes with emergency supply",
+      "30,000 feet for continuous operation"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 passenger oxygen system is certified for operation up to 42,000 feet for a minimum of 15 minutes. This ensures adequate oxygen supply for emergency descent to 10,000 feet or minimum safe altitude. The system provides 100% oxygen automatically when cabin altitude exceeds 14,000 feet.",
+    aircraftType: "A320_FAMILY",
+    category: "Oxygen",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.40.10 - Oxygen System",
+    regulationCode: "EASA CS-25.1441"
+  }
+];
+
+export const additionalQuestionsSet2: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the minimum visibility requirement for CAT II ILS approach in A320?",
+    options: [
+      "300 meters RVR with decision height of 100 feet",
+      "550 meters RVR with decision height of 200 feet",
+      "200 meters RVR with decision height of 50 feet",
+      "800 meters visibility with decision height of 150 feet"
+    ],
+    correctAnswer: 0,
+    explanation: "CAT II ILS approach minimums for A320 require 300 meters RVR (Runway Visual Range) with a decision height of 100 feet AGL. These conditions require special pilot training and aircraft equipment certification. The autopilot must be capable of autoland with these minimums for safe operation.",
+    aircraftType: "A320_FAMILY",
+    category: "Approach Procedures",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 3.22.30 - Approach Modes",
+    regulationCode: "EASA CS-25.1329"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During rapid decompression, what is the priority sequence for A320 emergency procedures?",
+    options: [
+      "Don oxygen masks, establish communication, control aircraft, initiate descent",
+      "Initiate descent, don oxygen masks, establish communication, control aircraft",
+      "Control aircraft, don oxygen masks, initiate descent, establish communication",
+      "Establish communication, control aircraft, don oxygen masks, initiate descent"
+    ],
+    correctAnswer: 0,
+    explanation: "In rapid decompression, the priority sequence is: 1) Don oxygen masks immediately to prevent hypoxia, 2) Establish communication with crew and passengers, 3) Control aircraft to maintain safe flight path, 4) Initiate emergency descent to 10,000 feet or minimum safe altitude. This sequence ensures crew capability is maintained before addressing other emergencies.",
+    aircraftType: "A320_FAMILY",
+    category: "Emergency Procedures",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 QRH - Emergency Procedures",
+    regulationCode: "EASA CS-25.1441"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum fuel imbalance allowed between A320 wing tanks?",
+    options: [
+      "370 kg during flight, 1500 kg at takeoff with special procedures",
+      "500 kg at all times",
+      "1000 kg with no restrictions",
+      "Zero imbalance allowed"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 allows a maximum fuel imbalance of 370 kg between wing tanks during flight. At takeoff, up to 1500 kg imbalance is permitted with special procedures including specific CG considerations. Exceeding these limits can affect aircraft handling, structural loads, and fuel system operation.",
+    aircraftType: "A320_FAMILY",
+    category: "Fuel",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.28.10 - Fuel System",
+    regulationCode: "EASA CS-25.1309"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the minimum battery voltage for A320 APU start?",
+    options: [
+      "22.5 volts with 25 volts recommended",
+      "25 volts minimum at all times",
+      "20 volts acceptable for emergency starts",
+      "28 volts required for normal operation"
+    ],
+    correctAnswer: 0,
+    explanation: "The minimum battery voltage for A320 APU start is 22.5 volts. However, 25 volts is recommended for optimal starting performance. Below 22.5 volts, APU start may be difficult or impossible. The batteries should be charged to at least this voltage before attempting APU start, especially in cold weather conditions.",
+    aircraftType: "A320_FAMILY",
+    category: "Electrical",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.24.30 - APU",
+    regulationCode: "EASA CS-25.1351"
+  }
+];
+
+export const additionalEngineQuestions2: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the minimum oil quantity required for engine start in the A320?",
+    options: [
+      "11 quarts plus estimated consumption",
+      "9 quarts plus estimated consumption",
+      "15 quarts with no additional requirements",
+      "7 quarts plus estimated consumption"
+    ],
+    correctAnswer: 0,
+    explanation: "The minimum oil quantity for CFM56-5B engine start is 11 quarts plus estimated consumption for the planned flight. This ensures adequate lubrication during engine operation. The 'estimated consumption' accounts for the flight duration, as the engine consumes approximately 0.5 quarts per hour. Starting with less than this minimum quantity can cause engine damage.",
+    aircraftType: "A320_FAMILY",
+    category: "Engines",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.70.10 - Powerplant",
+    regulationCode: "EASA CS-25.1305"
+  }
+];
+
+/**
+ * ADDITIONAL A320 APU QUESTIONS
+ * Based on A320 FCOM Volume 2 - Powerplant
+ */
+export const additionalAPUQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum altitude for APU pneumatic supply in the A320?",
+    options: [
+      "22,500 feet for air conditioning, 15,000 feet for engine start",
+      "25,000 feet for all pneumatic functions",
+      "20,000 feet for air conditioning, 10,000 feet for engine start",
+      "30,000 feet for air conditioning, 25,000 feet for engine start"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 APU has altitude limitations for pneumatic supply: 22,500 feet for air conditioning and 15,000 feet for engine start. These limitations are due to the APU's compressor performance decreasing with altitude. Above these altitudes, the APU cannot provide adequate bleed air pressure and temperature for the respective systems.",
+    aircraftType: "A320_FAMILY",
+    category: "APU",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.70.30 - APU",
+    regulationCode: "EASA CS-25.1305"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum EGT during APU start sequence?",
+    options: [
+      "1250°C for maximum 60 seconds",
+      "1050°C with no time limitation",
+      "1450°C for maximum 30 seconds",
+      "950°C with no time limitation"
+    ],
+    correctAnswer: 0,
+    explanation: "During APU start sequence, the maximum EGT is 1250°C for a maximum of 60 seconds. This higher temperature is acceptable during start because it's a transient condition. If EGT exceeds 1250°C or remains above 950°C for more than 60 seconds, the APU will automatically shut down to prevent damage. Normal operating EGT is typically below 950°C.",
+    aircraftType: "A320_FAMILY",
+    category: "APU",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.70.30 - APU",
+    regulationCode: "EASA CS-25.1305"
+  }
+];
+
+/**
+ * ADDITIONAL A320 LANDING GEAR QUESTIONS
+ * Based on A320 FCOM Volume 2 - Landing Gear
+ */
+export const additionalLandingGearQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the maximum speed for extending and retracting the landing gear in the A320?",
+    options: [
+      "250 KIAS for extension, 220 KIAS for retraction",
+      "280 KIAS for extension, 250 KIAS for retraction",
+      "230 KIAS for extension, 200 KIAS for retraction",
+      "300 KIAS for extension, 270 KIAS for retraction"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 landing gear has speed limitations: maximum 250 KIAS for extension and 220 KIAS for retraction. These limits protect the landing gear system from aerodynamic loads that could cause damage. The lower retraction limit ensures the gear doors can close properly without excessive aerodynamic forces. Exceeding these limits can cause gear system damage.",
+    aircraftType: "A320_FAMILY",
+    category: "Landing Gear",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.30.10 - Landing Gear",
+    regulationCode: "EASA CS-25.1309"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What happens if the landing gear is not down and locked during landing?",
+    options: [
+      "Landing gear lever flashes red, aural warning sounds",
+      "Aircraft automatically deploys landing gear",
+      "No warnings, pilots must visually confirm",
+      "Autopilot disconnects with visual alert only"
+    ],
+    correctAnswer: 0,
+    explanation: "If the landing gear is not down and locked during landing approach below 800 feet RA, the landing gear lever will flash red and an aural warning (five-tone chime) will sound. This continues until the gear is down and locked or the aircraft climbs above 800 feet RA. This system prevents landing gear up landings by providing clear visual and aural warnings.",
+    aircraftType: "A320_FAMILY",
+    category: "Landing Gear",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.30.20 - Landing Gear System",
+    regulationCode: "EASA CS-25.1309"
+  }
+];
+
 export const apuQuestions: RealAviationQuestion[] = [
   {
     _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
@@ -851,6 +1459,182 @@ export const performanceQuestions: RealAviationQuestion[] = [
 ];
 
 /**
+ * APPROACH PROCEDURES QUESTIONS
+ */
+export const approachProceduresQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During an ILS approach with AP1 engaged, what happens when you press the APPR button?",
+    options: [
+      "LOC and G/S modes arm, autopilot captures localizer and glideslope automatically",
+      "Autopilot disconnects and manual approach mode activates",
+      "Only localizer mode arms, glideslope must be captured manually",
+      "Autoland mode engages automatically regardless of aircraft configuration"
+    ],
+    correctAnswer: 0,
+    explanation: "When APPR button is pressed during an ILS approach, both LOC (localizer) and G/S (glideslope) modes arm. The autopilot will automatically capture the localizer first, then the glideslope when intercepted. This provides full ILS approach capability with the autopilot engaged.",
+    aircraftType: "A320_FAMILY",
+    category: "Approach Procedures",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 3.22.20 - ILS Approach",
+    regulationCode: "EASA CS-25.1329"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the minimum decision height for CAT I ILS approach?",
+    options: [
+      "200 feet AGL",
+      "100 feet AGL",
+      "50 feet AGL",
+      "Not applicable for CAT I"
+    ],
+    correctAnswer: 0,
+    explanation: "For CAT I ILS approach, the minimum decision height is 200 feet AGL. Below this height, the approach must be continued visually to landing or a missed approach must be executed. CAT II and CAT III approaches have lower decision heights but require additional equipment and crew certification.",
+    aircraftType: "COMMERCIAL_AIRCRAFT",
+    category: "Approach Procedures",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "ICAO Annex 10 - CAT I minimums",
+    regulationCode: "ICAO Annex 6"
+  }
+];
+
+/**
+ * EMERGENCY PROCEDURES QUESTIONS
+ */
+export const emergencyProceduresQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During an 'ENG 1 FIRE' warning, what is the immediate action required according to A320 QRH?",
+    options: [
+      "Engine 1 Master Switch - OFF, Engine 1 Fire Push Button - PUSH, Discharge Agent 1 - PRESS",
+      "Thrust Lever 1 - IDLE, Engine 1 Fire Button - PUSH, Land immediately",
+      "Autothrust - OFF, Engine 1 Master - OFF, Consider single engine approach",
+      "Engine 1 Fire Push Button - PUSH only, Monitor fire detection system"
+    ],
+    correctAnswer: 0,
+    explanation: "For an engine fire, the immediate memory items are: 1) Engine Master Switch OFF (stops fuel flow), 2) Engine Fire Push Button PUSH (arms fire extinguisher and shuts engine systems), 3) Discharge Agent PRESS (releases extinguishing agent). This sequence must be executed immediately to prevent fire spread and structural damage.",
+    aircraftType: "A320_FAMILY",
+    category: "Emergency Procedures",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 QRH - ENG FIRE, FCOM 2.78.10",
+    regulationCode: "EASA CS-25.1193"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "In case of rapid decompression, what is the immediate crew action?",
+    options: [
+      "Don oxygen masks, establish crew communication, initiate emergency descent",
+      "Declare MAYDAY, request immediate vectors to nearest airport",
+      "Secure cabin, deploy passenger oxygen masks, reduce altitude",
+      "Notify ATC, start APU, prepare for emergency landing"
+    ],
+    correctAnswer: 0,
+    explanation: "In rapid decompression, immediate actions are: 1) Don oxygen masks (within 5 seconds), 2) Establish crew communication, 3) Initiate emergency descent to 10,000 ft or MSA (whichever is higher). This sequence ensures crew survival and ability to control the aircraft while rapidly descending to a safe altitude.",
+    aircraftType: "COMMERCIAL_AIRCRAFT",
+    category: "Emergency Procedures",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "ICAO Doc 9858 - Emergency Descent Procedures",
+    regulationCode: "EASA CS-25.841"
+  }
+];
+
+/**
+ * FLIGHT PROTECTION QUESTIONS
+ */
+export const flightProtectionQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "In Normal Law, what protection prevents the aircraft from stalling?",
+    options: [
+      "Alpha protection prevents angle of attack from exceeding alpha max",
+      "Speed protection maintains minimum maneuvering speed automatically",
+      "Load factor protection limits G-force to maximum structural limits",
+      "Bank angle protection prevents excessive roll rates"
+    ],
+    correctAnswer: 0,
+    explanation: "Alpha protection in Normal Law prevents the angle of attack from exceeding alpha max (stall angle). When the pilot pulls back on the sidestick beyond alpha protection, the aircraft will not stall and maintains controlled flight even with full aft sidestick input.",
+    aircraftType: "A320_FAMILY",
+    category: "Flight Protection",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.10 - Flight Control Laws",
+    regulationCode: "EASA CS-25.143"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What happens when the aircraft exceeds maximum operating speed (VMO/MMO)?",
+    options: [
+      "Overspeed protection automatically reduces thrust and applies speed brakes",
+      "Stick shaker activates and autopilot disconnects automatically",
+      "Aural warning sounds and red warning message appears on ECAM",
+      "Aircraft automatically pitches up to reduce airspeed"
+    ],
+    correctAnswer: 0,
+    explanation: "When VMO/MMO is exceeded, overspeed protection automatically activates by reducing thrust and deploying speed brakes to prevent structural damage. This protection works even with autopilot engaged and is designed to prevent dangerous overspeed conditions that could damage the aircraft structure.",
+    aircraftType: "A320_FAMILY",
+    category: "Flight Protection",
+    difficulty: "advanced",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.27.10 - Overspeed Protection",
+    regulationCode: "EASA CS-25.143"
+  }
+];
+
+/**
+ * AIRCRAFT SYSTEMS QUESTIONS
+ */
+export const aircraftSystemsQuestions: RealAviationQuestion[] = [
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "What is the normal cabin pressure differential limit for the A320?",
+    options: [
+      "8.6 PSI maximum differential pressure",
+      "9.0 PSI maximum differential pressure",
+      "7.8 PSI maximum differential pressure",
+      "8.0 PSI maximum differential pressure"
+    ],
+    correctAnswer: 0,
+    explanation: "The A320 cabin pressure differential limit is 8.6 PSI. This limitation prevents structural damage to the fuselage while maintaining a comfortable cabin altitude. The cabin pressure controller automatically maintains this differential during normal operations.",
+    aircraftType: "A320_FAMILY",
+    category: "Aircraft Systems",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.21.10 - Pressurization System",
+    regulationCode: "EASA CS-25.841"
+  },
+  {
+    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    question: "During takeoff, what is the source of bleed air for air conditioning and pressurization?",
+    options: [
+      "Engine bleed air from both engines, APU bleed air if running",
+      "Only APU bleed air until cruise altitude",
+      "Ground air conditioning unit only during takeoff roll",
+      "Ram air through dedicated scoops in the fuselage"
+    ],
+    correctAnswer: 0,
+    explanation: "During takeoff, bleed air is supplied from both engine bleeds (5th and 9th stage) and APU bleed if the APU is running. The system automatically manages bleed air distribution to maintain cabin comfort and pressurization requirements throughout all phases of flight.",
+    aircraftType: "A320_FAMILY",
+    category: "Aircraft Systems",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "A320 FCOM 2.21.20 - Bleed Air System",
+    regulationCode: "EASA CS-25.831"
+  }
+];
+
+/**
  * INTERMEDIATE LEVEL QUESTIONS
  * For building foundational knowledge
  */
@@ -898,5 +1682,20 @@ export const allRealAviationQuestions: RealAviationQuestion[] = [
   ...regulationsQuestions,
   ...navigationQuestions,
   ...performanceQuestions,
-  ...intermediatePracticeQuestions
+  ...approachProceduresQuestions,
+  ...emergencyProceduresQuestions,
+  ...flightProtectionQuestions,
+  ...aircraftSystemsQuestions,
+  ...intermediatePracticeQuestions,
+  ...additionalElectricalQuestions,
+  ...additionalHydraulicQuestions,
+  ...additionalFlightControlsQuestions,
+  ...additionalFlightManagementQuestions,
+  ...additionalAutoflightQuestions,
+  ...additionalPerformanceQuestions,
+  ...additionalEngineQuestions,
+  ...additionalAPUQuestions,
+  ...additionalLandingGearQuestions,
+  ...additionalQuestionsSet1,
+  ...additionalQuestionsSet2
 ];

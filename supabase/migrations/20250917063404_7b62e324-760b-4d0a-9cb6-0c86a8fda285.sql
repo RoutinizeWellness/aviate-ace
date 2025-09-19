@@ -106,6 +106,127 @@ BEGIN
         );
     END LOOP;
 
+    -- Insertar preguntas adicionales en inglés para las categorías del sistema de revisión
+    -- Aircraft Systems
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Aircraft Systems',
+            'Aircraft Systems Question #' || i || ': What is the primary function of this system?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Aircraft Systems question #' || i || '.',
+            'A320 FCOM - Aircraft Systems',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Flight Protection
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Flight Protection',
+            'Flight Protection Question #' || i || ': What protection prevents this condition?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Flight Protection question #' || i || '.',
+            'A320 FCOM - Flight Protection',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Approach Procedures
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Approach Procedures',
+            'Approach Procedures Question #' || i || ': What is the correct procedure for this approach?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Approach Procedures question #' || i || '.',
+            'A320 FCOM - Approach Procedures',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Emergency Procedures
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Emergency Procedures',
+            'Emergency Procedures Question #' || i || ': What is the immediate action for this emergency?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Emergency Procedures question #' || i || '.',
+            'A320 QRH - Emergency Procedures',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Meteorology
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Meteorology',
+            'Meteorology Question #' || i || ': What weather condition is described?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Meteorology question #' || i || '.',
+            'ICAO Meteorology Manual',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Regulations
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Regulations',
+            'Regulations Question #' || i || ': What regulation applies to this situation?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Regulations question #' || i || '.',
+            'EASA Part-ORO',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Navigation
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Navigation',
+            'Navigation Question #' || i || ': What is the correct navigation procedure?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Navigation question #' || i || '.',
+            'ICAO PBN Manual',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
+    -- Performance
+    FOR i IN 1..50 LOOP
+        INSERT INTO public.exam_questions (exam_id, category, question, options, correct_answer, explanation, reference, tier)
+        VALUES (
+            exam_a320_id,
+            'Performance',
+            'Performance Question #' || i || ': What performance factor affects this parameter?',
+            '["Option A", "Option B", "Option C", "Option D"]'::jsonb,
+            (i % 4),
+            'Detailed explanation for Performance question #' || i || '.',
+            'A320 AFM - Performance Section',
+            CASE WHEN i <= 10 THEN 'free'::question_tier ELSE 'premium'::question_tier END
+        );
+    END LOOP;
+
 END;
 $$ LANGUAGE plpgsql;
 

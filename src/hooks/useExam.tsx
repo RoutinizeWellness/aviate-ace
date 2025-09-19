@@ -433,7 +433,16 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
         'meteorologia': ['Meteorología'],
         'reglamentacion': ['Reglamentación'],
         'navegacion': ['Navegación'],
-        'performance': ['Performance', 'Procedimientos de Despegue']
+        'performance': ['Performance', 'Procedimientos de Despegue'],
+        // Additional mappings for review system categories
+        'aircraft-systems': ['Aircraft Systems', 'Sistema Hidráulico', 'Sistema Eléctrico', 'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos', 'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno', 'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'],
+        'flight-protection': ['Flight Protection', 'Protección de Vuelo', 'Fire Protection', 'Fire Systems', 'Alpha Protection', 'Overspeed Protection', 'Load Factor Protection'],
+        'approach-procedures': ['Approach Procedures', 'Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático', 'ILS Approach', 'RNAV Approach', 'Autoland'],
+        'emergency-procedures': ['Emergency Procedures', 'Procedimientos de Emergencia', 'Sistema de Presurización', 'Emergency Descent', 'Engine Fire', 'Rapid Decompression'],
+        'meteorology': ['Meteorology', 'Meteorología', 'Weather', 'Wind Shear', 'Turbulence', 'Icing Conditions'],
+        'regulations': ['Regulations', 'Reglamentación', 'EASA', 'ICAO', 'FAA', 'Flight Time Limitations', 'Operating Rules'],
+        'navigation': ['Navigation', 'Navegación', 'Flight Management and Navigation', 'GPS', 'FMS', 'RNAV', 'RNP', 'ILS'],
+        'performance': ['Performance', 'Procedimientos de Despegue', 'Takeoff Performance', 'Landing Performance', 'Climb Performance', 'Fuel Planning']
       };
       
       const targetCategories = categoryMap[category] || [category];
@@ -506,7 +515,16 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
           'meteorologia': ['Meteorología'],
           'reglamentacion': ['Reglamentación'],
           'navegacion': ['Navegación'],
-          'performance': ['Performance', 'Procedimientos de Despegue']
+          'performance': ['Performance', 'Procedimientos de Despegue'],
+          // Additional mappings for review system categories
+          'aircraft-systems': ['Aircraft Systems', 'Sistema Hidráulico', 'Sistema Eléctrico', 'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos', 'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno', 'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'],
+          'flight-protection': ['Flight Protection', 'Protección de Vuelo', 'Fire Protection', 'Fire Systems', 'Alpha Protection', 'Overspeed Protection', 'Load Factor Protection'],
+          'approach-procedures': ['Approach Procedures', 'Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático', 'ILS Approach', 'RNAV Approach', 'Autoland'],
+          'emergency-procedures': ['Emergency Procedures', 'Procedimientos de Emergencia', 'Sistema de Presurización', 'Emergency Descent', 'Engine Fire', 'Rapid Decompression'],
+          'meteorology': ['Meteorology', 'Meteorología', 'Weather', 'Wind Shear', 'Turbulence', 'Icing Conditions'],
+          'regulations': ['Regulations', 'Reglamentación', 'EASA', 'ICAO', 'FAA', 'Flight Time Limitations', 'Operating Rules'],
+          'navigation': ['Navigation', 'Navegación', 'Flight Management and Navigation', 'GPS', 'FMS', 'RNAV', 'RNP', 'ILS'],
+          'performance': ['Performance', 'Procedimientos de Despegue', 'Takeoff Performance', 'Landing Performance', 'Climb Performance', 'Fuel Planning']
         };
         
         const targetCategories = categoryMap[category] || [category];

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
@@ -29,6 +30,12 @@ import { useState, useEffect } from "react";
 const TypeRating = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { hasAccessTo, getCurrentSubscription, isAdmin, getSubscriptionDisplayName } = useSubscription();
+  
+  // Check if user has access to A320 content
+  const hasA320Access = hasAccessTo('A320_FAMILY');
+  const userSubscription = getCurrentSubscription();
+  const adminUser = isAdmin();
   
   // Convex queries for user data - temporarily disabled due to mock auth
   // const userProfile = useQuery(api.auth.getUserProfile, user ? { userId: user._id as Id<"users"> } : "skip");
@@ -563,17 +570,46 @@ const TypeRating = () => {
                 <ArrowLeft className="w-4 h-4" />
                 Volver al Dashboard
               </Button>
+              {!hasA320Access && (
+                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                  <Lock className="w-3 h-3 mr-1" />
+                  Contenido Restringido
+                </Badge>
+              )}
             </div>
-            <h1 className="text-4xl font-bold mb-2">A320 Type Rating</h1>
-            <p className="text-muted-foreground">Entrenamiento completo para habilitación de tipo en Airbus A320. Aprende la teoría y practica con exámenes.</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">A320 Type Rating</h1>
+                <p className="text-muted-foreground">Entrenamiento completo para habilitación de tipo en Airbus A320. Aprende la teoría y practica con exámenes.</p>
+              </div>
+              <div className="text-right">
+                <Badge className="bg-primary/10 text-primary">
+                  {getSubscriptionDisplayName()}
+                </Badge>
+                {!hasA320Access && (
+                  <p className="text-xs text-warning mt-2">Necesitas suscripción A320</p>
+                )}
+              </div>
+            </div>
           </header>
         )}
 
         {/* Header - Mobile */}
         {isMobile && (
           <header className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">A320 Type Rating</h1>
-            <p className="text-sm text-muted-foreground">Entrenamiento completo para habilitación de tipo en Airbus A320.</p>
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-2xl font-bold">A320 Type Rating</h1>
+              <Badge className="bg-primary/10 text-primary text-xs">
+                {getSubscriptionDisplayName()}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">Entrenamiento completo para habilitación de tipo en Airbus A320.</p>
+            {!hasA320Access && (
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
+                <Lock className="w-3 h-3 mr-1" />
+                Contenido Restringido - Necesitas suscripción A320
+              </Badge>
+            )}
           </header>
         )}
 
@@ -804,10 +840,11 @@ const TypeRating = () => {
                 <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-warning/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
                   <Lightbulb className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-warning`} />
                 </div>
-                <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Flashcards</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Repasa conceptos clave con tarjetas interactivas</p>
-                <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
-                  Próximamente
+                <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Real A320 Flashcards</h3>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Study key concepts with advanced interactive flashcards</p>
+                <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} onClick={() => navigate('/flashcards/a320')}>
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Start Flashcards
                 </Button>
               </CardContent>
             </Card>
@@ -831,25 +868,59 @@ const TypeRating = () => {
         <section className={isMobile ? 'mt-6' : 'mt-10'}>
           <h2 className={`font-bold ${isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'}`}>Selecciona tu Aeronave</h2>
           <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 gap-6'}`}>
-            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={() => navigate('/type-rating')}>
+            <Card 
+              className={`surface-mid border-border/50 ${
+                hasA320Access ? 'hover-lift cursor-pointer' : 'opacity-60'
+              }`} 
+              onClick={() => hasA320Access && navigate('/type-rating')}
+            >
               <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
                 <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-primary/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
                   <Plane className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-primary`} />
                 </div>
-                <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Airbus A320</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Entrenamiento completo para habilitación de tipo en Airbus A320</p>
-                <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>Iniciar A320</Button>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>Airbus A320</h3>
+                  {!hasA320Access && <Lock className="w-4 h-4 text-muted-foreground" />}
+                </div>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                  Entrenamiento completo para habilitación de tipo en Airbus A320
+                </p>
+                {hasA320Access ? (
+                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>Iniciar A320</Button>
+                ) : (
+                  <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Requiere Suscripción A320
+                  </Button>
+                )}
               </CardContent>
             </Card>
 
-            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={() => navigate('/b737-type-rating')}>
+            <Card 
+              className={`surface-mid border-border/50 ${
+                hasAccessTo('BOEING_737') ? 'hover-lift cursor-pointer' : 'opacity-60'
+              }`} 
+              onClick={() => hasAccessTo('BOEING_737') && navigate('/b737-type-rating')}
+            >
               <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
                 <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-blue-500/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
                   <Plane className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-blue-500`} />
                 </div>
-                <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Boeing 737</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Entrenamiento completo para habilitación de tipo en Boeing 737</p>
-                <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} variant="outline">Iniciar B737</Button>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>Boeing 737</h3>
+                  {!hasAccessTo('BOEING_737') && <Lock className="w-4 h-4 text-muted-foreground" />}
+                </div>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                  Entrenamiento completo para habilitación de tipo en Boeing 737
+                </p>
+                {hasAccessTo('BOEING_737') ? (
+                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} variant="outline">Iniciar B737</Button>
+                ) : (
+                  <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Requiere Suscripción Boeing
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>

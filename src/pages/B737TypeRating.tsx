@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
@@ -29,6 +30,12 @@ import { useState, useEffect } from "react";
 const B737TypeRating = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { hasAccessTo, getCurrentSubscription, isAdmin, getSubscriptionDisplayName } = useSubscription();
+  
+  // Check if user has access to Boeing 737 content
+  const hasBoeingAccess = hasAccessTo('BOEING_737');
+  const userSubscription = getCurrentSubscription();
+  const adminUser = isAdmin();
   
   // Mock data for development
   const userProfile = {
@@ -559,17 +566,46 @@ const B737TypeRating = () => {
                 <ArrowLeft className="w-4 h-4" />
                 Volver al Dashboard
               </Button>
+              {!hasBoeingAccess && (
+                <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
+                  <Lock className="w-3 h-3 mr-1" />
+                  Contenido Restringido
+                </Badge>
+              )}
             </div>
-            <h1 className="text-4xl font-bold mb-2">B737 Type Rating</h1>
-            <p className="text-muted-foreground">Entrenamiento completo para habilitación de tipo en Boeing 737. Aprende la teoría y practica con exámenes.</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">B737 Type Rating</h1>
+                <p className="text-muted-foreground">Entrenamiento completo para habilitación de tipo en Boeing 737. Aprende la teoría y practica con exámenes.</p>
+              </div>
+              <div className="text-right">
+                <Badge className="bg-primary/10 text-primary">
+                  {getSubscriptionDisplayName()}
+                </Badge>
+                {!hasBoeingAccess && (
+                  <p className="text-xs text-warning mt-2">Necesitas suscripción Boeing 737</p>
+                )}
+              </div>
+            </div>
           </header>
         )}
 
         {/* Header - Mobile */}
         {isMobile && (
           <header className="mb-6">
-            <h1 className="text-2xl font-bold mb-2">B737 Type Rating</h1>
-            <p className="text-sm text-muted-foreground">Entrenamiento completo para habilitación de tipo en Boeing 737.</p>
+            <div className="flex items-center justify-between mb-3">
+              <h1 className="text-2xl font-bold">B737 Type Rating</h1>
+              <Badge className="bg-primary/10 text-primary text-xs">
+                {getSubscriptionDisplayName()}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground mb-3">Entrenamiento completo para habilitación de tipo en Boeing 737.</p>
+            {!hasBoeingAccess && (
+              <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
+                <Lock className="w-3 h-3 mr-1" />
+                Contenido Restringido - Necesitas suscripción Boeing 737
+              </Badge>
+            )}
           </header>
         )}
 
@@ -800,10 +836,11 @@ const B737TypeRating = () => {
                 <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-warning/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
                   <Lightbulb className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-warning`} />
                 </div>
-                <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Flashcards</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Repasa conceptos clave con tarjetas interactivas</p>
-                <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
-                  Próximamente
+                <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Real B737 Flashcards</h3>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Study key concepts with advanced interactive flashcards</p>
+                <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} onClick={() => navigate('/flashcards/b737')}>
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Start Flashcards
                 </Button>
               </CardContent>
             </Card>

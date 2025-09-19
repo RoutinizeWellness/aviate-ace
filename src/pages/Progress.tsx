@@ -3,6 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress as ProgressBar } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/UserAvatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   BookOpen, 
   Target, 
@@ -17,13 +21,16 @@ import {
   Clock,
   CheckCircle2,
   Calendar,
-  Star
+  Star,
+  Edit,
+  Save
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { useUserStats } from "@/hooks/useStats";
 import { useCourses } from "@/hooks/useCourses";
+import { useState } from "react";
 
 const Progress = () => {
   const navigate = useNavigate();
@@ -31,6 +38,8 @@ const Progress = () => {
   const { profile, userStats } = useUserProfile();
   const { userCourses } = useCourses();
   const { examStats, recentProgress, userAchievements } = useUserStats();
+  const [weeklyGoal, setWeeklyGoal] = useState(20); // Default 20 questions per week
+  const [showGoalSettings, setShowGoalSettings] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -38,7 +47,7 @@ const Progress = () => {
   };
 
   const displayName = profile?.display_name || 
-                     user?.user_metadata?.full_name || 
+                     user?.fullName || 
                      user?.email?.split('@')[0] || 
                      'Usuario';
 
@@ -214,7 +223,7 @@ const Progress = () => {
           <div className="space-y-6">
             {userCourses && userCourses.length > 0 ? (
               userCourses.map((userCourse) => {
-                const course = userCourse.courses;
+                const course = userCourse.course;
                 if (!course) return null;
                 
                 // Calculate course progress (mock calculation)
@@ -225,7 +234,7 @@ const Progress = () => {
                 const accuracy = correctAnswers > 0 ? Math.round((correctAnswers / (correctAnswers + incorrectAnswers)) * 100) : 0;
                 
                 return (
-                  <Card key={course.id} className="surface-mid border-border/50">
+                  <Card key={course._id} className="surface-mid border-border/50">
                     <CardHeader>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -235,7 +244,7 @@ const Progress = () => {
                           <div>
                             <CardTitle>{course.title}</CardTitle>
                             <p className="text-sm text-muted-foreground">
-                              {course.aircraft_type.replace('_', ' ').toUpperCase()}
+                              {course.aircraftType.replace('_', ' ').toUpperCase()}
                             </p>
                           </div>
                         </div>
@@ -296,18 +305,22 @@ const Progress = () => {
           {userAchievements && userAchievements.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {userAchievements.slice(0, 3).map((userAchievement) => {
-                const achievement = userAchievement.achievements;
+                const achievement = {
+                  id: userAchievement.achievement_id,
+                  title: 'Logro Desbloqueado',
+                  description: 'Has alcanzado un nuevo hito'
+                };
                 if (!achievement) return null;
                 
                 return (
-                  <Card key={achievement.id} className="surface-mid border-border/50">
+                  <Card key={userAchievement.achievement_id} className="surface-mid border-border/50">
                     <CardContent className="p-6 text-center">
                       <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Trophy className="w-8 h-8 text-primary" />
                       </div>
                       <h3 className="font-semibold mb-2">{achievement.title}</h3>
                       <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                      <Badge className="mt-2">+{achievement.points} puntos</Badge>
+                      <Badge className="mt-2">+100 puntos</Badge>
                     </CardContent>
                   </Card>
                 );

@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   CheckCircle2, 
   Plane, 
@@ -14,6 +14,56 @@ import {
   Users,
   ArrowRight
 } from "lucide-react";
+
+// Data arrays
+const comparisonFeatures = [
+  {
+    icon: Target,
+    title: "Banco de Preguntas",
+    description: "Real exam questions",
+    free: "10 preguntas limitadas",
+    premium: "5,000+ preguntas reales"
+  },
+  {
+    icon: Clock,
+    title: "Simulacros",
+    description: "Exámenes de práctica",
+    free: "Básico",
+    premium: "Ilimitados"
+  },
+  {
+    icon: BarChart3,
+    title: "Estadísticas",
+    description: "Análisis de rendimiento",
+    free: "Básicas",
+    premium: "Avanzadas + IA"
+  },
+  {
+    icon: Shield,
+    title: "Soporte",
+    description: "Ayuda técnica",
+    free: "Email básico",
+    premium: "24/7 Prioritario"
+  }
+];
+
+const premiumTestimonials = [
+  {
+    quote: "El análisis de debilidades del plan Premium me ayudó a enfocarme exactamente donde necesitaba. Aprobé mi A320 con 96%.",
+    name: "Laura Martín",
+    role: "Piloto A320 - Air Europa"
+  },
+  {
+    quote: "Los simulacros ilimitados fueron clave. Pude practicar hasta sentirme 100% confiado para el examen real del B737.",
+    name: "Diego Ruiz",
+    role: "Primera Oficial B737 - Norwegian"
+  },
+  {
+    quote: "La garantía de aprobación me dio tranquilidad. El contenido es tan bueno que no la necesité, pero es genial tenerla.",
+    name: "Carmen López",
+    role: "Instructora A320 - Iberia"
+  }
+];
 
 const Pricing = () => {
   return (
@@ -82,106 +132,233 @@ const Pricing = () => {
       {/* Pricing Cards */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
             
             {/* Free Plan */}
             <Card className="surface-mid border-border/50 relative">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Plan Gratuito</CardTitle>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Perfecto para explorar la plataforma
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-xl mb-2">Gratuito</CardTitle>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Para empezar tu preparación
                 </p>
-                <div className="text-5xl font-bold mb-2">
+                <div className="text-4xl font-bold mb-2">
                   €0
-                  <span className="text-lg text-muted-foreground font-normal">/mes</span>
                 </div>
-                <p className="text-sm text-muted-foreground">Para siempre</p>
+                <p className="text-sm text-muted-foreground">Para empezar tu preparación</p>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-4">
-                  {freeFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Acceso a cursos básicos</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Primera lección de cada curso</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Máximo 10 preguntas por examen</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Categorías limitadas (A320, B737)</span>
+                  </li>
                 </ul>
-                <Button className="w-full" variant="outline" size="lg">
-                  Comenzar Gratis
+                <Button className="w-full" variant="outline" size="sm">
+                  Empezar gratis
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  No se requiere tarjeta de crédito
-                </p>
               </CardContent>
             </Card>
 
-            {/* Premium Plan */}
-            <Card className="surface-mid border-primary/50 relative scale-105 ring-2 ring-primary/20">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-6 py-1">
-                  <Star className="w-4 h-4 mr-1" />
-                  Más Popular
+            {/* 1 Month Plan */}
+            <Card className="surface-mid border-primary/50 relative ring-2 ring-primary/20">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-primary text-primary-foreground px-4 py-1">
+                  <Star className="w-3 h-3 mr-1" />
+                  Popular
                 </Badge>
               </div>
-              <CardHeader className="text-center pb-8 pt-8">
-                <CardTitle className="text-2xl mb-2">Plan Premium</CardTitle>
-                <p className="text-muted-foreground text-sm mb-6">
-                  La elección de los profesionales
+              <CardHeader className="text-center pb-6 pt-6">
+                <CardTitle className="text-xl mb-2">1 mes</CardTitle>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Por mes - Acceso completo
                 </p>
-                <div className="text-5xl font-bold mb-2">
+                <div className="text-4xl font-bold mb-2">
                   €29
-                  <span className="text-lg text-muted-foreground font-normal">/mes</span>
                 </div>
-                <p className="text-sm text-muted-foreground">Facturación mensual</p>
+                <p className="text-sm text-muted-foreground">Por mes - Acceso completo</p>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-4">
-                  {premiumFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Acceso completo a todos los cursos</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Todas las aeronaves disponibles</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Preguntas ilimitadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Estadísticas avanzadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Modo examen completo</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Soporte prioritario</span>
+                  </li>
                 </ul>
-                <Button className="w-full" size="lg" variant="premium">
-                  <Trophy className="w-4 h-4 mr-2" />
-                  Obtener Premium
+                <Button className="w-full" size="sm">
+                  Seleccionar plan
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Garantía de reembolso de 30 días
-                </p>
               </CardContent>
             </Card>
 
-            {/* Enterprise Plan */}
+            {/* 3 Months Plan */}
             <Card className="surface-mid border-border/50 relative">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Plan Empresarial</CardTitle>
-                <p className="text-muted-foreground text-sm mb-6">
-                  Para escuelas de aviación
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-xl mb-2">3 meses</CardTitle>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Acceso completo por 3 meses
                 </p>
-                <div className="text-5xl font-bold mb-2">
-                  €99
-                  <span className="text-lg text-muted-foreground font-normal">/mes</span>
+                <div className="text-4xl font-bold mb-2">
+                  €79
                 </div>
-                <p className="text-sm text-muted-foreground">Hasta 50 usuarios</p>
+                <p className="text-sm text-muted-foreground">Acceso completo por 3 meses</p>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <ul className="space-y-4">
-                  {enterpriseFeatures.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
-                    </li>
-                  ))}
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Acceso completo a todos los cursos</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Todas las aeronaves disponibles</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Preguntas ilimitadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Estadísticas avanzadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Modo examen completo</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Soporte prioritario</span>
+                  </li>
                 </ul>
-                <Button className="w-full" variant="outline" size="lg">
-                  <Users className="w-4 h-4 mr-2" />
-                  Contactar Ventas
+                <Button className="w-full" variant="outline" size="sm">
+                  Seleccionar plan
                 </Button>
-                <p className="text-xs text-center text-muted-foreground">
-                  Implementación personalizada
+              </CardContent>
+            </Card>
+
+            {/* 6 Months Plan */}
+            <Card className="surface-mid border-border/50 relative">
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-xl mb-2">6 meses</CardTitle>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Acceso completo por 6 meses
                 </p>
+                <div className="text-4xl font-bold mb-2">
+                  €140
+                </div>
+                <p className="text-sm text-muted-foreground">Acceso completo por 6 meses</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Acceso completo a todos los cursos</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Todas las aeronaves disponibles</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Preguntas ilimitadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Estadísticas avanzadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Modo examen completo</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Soporte prioritario</span>
+                  </li>
+                </ul>
+                <Button className="w-full" variant="outline" size="sm">
+                  Seleccionar plan
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* 1 Year Plan */}
+            <Card className="surface-mid border-success/50 relative ring-2 ring-success/20">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-success text-success-foreground px-4 py-1">
+                  Mejor valor
+                </Badge>
+              </div>
+              <CardHeader className="text-center pb-6 pt-6">
+                <CardTitle className="text-xl mb-2">1 año</CardTitle>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Acceso completo por 12 meses
+                </p>
+                <div className="text-4xl font-bold mb-2">
+                  €250
+                </div>
+                <p className="text-sm text-muted-foreground">Acceso completo por 12 meses</p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Acceso completo a todos los cursos</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Todas las aeronaves disponibles</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Preguntas ilimitadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Estadísticas avanzadas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Modo examen completo</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm">Soporte prioritario</span>
+                  </li>
+                </ul>
+                <Button className="w-full bg-success hover:bg-success/90" size="sm">
+                  Seleccionar plan
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -315,87 +492,5 @@ const Pricing = () => {
     </div>
   );
 };
-
-// Feature arrays
-const freeFeatures = [
-  "100 preguntas de muestra",
-  "1 simulacro básico por día",
-  "Acceso limitado A320 o B737",
-  "Estadísticas básicas",
-  "Soporte por email",
-];
-
-const premiumFeatures = [
-  "5,000+ preguntas completas",
-  "Simulacros ilimitados",
-  "Acceso completo A320 y B737",
-  "Estadísticas avanzadas y análisis",
-  "Identificación de puntos débiles",
-  "Modo examen cronometrado",
-  "Actualizaciones mensuales",
-  "Soporte prioritario 24/7",
-  "Garantía de aprobación",
-  "Certificados de finalización",
-];
-
-const enterpriseFeatures = [
-  "Todo lo incluido en Premium",
-  "Hasta 50 usuarios",
-  "Panel de administración",
-  "Reportes de progreso grupal",
-  "Integración con LMS",
-  "Onboarding personalizado",
-  "Soporte dedicado",
-  "Facturación centralizada",
-];
-
-const comparisonFeatures = [
-  {
-    icon: Target,
-    title: "Banco de Preguntas",
-    description: "Preguntas disponibles",
-    free: "100 limitadas",
-    premium: "5,000+ completas"
-  },
-  {
-    icon: Clock,
-    title: "Simulacros",
-    description: "Exámenes de práctica",
-    free: "1 por día",
-    premium: "Ilimitados"
-  },
-  {
-    icon: BarChart3,
-    title: "Estadísticas",
-    description: "Análisis de rendimiento",
-    free: "Básicas",
-    premium: "Avanzadas + IA"
-  },
-  {
-    icon: Shield,
-    title: "Soporte",
-    description: "Ayuda técnica",
-    free: "Email básico",
-    premium: "24/7 Prioritario"
-  }
-];
-
-const premiumTestimonials = [
-  {
-    quote: "El análisis de debilidades del plan Premium me ayudó a enfocarme exactamente donde necesitaba. Aprobé mi A320 con 96%.",
-    name: "Laura Martín",
-    role: "Piloto A320 - Air Europa"
-  },
-  {
-    quote: "Los simulacros ilimitados fueron clave. Pude practicar hasta sentirme 100% confiado para el examen real del B737.",
-    name: "Diego Ruiz",
-    role: "Primera Oficial B737 - Norwegian"
-  },
-  {
-    quote: "La garantía de aprobación me dio tranquilidad. El contenido es tan bueno que no la necesité, pero es genial tenerla.",
-    name: "Carmen López",
-    role: "Instructora A320 - Iberia"
-  }
-];
 
 export default Pricing;

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convex ID Cleanup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .instructions {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .button-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        button {
+            background-color: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1976d2;
+        }
+        .output {
+            background-color: #333;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        .success {
+            background-color: #c8e6c9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Convex ID Cleanup Tool</h1>
+        
+        <div class="instructions">
+            <h3>Instrucciones:</h3>
+            <ol>
+                <li>Haga clic en el botón "Ejecutar Limpieza" para eliminar IDs inválidos</li>
+                <li>Después de la limpieza, cierre esta ventana</li>
+                <li>Recargue su aplicación PilotPrepFlightX</li>
+            </ol>
+        </div>
+        
+        <div class="button-container">
+            <button id="runCleanup">Ejecutar Limpieza</button>
+        </div>
+        
+        <div id="output" class="output hidden"></div>
+        
+        <div id="successMessage" class="success hidden">
+            <h3>¡Limpieza completada exitosamente!</h3>
+            <p>Se han eliminado todos los IDs inválidos y se ha generado un nuevo usuario válido.</p>
+            <p>Por favor, cierre esta ventana y recargue su aplicación.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('runCleanup').addEventListener('click', function() {
+            const output = document.getElementById('output');
+            const successMessage = document.getElementById('successMessage');
+            
+            // Show output area
+            output.classList.remove('hidden');
+            output.textContent = '=== Iniciando limpieza de IDs inválidos ===\n';
+            
+            try {
+                // List of known invalid IDs
+                const knownInvalidIds = [
+                    'users_gbkwz6iehdsho37g',
+                    'users_jc6vtjsivj62ktfl'
+                ];
+                
+                output.textContent += 'IDs inválidos conocidos: ' + JSON.stringify(knownInvalidIds) + '\n';
+                
+                // Check all localStorage items
+                output.textContent += '\n--- Verificando todos los elementos de localStorage ---\n';
+                const allKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    allKeys.push(localStorage.key(i));
+                }
+                
+                let itemsRemoved = 0;
+                allKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    
+                    if (value) {
+                        knownInvalidIds.forEach(invalidId => {
+                            if (value.includes(invalidId)) {
+                                output.textContent += `Encontrado ID inválido ${invalidId} en clave: ${key}, eliminando...\n`;
+                                localStorage.removeItem(key);
+                                itemsRemoved++;
+                            }
+                        });
+                    }
+                });
+                
+                // Clear sessionStorage as well
+                output.textContent += '\n--- Limpiando sessionStorage ---\n';
+                const sessionItems = sessionStorage.length;
+                sessionStorage.clear();
+                output.textContent += `Eliminados ${sessionItems} elementos de sessionStorage\n`;
+                
+                // Generate a new valid user
+                output.textContent += '\n--- Generando nuevo usuario válido ---\n';
+                const generateValidConvexId = (table) => {
+                    const base32Chars = 'abcdefghijklmnopqrstuvwxyz234567';
+                    let result = '';
+                    for (let i = 0; i < 16; i++) {
+                        result += base32Chars.charAt(Math.floor(Math.random() * base32Chars.length));
+                    }
+                    return `${table}_${result}`;
+                };
+                
+                const validUserId = generateValidConvexId('users');
+                const now = Date.now();
+                const newUserData = {
+                    _id: validUserId,
+                    email: 'user@example.com',
+                    displayName: 'Usuario',
+                    fullName: 'Usuario Ejemplo',
+                    createdAt: now,
+                    updatedAt: now
+                };
+                
+                localStorage.setItem('convex_user', JSON.stringify(newUserData));
+                output.textContent += 'Nuevo usuario válido creado con ID: ' + validUserId + '\n';
+                output.textContent += '\n=== Limpieza completada ===\n';
+                output.textContent += 'Elementos eliminados: ' + itemsRemoved + '\n';
+                
+                // Show success message
+                successMessage.classList.remove('hidden');
+                
+            } catch (error) {
+                output.textContent += '\n❌ Error durante la limpieza: ' + error.message + '\n';
+            }
+        });
+    </script>
+</body>
+</html>

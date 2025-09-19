@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, XCircle, Clock, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, RotateCcw, BookmarkPlus, Flag } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useQuestionReview } from '@/hooks/useQuestionReview';
 
 interface QuizQuestion {
   id: number;
@@ -11,6 +12,9 @@ interface QuizQuestion {
   options: string[];
   correctAnswer: number;
   explanation: string;
+  category?: string;
+  difficulty?: string;
+  aircraftType?: string;
 }
 
 interface QuizData {
@@ -34,6 +38,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
   onComplete 
 }) => {
   const isMobile = useIsMobile();
+  const { markQuestionForReview, getReviewCount } = useQuestionReview();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -42,6 +47,7 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [score, setScore] = useState(0);
   const [timeElapsed, setTimeElapsed] = useState(0);
+  const [reviewedQuestions, setReviewedQuestions] = useState<Set<number>>(new Set());
 
   const currentQuestion = quizData.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
@@ -94,6 +100,22 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
       setIsAnswered(false);
     } else {
       completeQuiz();
+    }
+  };
+
+  const handleMarkForReview = async () => {
+    try {
+      // Convert the numeric question ID to a proper Convex ID format for examQuestions
+      const questionConvexId = `examQuestions_${currentQuestion.id.toString().padStart(16, '0')}`;
+      await markQuestionForReview(
+        questionConvexId as any,
+        currentQuestion.category || 'General',
+        currentQuestion.difficulty || 'Medium',
+        currentQuestion.aircraftType || 'General'
+      );
+      setReviewedQuestions(prev => new Set(prev).add(currentQuestion.id));
+    } catch (error) {
+      console.error('Error marking question for review:', error);
     }
   };
 
@@ -319,20 +341,45 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
       {/* Action Buttons */}
       <div className="flex gap-3">
         {!isAnswered ? (
-          <Button 
-            onClick={handleSubmitAnswer}
-            disabled={selectedAnswer === null}
-            className="flex-1"
-          >
-            Confirmar Respuesta
-          </Button>
+          <>
+            <Button 
+              onClick={handleSubmitAnswer}
+              disabled={selectedAnswer === null}
+              className="flex-1"
+            >
+              Confirmar Respuesta
+            </Button>
+            <Button 
+              onClick={handleMarkForReview}
+              variant="outline"
+              className="px-4"
+              title="Marcar para repasar"
+            >
+              <BookmarkPlus className="h-4 w-4" />
+            </Button>
+          </>
         ) : (
-          <Button 
-            onClick={handleNextQuestion}
-            className="flex-1"
-          >
-            {currentQuestionIndex < quizData.questions.length - 1 ? 'Siguiente Pregunta' : 'Finalizar Quiz'}
-          </Button>
+          <>
+            <Button 
+              onClick={handleNextQuestion}
+              className="flex-1"
+            >
+              {currentQuestionIndex < quizData.questions.length - 1 ? 'Siguiente Pregunta' : 'Finalizar Quiz'}
+            </Button>
+            <Button 
+              onClick={handleMarkForReview}
+              variant="outline"
+              className="px-4"
+              title="Marcar para repasar"
+              disabled={reviewedQuestions.has(currentQuestion.id)}
+            >
+              {reviewedQuestions.has(currentQuestion.id) ? (
+                <Flag className="h-4 w-4 text-orange-600" />
+              ) : (
+                <BookmarkPlus className="h-4 w-4" />
+              )}
+            </Button>
+          </>
         )}
       </div>
     </div>

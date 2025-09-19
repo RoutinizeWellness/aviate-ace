@@ -19,7 +19,11 @@ import Settings from "./pages/Settings";
 import TypeRating from "./pages/TypeRating";
 import B737TypeRating from "./pages/B737TypeRating";
 import LessonDetail from "./pages/LessonDetail";
+import Flashcards from "./pages/Flashcards";
+import QuizDemo from "./pages/QuizDemo";
 import AdvancedAnalytics from "./pages/AdvancedAnalytics";
+import AdminPanel from "./pages/AdminPanel";
+import AdminSetup from "./pages/AdminSetup";
 import NotFound from "./pages/NotFound";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
@@ -76,6 +80,11 @@ const App = () => (
                 <LessonDetail />
               </ProtectedRoute>
             } />
+            <Route path="/flashcards/:aircraft" element={
+              <ProtectedRoute>
+                <Flashcards />
+              </ProtectedRoute>
+            } />
             <Route path="/progress" element={
               <ProtectedRoute>
                 <Progress />
@@ -91,12 +100,18 @@ const App = () => (
                 <Settings />
               </ProtectedRoute>
             } />
+            <Route path="/quiz-demo" element={<QuizDemo />} />
             <Route path="/analytics" element={
               <ProtectedRoute>
                 <AdvancedAnalytics />
               </ProtectedRoute>
             } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminPanel />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin-setup" element={<AdminSetup />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

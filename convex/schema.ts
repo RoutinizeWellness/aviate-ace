@@ -8,10 +8,19 @@ export default defineSchema({
     fullName: v.optional(v.string()),
     displayName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),
+    role: v.optional(v.string()), // "user", "admin", "premium"
+    accountType: v.optional(v.string()), // "free", "premium", "enterprise"
+    subscription: v.optional(v.string()), // "A320", "BOEING_737", "ALL" (for admin)
+    ipAddress: v.optional(v.string()), // Track IP for one account per IP restriction
+    isActive: v.optional(v.boolean()),
+    permissions: v.optional(v.array(v.string())), // ["manage_users", "view_analytics", etc.]
     createdAt: v.number(),
     updatedAt: v.number(),
   })
-    .index("by_email", ["email"]),
+    .index("by_email", ["email"])
+    .index("by_role", ["role"])
+    .index("by_subscription", ["subscription"])
+    .index("by_ip", ["ipAddress"]),
 
   // User Profiles table
   profiles: defineTable({
@@ -158,6 +167,26 @@ export default defineSchema({
     .index("by_aircraft", ["aircraftType"])
     .index("by_category", ["category"])
     .index("by_difficulty", ["difficulty"]),
+
+  // User Incorrect Questions table (for review mode)
+  userIncorrectQuestions: defineTable({
+    userId: v.id("users"),
+    questionId: v.id("examQuestions"),
+    incorrectAnswer: v.number(),
+    correctAnswer: v.number(),
+    sessionType: v.string(), // "practice", "timed", "exam"
+    category: v.string(),
+    difficulty: v.string(),
+    aircraftType: v.string(),
+    isResolved: v.optional(v.boolean()), // true when user answers correctly in review
+    attemptCount: v.optional(v.number()), // how many times user got it wrong
+    lastAttemptAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_category", ["userId", "category"])
+    .index("by_user_unresolved", ["userId", "isResolved"])
+    .index("by_question", ["questionId"]),
 
   // User Exam Sessions table
   userExamSessions: defineTable({

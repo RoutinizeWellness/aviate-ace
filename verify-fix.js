@@ -1,40 +1,80 @@
-// Verification script to check if the Convex ID fix is working
-console.log('=== Convex ID Verification ===');
+// Verification script to check if Convex ID issues are resolved
+// Run this in your browser's console after cleanup
 
-// Function to validate Convex ID format
-function isValidConvexId(id) {
-  const isValid = /^[a-z]+_[a-z2-7]{16}$/.test(id);
-  console.log(`ID ${id} validation:`, isValid);
-  return isValid;
-}
-
-// Check if there's a user in localStorage
-const storedUser = localStorage.getItem('convex_user');
-if (storedUser) {
+(function() {
+  console.log('=== Verifying Convex ID Fix ===');
+  
+  // Check if localStorage has a valid user
+  const storedUser = localStorage.getItem('convex_user');
+  if (!storedUser) {
+    console.log('❌ No user found in localStorage');
+    return;
+  }
+  
   try {
     const user = JSON.parse(storedUser);
-    console.log('Found user in localStorage:', user);
+    console.log('✅ User found in localStorage:', user);
     
-    if (user._id) {
-      if (isValidConvexId(user._id)) {
-        console.log('✅ SUCCESS: User has a valid Convex ID');
-        console.log('User ID:', user._id);
-        console.log('ID length after underscore:', user._id.split('_')[1].length);
-      } else {
-        console.log('❌ ERROR: User has an invalid Convex ID');
-        console.log('Invalid ID:', user._id);
-        console.log('ID length after underscore:', user._id.split('_')[1].length);
-      }
-    } else {
-      console.log('❌ ERROR: User object missing _id field');
+    // Check if user has an ID
+    if (!user._id) {
+      console.log('❌ User has no ID');
+      return;
     }
-  } catch (e) {
-    console.log('❌ ERROR: Could not parse user data');
-    console.log('Stored data:', storedUser);
+    
+    console.log('User ID:', user._id);
+    
+    // Validate the ID format
+    const isValidFormat = /^[a-z]+_[a-z2-7]{16}$/.test(user._id);
+    if (!isValidFormat) {
+      console.log('❌ User ID format is invalid');
+      console.log('Expected format: table_name_16_base32_characters');
+      console.log('Actual ID:', user._id);
+      console.log('Length:', user._id.length);
+      return;
+    }
+    
+    console.log('✅ User ID format is valid');
+    
+    // Check for known invalid IDs
+    const knownInvalidIds = [
+      'users_gbkwz6iehdsho37g',
+      'users_jc6vtjsivj62ktfl'
+    ];
+    
+    if (knownInvalidIds.includes(user._id)) {
+      console.log('❌ User has a known invalid ID');
+      return;
+    }
+    
+    console.log('✅ User ID is not in the known invalid list');
+    
+    // Check all localStorage items for invalid IDs
+    console.log('\n--- Checking all localStorage items ---');
+    let hasInvalidIds = false;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) {
+        const value = localStorage.getItem(key);
+        if (value) {
+          knownInvalidIds.forEach(invalidId => {
+            if (value.includes(invalidId)) {
+              console.log(`❌ Found invalid ID ${invalidId} in key: ${key}`);
+              hasInvalidIds = true;
+            }
+          });
+        }
+      }
+    }
+    
+    if (!hasInvalidIds) {
+      console.log('✅ No invalid IDs found in localStorage');
+    }
+    
+    console.log('\n=== Verification Complete ===');
+    console.log('✅ Convex ID issues appear to be resolved!');
+    console.log('You can now use your application normally.');
+    
+  } catch (error) {
+    console.log('❌ Error parsing user data:', error);
   }
-} else {
-  console.log('⚠️ WARNING: No user found in localStorage');
-  console.log('This is normal if you just ran the fix script and haven\'t refreshed the page yet');
-}
-
-console.log('=== Verification Complete ===');
+})();

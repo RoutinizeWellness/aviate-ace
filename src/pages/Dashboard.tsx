@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   BookOpen, 
@@ -17,11 +17,12 @@ import {
   CheckCircle2,
   Star,
   Award,
-  Gamepad2
+  Gamepad2,
+  Shield
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useConvexAuth";
+import { useAuth, isAdmin } from "@/hooks/useConvexAuth";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { UserAvatar } from "@/components/UserAvatar";
@@ -31,17 +32,15 @@ import { Menu } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 import type { Id } from "../../convex/_generated/dataModel";
 
-// Helper function to check if an ID looks like a Convex ID
+// Helper function to validate Convex IDs
 const isValidConvexId = (id: string): boolean => {
-  // Convex IDs have format: table_name_ followed by 16 base32 characters
-  const isValid = /^[a-z]+_[a-z2-7]{16}$/.test(id);
-  console.log(`Dashboard ID validation for ${id}:`, isValid);
-  return isValid;
+  // Convex IDs are 32-character strings with lowercase letters and digits
+  return /^[a-z0-9]{32}$/.test(id);
 };
 
 const MobileNavigation = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
@@ -107,6 +106,18 @@ const MobileNavigation = () => {
                 <Settings className="w-5 h-5" />
                 <span>Configuración</span>
               </Button>
+              
+              {/* Admin Panel - Only show for admins */}
+              {isAdmin(user) && (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Shield className="w-5 h-5" />
+                  <span>Panel Admin</span>
+                </Button>
+              )}
             </nav>
           </div>
           <div className="p-4 border-t">
@@ -134,22 +145,28 @@ const Dashboard = () => {
     if (user) {
       console.log('Dashboard user:', user);
       console.log('User ID:', user._id);
-      console.log('ID is valid:', isValidConvexId(user._id));
+      console.log('Is valid Convex ID:', isValidConvexId(user._id));
+      console.log('User email:', user.email);
+      console.log('User role:', user.role);
+      console.log('Is admin check:', isAdmin(user));
     }
   }, [user]);
   
   // Convex queries - will work when Convex is deployed and user ID is valid
+  const userProfileQueryParams = user && isValidConvexId(user._id) ? { userId: user._id } : "skip";
+  console.log('User profile query params:', userProfileQueryParams);
+  
   const userProfile = useQuery(
     api.auth.getUserProfile, 
-    user && isValidConvexId(user._id) ? { userId: user._id as Id<"users"> } : "skip"
+    userProfileQueryParams
   );
   const userCourses = useQuery(
     api.courses.getUserCourses, 
-    user && isValidConvexId(user._id) ? { userId: user._id as Id<"users"> } : "skip"
+    user && isValidConvexId(user._id) ? { userId: user._id } : "skip"
   );
   const userStats = useQuery(
     api.auth.getUserStats, 
-    user && isValidConvexId(user._id) ? { userId: user._id as Id<"users"> } : "skip"
+    user && isValidConvexId(user._id) ? { userId: user._id } : "skip"
   );
   
   // Mock data for development (remove when Convex is deployed)
@@ -289,6 +306,18 @@ const Dashboard = () => {
                 <Settings className="w-5 h-5" />
                 <span>Configuración</span>
               </Button>
+              
+              {/* Admin Panel - Only show for admins */}
+              {isAdmin(user) && (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
+                  onClick={() => navigate('/admin')}
+                >
+                  <Shield className="w-5 h-5" />
+                  <span>Panel Admin</span>
+                </Button>
+              )}
             </nav>
 
             {/* Logout */}
@@ -330,6 +359,20 @@ const Dashboard = () => {
           <header className="mb-8">
             <h1 className="text-4xl font-bold mb-2">Panel de Control</h1>
             <p className="text-muted-foreground">Bienvenido de vuelta, {displayName}. Continúa tu preparación para la certificación.</p>
+            
+            {/* Admin Setup Button for tiniboti@gmail.com */}
+            {user?.email === 'tiniboti@gmail.com' && !isAdmin(user) && (
+              <div className="mt-4">
+                <Button 
+                  onClick={() => navigate('/admin-setup')}
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  size="sm"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Configurar Permisos de Admin
+                </Button>
+              </div>
+            )}
           </header>
         )}
 
@@ -338,6 +381,20 @@ const Dashboard = () => {
           <header className="mb-6">
             <h1 className="text-2xl font-bold mb-2">Panel de Control</h1>
             <p className="text-sm text-muted-foreground">Bienvenido de vuelta, {displayName}.</p>
+            
+            {/* Admin Setup Button for tiniboti@gmail.com */}
+            {user?.email === 'tiniboti@gmail.com' && !isAdmin(user) && (
+              <div className="mt-3">
+                <Button 
+                  onClick={() => navigate('/admin-setup')}
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  size="sm"
+                >
+                  <Shield className="w-4 h-4 mr-2" />
+                  Configurar Admin
+                </Button>
+              </div>
+            )}
           </header>
         )}
 

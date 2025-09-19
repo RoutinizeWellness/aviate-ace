@@ -228,20 +228,20 @@ export const getUserExamSessions = query({
   },
 });
 
-// Seed sample exams and questions for testing
-export const seedSampleData = mutation({
+// Seed A320 Type Rating exam with real aviation questions
+export const seedA320TypeRatingExam = mutation({
   args: {},
   handler: async (ctx) => {
-    // Check if data already exists
+    // Check if A320 type rating exam already exists
     const existingExams = await ctx.db.query("exams").collect();
     if (existingExams.length > 0) {
-      return { message: "Sample data already exists" };
+      return { message: "A320 Type Rating exam already exists" };
     }
 
-    // Create sample exam
+    // Create A320 Type Rating exam
     const examId = await ctx.db.insert("exams", {
-      title: "Examen Básico de Aviación Comercial",
-      description: "Examen básico que cubre los fundamentos de la aviación comercial incluyendo sistemas de aeronave y procedimientos básicos.",
+      title: "A320 Type Rating - Real Examination",
+      description: "Comprehensive A320 type rating examination based on real EASA/FAA content including electrical systems, hydraulics, flight management, and emergency procedures.",
       aircraftType: "A320_FAMILY",
       category: "General",
       difficulty: "intermediate",
@@ -253,14 +253,29 @@ export const seedSampleData = mutation({
       updatedAt: Date.now(),
     });
 
-    // Create sample questions
+    // Create real A320 system questions
     const questions = [
       {
-        question: "¿Cuál es la presión normal del sistema hidráulico principal en una aeronave comercial?",
-        options: ["3000 PSI", "2500 PSI", "3500 PSI", "4000 PSI"],
+        question: "During an 'ELEC IDG 1 FAULT' condition, what is the correct sequence of actions according to the QRH?",
+        options: ["ENG 1 IDG pb - OFF, Monitor electrical parameters, Consider APU start", "ENG 1 IDG pb - DISC, Land as soon as practical, Emergency electrical config", "Continue normal ops, Monitor oil temperature, Land at nearest suitable airport", "IDG 1 - DISCONNECT, RAT deployment, Essential power only"],
+        correctAnswer: 1,
+        explanation: "According to A320 QRH ELEC.IDG FAULT procedure: The IDG should be disconnected (not just turned off), land as soon as practical should be considered, and emergency electrical configuration may be required depending on the severity.",
+        aircraftType: "A320_FAMILY",
+        category: "Electrical System",
+        difficulty: "advanced",
+        isActive: true,
+        createdAt: Date.now(),
+      },
+      {
+        question: "What is the minimum battery voltage required for APU start in emergency electrical configuration?",
+        options: ["22V for at least 2 minutes duration", "24V for at least 3 minutes duration", "25V for at least 5 minutes duration", "23V for at least 1 minute duration"],
         correctAnswer: 0,
-        explanation: "La presión normal del sistema hidráulico principal es de 3000 PSI, lo que proporciona la fuerza necesaria para operar los controles de vuelo, frenos y tren de aterrizaje.",
-        category: "Sistema Hidráulico",
+        explanation: "Per A320 FCOM, the minimum battery voltage for APU start in emergency conditions is 22V, and it must be maintained for at least 2 minutes to ensure successful APU start sequence.",
+        aircraftType: "A320_FAMILY",
+        category: "Electrical System",
+        difficulty: "advanced",
+        isActive: true,
+        createdAt: Date.now(),
       },
       {
         question: "¿Qué voltaje proporciona el generador principal de una aeronave comercial?",
@@ -343,7 +358,7 @@ export const seedSampleData = mutation({
       });
     }
 
-    return { message: "Sample data seeded successfully", examId };
+    return { message: "A320 Type Rating exam and questions seeded successfully", examId };
   },
 });
 

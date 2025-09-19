@@ -454,7 +454,15 @@ const Profile = () => {
                   <span className="text-sm">Próxima facturación</span>
                   <span className="text-sm text-muted-foreground">15 Oct 2024</span>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => {
+                    // Open subscription management
+                    window.open('/subscription-management', '_blank') || 
+                    navigate('/settings'); // Fallback to settings
+                  }}
+                >
                   Gestionar suscripción
                 </Button>
               </CardContent>

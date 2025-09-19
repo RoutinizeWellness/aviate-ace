@@ -12,6 +12,7 @@ import {
   Target,
   Flag,
   CheckCircle2,
+  XCircle,
   Play,
   Trophy
 } from "lucide-react";
@@ -20,6 +21,9 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useExamSession, useExams } from "@/hooks/useExam";
 import { useAuth } from "@/hooks/useConvexAuth";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import type { Id } from '../../convex/_generated/dataModel';
 
 const ExamMode = () => {
   const navigate = useNavigate();
@@ -28,25 +32,84 @@ const ExamMode = () => {
   const { toast } = useToast();
   const { exams, isLoadingExams } = useExams();
   
+  // Mutations for tracking incorrect questions
+  const recordIncorrectQuestion = useMutation(api.auth.recordIncorrectQuestion);
+  const markQuestionResolved = useMutation(api.auth.markQuestionResolved);
+  
+  // Extract parameters from URL
+  const rawMode = searchParams.get('mode') || 'practice';
+  const examMode: 'practice' | 'timed' | 'review' = 
+    rawMode === 'timed' || rawMode === 'review' ? rawMode : 'practice';
+  const selectedCategory = searchParams.get('category') || '';
+  const selectedDifficulty = searchParams.get('difficulty') || '';
+  const selectedAircraft = searchParams.get('aircraft') || 'A320_FAMILY';
+  const timeLimit = parseInt(searchParams.get('timeLimit') || '0');
+  const questionCount = parseInt(searchParams.get('questionCount') || '20');
+  
   const [selectedExamId, setSelectedExamId] = useState<string | null>(searchParams.get('examId'));
-  const [showExamSelector, setShowExamSelector] = useState(!selectedExamId);
+  const [showExamSelector, setShowExamSelector] = useState(!selectedExamId && examMode === 'practice' && !selectedCategory);
   
   const {
     exam,
     questions,
-    isLoadingQuestions,
     examState,
-    currentQuestion,
-    currentAnswer,
-    startExam,
-    isStartingExam,
-    answerQuestion,
-    nextQuestion,
-    previousQuestion,
-    submitExam,
-    isSubmittingExam,
-    questionsError,
-  } = useExamSession(selectedExamId || '');
+    handleStartExam,
+    handleSubmitExam,
+    setExamState,
+  } = useExamSession(selectedExamId || '', {
+    mode: examMode,
+    category: selectedCategory,
+    difficulty: selectedDifficulty,
+    timeLimit,
+    questionCount,
+    aircraft: selectedAircraft
+  });
+
+  // Auto-start exam if we have category/difficulty or examId
+  useEffect(() => {
+    if ((selectedCategory || selectedExamId) && !examState.sessionId && questions && questions.length > 0) {
+      handleStartExam();
+    }
+  }, [selectedCategory, selectedExamId, questions, examState.sessionId, handleStartExam]);
+
+  // State for loading and error handling
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState<Error | null>(null);
+  const [isSubmittingExam, setIsSubmittingExam] = useState(false);
+
+  // Timer countdown effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    
+    if (examState.timeRemaining > 0 && !examState.isCompleted) {
+      interval = setInterval(() => {
+        setExamState(prev => {
+          const newTimeRemaining = prev.timeRemaining - 1;
+          
+          // Auto-submit when time runs out
+          if (newTimeRemaining <= 0) {
+            handleSubmitExam(prev.answers);
+            return {
+              ...prev,
+              timeRemaining: 0,
+              isCompleted: true
+            };
+          }
+          
+          return {
+            ...prev,
+            timeRemaining: newTimeRemaining
+          };
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [examState.timeRemaining, examState.isCompleted, handleSubmitExam]);
 
   // Convert seconds to MM:SS format
   const formatTime = (seconds: number) => {
@@ -55,197 +118,199 @@ const ExamMode = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Get current question based on current index
+  const getCurrentQuestion = () => {
+    return questions && questions.length > 0 ? questions[examState.currentQuestionIndex] : null;
+  };
+  
+  // Get current answer for the current question
+  const getCurrentAnswer = () => {
+    const currentQ = getCurrentQuestion();
+    return currentQ ? examState.answers.find(a => a.questionId === currentQ._id) || null : null;
+  };
+
   const handleExamSelect = (examId: string) => {
     setSelectedExamId(examId);
     setShowExamSelector(false);
   };
 
-  const handleStartExam = () => {
+  const handleStartExamClick = () => {
     if (!selectedExamId) return;
-    startExam();
+    setIsLoadingQuestions(true);
+    setQuestionsError(null);
+    
+    handleStartExam().finally(() => {
+      setIsLoadingQuestions(false);
+    }).catch((error) => {
+      setQuestionsError(error);
+    });
   };
 
-  const handleSubmitExam = () => {
-    submitExam();
-    toast({
-      title: "Examen enviado",
-      description: "Tu examen ha sido enviado exitosamente.",
-    });
-    navigate('/exams');
+  const handleSubmitExamClick = async () => {
+    setIsSubmittingExam(true);
+    try {
+      await handleSubmitExam(examState.answers);
+      
+      // Show success message based on mode
+      const modeMessages = {
+        practice: "Práctica completada y guardada en el historial.",
+        timed: "Examen cronometrado enviado exitosamente.",
+        review: "Sesión de repaso completada."
+      };
+      
+      toast({
+        title: "Examen completado",
+        description: modeMessages[examMode] || "Tu examen ha sido enviado exitosamente.",
+      });
+      navigate('/exams');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Hubo un problema al enviar el examen.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingExam(false);
+    }
   };
 
   const handleExitExam = () => {
     navigate('/exams');
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="surface-mid border-border/50 p-8 text-center max-w-md">
-          <AlertCircle className="w-12 h-12 text-warning mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Autenticación Requerida</h2>
-          <p className="text-muted-foreground mb-6">
-            Debes iniciar sesión para acceder al modo examen.
-          </p>
-          <Button onClick={() => navigate('/login')} className="w-full">
-            Iniciar Sesión
-          </Button>
-        </Card>
-      </div>
-    );
-  }
+  // State for answer verification
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
-  // Exam Selection Dialog
-  if (showExamSelector) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="surface-mid border-border/50 w-full max-w-2xl">
-          <CardContent className="p-8">
-            <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Target className="w-8 h-8 text-primary" />
-              </div>
-              <h1 className="text-3xl font-bold mb-2">Seleccionar Examen</h1>
-              <p className="text-muted-foreground">
-                Elige el examen que deseas realizar. Cada examen tiene un tiempo límite y un puntaje mínimo para aprobar.
-              </p>
-            </div>
+  // Function to select an answer (in practice mode)
+  const selectAnswer = (questionId: string, answerIndex: number) => {
+    if (examMode === 'practice' && !isAnswered) {
+      setSelectedAnswer(answerIndex);
+    } else if (examMode !== 'practice') {
+      // For timed/review modes, answer immediately
+      answerQuestion(questionId, answerIndex);
+    }
+  };
 
-            {isLoadingExams ? (
-              <div className="text-center py-8">
-                <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-muted-foreground">Cargando exámenes...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {exams?.map((exam) => (
-                  <Card 
-                    key={exam.id} 
-                    className="surface-light border-border/50 hover:border-primary/50 cursor-pointer transition-all"
-                    onClick={() => handleExamSelect(exam.id)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <Plane className="w-6 h-6 text-primary" />
-                          </div>
-                          <div>
-                            <h3 className="font-bold text-lg">{exam.title}</h3>
-                            <p className="text-sm text-muted-foreground">{exam.description}</p>
-                            <div className="flex items-center gap-4 mt-2">
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Clock className="w-3 h-3" />
-                                <span>{exam.duration_minutes} min</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Target className="w-3 h-3" />
-                                <span>{exam.total_questions} preguntas</span>
-                              </div>
-                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                <Trophy className="w-3 h-3" />
-                                <span>{exam.passing_score}% para aprobar</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <Badge className="bg-primary/10 text-primary">
-                          {exam.aircraft_type.replace('_', ' ').toUpperCase()}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+  // Function to confirm answer in practice mode
+  const confirmAnswer = (questionId: string) => {
+    if (selectedAnswer === null) return;
+    
+    const timeSpent = Math.floor((Date.now() - examState.startTime.getTime()) / 1000);
+    
+    setExamState(prev => {
+      const existingAnswerIndex = prev.answers.findIndex(a => a.questionId === questionId);
+      
+      const newAnswer = {
+        questionId,
+        selectedAnswer: selectedAnswer!,
+        timeSpent
+      };
+      
+      if (existingAnswerIndex >= 0) {
+        const newAnswers = [...prev.answers];
+        newAnswers[existingAnswerIndex] = newAnswer;
+        return { ...prev, answers: newAnswers };
+      } else {
+        return {
+          ...prev,
+          answers: [...prev.answers, newAnswer]
+        };
+      }
+    });
+    
+    setIsAnswered(true);
+    setShowExplanation(true);
+    
+    // Track incorrect question for review mode
+    const currentQuestion = getCurrentQuestion();
+    if (currentQuestion && selectedAnswer !== currentQuestion.correctAnswer) {
+      recordIncorrectQuestion({
+        userId: user!._id as Id<"users">,
+        questionId: currentQuestion._id as Id<"examQuestions">,
+        incorrectAnswer: selectedAnswer,
+        correctAnswer: currentQuestion.correctAnswer,
+        sessionType: examMode || 'practice',
+        category: currentQuestion.category,
+        difficulty: currentQuestion.difficulty,
+        aircraftType: currentQuestion.aircraftType,
+      }).catch(error => console.log('Could not track incorrect question:', error));
+    }
+  };
 
-            <div className="flex justify-center mt-8">
-              <Button variant="outline" onClick={() => navigate('/exams')}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Volver a Exámenes
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Function to answer a question (for non-practice modes)
+  const answerQuestion = (questionId: string, selectedAnswerIndex: number) => {
+    const timeSpent = Math.floor((Date.now() - examState.startTime.getTime()) / 1000);
+    
+    setExamState(prev => {
+      const existingAnswerIndex = prev.answers.findIndex(a => a.questionId === questionId);
+      
+      if (existingAnswerIndex >= 0) {
+        const newAnswers = [...prev.answers];
+        newAnswers[existingAnswerIndex] = {
+          ...newAnswers[existingAnswerIndex],
+          selectedAnswer: selectedAnswerIndex,
+          timeSpent
+        };
+        return { ...prev, answers: newAnswers };
+      } else {
+        return {
+          ...prev,
+          answers: [
+            ...prev.answers,
+            {
+              questionId,
+              selectedAnswer: selectedAnswerIndex,
+              timeSpent
+            }
+          ]
+        };
+      }
+    });
+  };
 
-  // Pre-exam setup
-  if (!examState.timeRemaining && !examState.isCompleted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="surface-mid border-border/50 w-full max-w-2xl">
-          <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Plane className="w-8 h-8 text-primary" />
-            </div>
-            
-            <h1 className="text-3xl font-bold mb-4">{exam?.title}</h1>
-            <p className="text-muted-foreground mb-8">{exam?.description}</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center">
-                <Clock className="w-8 h-8 text-primary mx-auto mb-2" />
-                <h3 className="font-semibold">Duración</h3>
-                <p className="text-muted-foreground">{exam?.duration_minutes} minutos</p>
-              </div>
-              <div className="text-center">
-                <Target className="w-8 h-8 text-primary mx-auto mb-2" />
-                <h3 className="font-semibold">Preguntas</h3>
-                <p className="text-muted-foreground">{exam?.total_questions} preguntas</p>
-              </div>
-              <div className="text-center">
-                <Trophy className="w-8 h-8 text-primary mx-auto mb-2" />
-                <h3 className="font-semibold">Puntaje Mínimo</h3>
-                <p className="text-muted-foreground">{exam?.passing_score}%</p>
-              </div>
-            </div>
-            
-            <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 mb-8">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-left">
-                  <p className="font-medium text-warning mb-1">Instrucciones Importantes</p>
-                  <ul className="text-muted-foreground space-y-1 list-disc list-inside">
-                    <li>El cronómetro comenzará automáticamente al iniciar el examen</li>
-                    <li>Tus respuestas se guardan automáticamente</li>
-                    <li>Puedes marcar preguntas para revisión</li>
-                    <li>El examen se enviará automáticamente cuando el tiempo expire</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex gap-4 justify-center">
-              <Button variant="outline" onClick={() => setShowExamSelector(true)}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Cambiar Examen
-              </Button>
-              <Button 
-                onClick={handleStartExam} 
-                disabled={isStartingExam || isLoadingQuestions}
-                size="lg"
-                className="bg-primary hover:bg-primary/90"
-              >
-                {isStartingExam ? (
-                  "Iniciando..."
-                ) : (
-                  <>
-                    <Play className="w-4 h-4 mr-2" />
-                    Comenzar Examen
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // Function to go to next question
+  const nextQuestion = () => {
+    if (examState.currentQuestionIndex < (questions?.length || 1) - 1) {
+      setExamState(prev => ({
+        ...prev,
+        currentQuestionIndex: prev.currentQuestionIndex + 1
+      }));
+      
+      // Reset practice mode state
+      if (examMode === 'practice') {
+        setIsAnswered(false);
+        setShowExplanation(false);
+        setSelectedAnswer(null);
+      }
+    }
+  };
+
+  // Function to go to previous question
+  const previousQuestion = () => {
+    if (examState.currentQuestionIndex > 0) {
+      setExamState(prev => ({
+        ...prev,
+        currentQuestionIndex: prev.currentQuestionIndex - 1
+      }));
+      
+      // Reset practice mode state
+      if (examMode === 'practice') {
+        setIsAnswered(false);
+        setShowExplanation(false);
+        const previousAnswer = examState.answers.find(a => a.questionId === questions?.[examState.currentQuestionIndex - 1]?._id);
+        setSelectedAnswer(previousAnswer?.selectedAnswer ?? null);
+        setShowExplanation(!!previousAnswer);
+        setIsAnswered(!!previousAnswer);
+      }
+    }
+  };
 
   // Main exam interface
   if (!examState.isCompleted && questions && questions.length > 0) {
+    const currentQuestion = getCurrentQuestion();
+    const currentAnswer = getCurrentAnswer();
     const progressPercentage = ((examState.currentQuestionIndex + 1) / questions.length) * 100;
     const answeredCount = examState.answers.length;
 
@@ -265,7 +330,11 @@ const ExamMode = () => {
                   <Plane className="w-6 h-6 text-primary" />
                   <div>
                     <h1 className="font-bold">{exam?.title}</h1>
-                    <p className="text-xs text-muted-foreground">Modo Examen Cronometrado</p>
+                    <p className="text-xs text-muted-foreground">
+                      {examMode === 'timed' ? 'Modo Examen Cronometrado' : 
+                       examMode === 'review' ? 'Modo Repaso' : 
+                       'Modo Práctica'}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -309,7 +378,7 @@ const ExamMode = () => {
                     {currentQuestion?.category}
                   </Badge>
                   <Badge variant="outline" className="bg-warning/10 text-warning">
-                    {currentQuestion?.tier === 'premium' ? 'Premium' : 'Gratis'}
+                    {currentQuestion?.difficulty === 'advanced' ? 'Avanzado' : currentQuestion?.difficulty === 'intermediate' ? 'Intermedio' : 'Básico'}
                   </Badge>
                 </div>
                 
@@ -328,42 +397,141 @@ const ExamMode = () => {
 
               {/* Answer Options */}
               <div className="space-y-4 mb-8">
-                {currentQuestion?.options && (currentQuestion.options as string[]).map((option, index) => (
-                  <label
-                    key={index}
-                    className={`
-                      flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all
-                      ${currentAnswer?.selectedAnswer === index 
-                        ? 'border-primary bg-primary/5' 
-                        : 'border-border hover:border-primary/50 hover:bg-surface-light'
+                {currentQuestion?.options && (currentQuestion.options as string[]).map((option, index) => {
+                  let optionClass = 'flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all';
+                  let borderClass = '';
+                  let bgClass = '';
+                  let isDisabled = false;
+                  
+                  if (examMode === 'practice') {
+                    // Practice mode - show verification after answering
+                    if (isAnswered) {
+                      isDisabled = true;
+                      if (index === currentQuestion.correctAnswer) {
+                        borderClass = 'border-success';
+                        bgClass = 'bg-success/10';
+                      } else if (index === selectedAnswer && index !== currentQuestion.correctAnswer) {
+                        borderClass = 'border-destructive';
+                        bgClass = 'bg-destructive/10';
+                      } else {
+                        borderClass = 'border-border';
+                        bgClass = 'bg-surface-light';
                       }
-                    `}
-                  >
-                    <input
-                      type="radio"
-                      name="answer"
-                      value={index}
-                      checked={currentAnswer?.selectedAnswer === index}
-                      onChange={() => answerQuestion(currentQuestion.id, index)}
-                      className="sr-only"
-                    />
-                    <div className={`
-                      w-6 h-6 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center
-                      ${currentAnswer?.selectedAnswer === index 
-                        ? 'border-primary bg-primary' 
-                        : 'border-muted-foreground'
+                    } else {
+                      // Not answered yet
+                      if (selectedAnswer === index) {
+                        borderClass = 'border-primary';
+                        bgClass = 'bg-primary/5';
+                      } else {
+                        borderClass = 'border-border hover:border-primary/50';
+                        bgClass = 'hover:bg-surface-light';
                       }
-                    `}>
-                      {currentAnswer?.selectedAnswer === index && (
-                        <div className="w-2 h-2 rounded-full bg-primary-foreground"></div>
-                      )}
-                    </div>
-                    <span className="text-sm leading-relaxed font-medium">
-                      {String.fromCharCode(65 + index)}. {option}
-                    </span>
-                  </label>
-                ))}
+                    }
+                  } else {
+                    // Timed/Review modes - immediate selection
+                    if (currentAnswer?.selectedAnswer === index) {
+                      borderClass = 'border-primary';
+                      bgClass = 'bg-primary/5';
+                    } else {
+                      borderClass = 'border-border hover:border-primary/50';
+                      bgClass = 'hover:bg-surface-light';
+                    }
+                  }
+                  
+                  optionClass += ` ${borderClass} ${bgClass}`;
+                  
+                  return (
+                    <label
+                      key={index}
+                      className={optionClass}
+                    >
+                      <input
+                        type="radio"
+                        name="answer"
+                        value={index}
+                        checked={examMode === 'practice' ? selectedAnswer === index : currentAnswer?.selectedAnswer === index}
+                        onChange={() => examMode === 'practice' ? selectAnswer(currentQuestion._id, index) : answerQuestion(currentQuestion._id, index)}
+                        disabled={isDisabled}
+                        className="sr-only"
+                      />
+                      <div className={`
+                        w-6 h-6 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center
+                        ${
+                          examMode === 'practice'
+                            ? isAnswered
+                              ? index === currentQuestion.correctAnswer
+                                ? 'border-success bg-success'
+                                : index === selectedAnswer && index !== currentQuestion.correctAnswer
+                                ? 'border-destructive bg-destructive'
+                                : 'border-muted-foreground'
+                              : selectedAnswer === index
+                              ? 'border-primary bg-primary'
+                              : 'border-muted-foreground'
+                            : currentAnswer?.selectedAnswer === index
+                            ? 'border-primary bg-primary'
+                            : 'border-muted-foreground'
+                        }
+                      `}>
+                        {((examMode === 'practice' && (selectedAnswer === index || (isAnswered && index === currentQuestion.correctAnswer))) ||
+                          (examMode !== 'practice' && currentAnswer?.selectedAnswer === index)) && (
+                          <div className={`w-2 h-2 rounded-full ${
+                            examMode === 'practice' && isAnswered
+                              ? index === currentQuestion.correctAnswer
+                                ? 'bg-primary-foreground'
+                                : index === selectedAnswer
+                                ? 'bg-primary-foreground'
+                                : 'bg-primary-foreground'
+                              : 'bg-primary-foreground'
+                          }`}></div>
+                        )}
+                        {examMode === 'practice' && isAnswered && (
+                          index === currentQuestion.correctAnswer ? (
+                            <CheckCircle2 className="w-4 h-4 text-success" />
+                          ) : index === selectedAnswer && index !== currentQuestion.correctAnswer ? (
+                            <XCircle className="w-4 h-4 text-destructive" />
+                          ) : null
+                        )}
+                      </div>
+                      <span className="text-sm leading-relaxed font-medium">
+                        {String.fromCharCode(65 + index)}. {option}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
+
+              {/* Answer Explanation for Practice Mode */}
+              {examMode === 'practice' && showExplanation && currentQuestion?.explanation && (
+                <Card className="mb-8 surface-light border-border/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      {selectedAnswer === currentQuestion.correctAnswer ? (
+                        <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <XCircle className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" />
+                      )}
+                      <div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          {selectedAnswer === currentQuestion.correctAnswer ? '¡Correcto!' : 'Incorrecto'}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {currentQuestion.explanation}
+                        </p>
+                        {selectedAnswer !== currentQuestion.correctAnswer && (
+                          <div className="mt-3 p-3 bg-success/10 border border-success/20 rounded-lg">
+                            <p className="text-sm">
+                              <span className="font-medium text-success">Respuesta correcta:</span>{' '}
+                              <span className="font-medium">
+                                {String.fromCharCode(65 + currentQuestion.correctAnswer)}. {(currentQuestion.options as string[])[currentQuestion.correctAnswer]}
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Navigation */}
               <div className="flex items-center justify-between pt-6 border-t border-border">
@@ -384,9 +552,19 @@ const ExamMode = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  {examState.currentQuestionIndex === questions.length - 1 ? (
+                  {examMode === 'practice' && !isAnswered ? (
                     <Button 
-                      onClick={handleSubmitExam}
+                      onClick={() => currentQuestion && confirmAnswer(currentQuestion._id)}
+                      disabled={selectedAnswer === null}
+                      className="bg-primary hover:bg-primary/90"
+                      size="lg"
+                    >
+                      <Target className="w-4 h-4 mr-2" />
+                      Confirmar Respuesta
+                    </Button>
+                  ) : examState.currentQuestionIndex === questions.length - 1 ? (
+                    <Button 
+                      onClick={handleSubmitExamClick}
                       disabled={isSubmittingExam}
                       className="bg-success hover:bg-success/90" 
                       size="lg"
@@ -403,6 +581,7 @@ const ExamMode = () => {
                   ) : (
                     <Button 
                       onClick={nextQuestion}
+                      disabled={examMode === 'practice' && !isAnswered}
                       size="lg"
                     >
                       Siguiente

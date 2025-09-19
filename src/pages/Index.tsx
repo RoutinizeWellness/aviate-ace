@@ -17,6 +17,149 @@ import {
 } from "lucide-react";
 import heroCockpit from "@/assets/hero-cockpit.jpg";
 
+interface PricingPlan {
+  name: string;
+  price: string;
+  featured: boolean;
+  bestValue?: boolean;
+  description?: string;
+  features: string[];
+  cta: string;
+}
+
+// Data arrays
+const features = [
+  {
+    icon: Target,
+    title: "Simulacros Reales",
+    description: "Exámenes idénticos al formato oficial con tiempo limitado y condiciones reales de evaluación."
+  },
+  {
+    icon: BarChart3,
+    title: "Estadísticas Avanzadas",
+    description: "Análisis detallado de tu rendimiento por categorías, identificando tus fortalezas y debilidades."
+  },
+  {
+    icon: BookOpen,
+    title: "Banco Exclusivo",
+    description: "5,000+ preguntas actualizadas mensualmente, organizadas por sistemas A320 y B737."
+  },
+  {
+    icon: Clock,
+    title: "Práctica Cronometrada",
+    description: "Entrenamientos con tiempo real para desarrollar velocidad y precisión bajo presión."
+  },
+  {
+    icon: Shield,
+    title: "Contenido Certificado",
+    description: "Material validado por pilotos activos con experiencia en A320 y B737."
+  },
+  {
+    icon: TrendingUp,
+    title: "Progreso Inteligente",
+    description: "Sistema adaptativo que ajusta la dificultad según tu nivel de conocimiento."
+  }
+];
+
+const pricingPlans: PricingPlan[] = [
+  {
+    name: "Gratuito",
+    price: "€0",
+    featured: false,
+    bestValue: false,
+    description: "Para empezar tu preparación",
+    features: [
+      "Acceso a cursos básicos",
+      "Primera lección de cada curso",
+      "Máximo 10 preguntas por examen",
+      "Categorías limitadas (A320, B737)"
+    ],
+    cta: "Empezar gratis"
+  },
+  {
+    name: "1 mes",
+    price: "€29",
+    featured: true,
+    bestValue: false,
+    description: "Por mes - Acceso completo",
+    features: [
+      "Acceso completo a todos los cursos",
+      "Todas las aeronaves disponibles",
+      "Preguntas ilimitadas",
+      "Estadísticas avanzadas",
+      "Modo examen completo",
+      "Soporte prioritario"
+    ],
+    cta: "Seleccionar plan"
+  },
+  {
+    name: "3 meses",
+    price: "€79",
+    featured: false,
+    bestValue: false,
+    description: "Acceso completo por 3 meses",
+    features: [
+      "Acceso completo a todos los cursos",
+      "Todas las aeronaves disponibles",
+      "Preguntas ilimitadas",
+      "Estadísticas avanzadas",
+      "Modo examen completo",
+      "Soporte prioritario"
+    ],
+    cta: "Seleccionar plan"
+  },
+  {
+    name: "6 meses",
+    price: "€140",
+    featured: false,
+    bestValue: false,
+    description: "Acceso completo por 6 meses",
+    features: [
+      "Acceso completo a todos los cursos",
+      "Todas las aeronaves disponibles",
+      "Preguntas ilimitadas",
+      "Estadísticas avanzadas",
+      "Modo examen completo",
+      "Soporte prioritario"
+    ],
+    cta: "Seleccionar plan"
+  },
+  {
+    name: "1 año",
+    price: "€250",
+    featured: false,
+    bestValue: true,
+    description: "Acceso completo por 12 meses",
+    features: [
+      "Acceso completo a todos los cursos",
+      "Todas las aeronaves disponibles",
+      "Preguntas ilimitadas",
+      "Estadísticas avanzadas",
+      "Modo examen completo",
+      "Soporte prioritario"
+    ],
+    cta: "Seleccionar plan"
+  }
+];
+
+const testimonials = [
+  {
+    quote: "I passed my A320 exam on the first try. The questions were identical to the real exam. Amazing platform.",
+    name: "Carlos Mendoza",
+    role: "Piloto A320 - Iberia"
+  },
+  {
+    quote: "The statistics helped me focus on my weak points. In 3 weeks I was ready for the B737.",
+    name: "Ana García",
+    role: "Primera Oficial B737 - Ryanair"
+  },
+  {
+    quote: "After failing with other methods, this platform gave me the confidence and knowledge I needed.",
+    name: "Miguel Torres",
+    role: "Piloto B737 - Vueling"
+  }
+];
+
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
@@ -35,6 +178,7 @@ const Index = () => {
           
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Características</a>
+            <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">Sobre Nosotros</a>
             <a href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">Planes</a>
             <a href="#testimonials" className="text-sm font-medium hover:text-primary transition-colors">Testimonios</a>
           </nav>
@@ -186,6 +330,101 @@ const Index = () => {
         </div>
       </section>
 
+      {/* About Us Section */}
+      <section id="about" className="py-20 surface-light">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <span className="text-primary">Sobre nosotros</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Ayudamos a pilotos a prepararse para sus type ratings con una plataforma moderna,
+              práctica y enfocada en resultados.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <div className="space-y-8">
+              <Card className="surface-mid border-border/50">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3 text-primary">Misión</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Proveer una preparación efectiva y realista que acelere el camino al éxito en evaluaciones oficiales.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="surface-mid border-border/50">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3 text-primary">Visión</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Ser el estándar en preparación digital de pilotos para aeronaves Airbus y Boeing.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="surface-mid border-border/50">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-3 text-primary">Valores</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Precisión, mejora continua y experiencia de aprendizaje centrada en el piloto.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-8">
+              <Card className="surface-mid border-border/50">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-4 text-primary">Nuestra historia</h3>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Nacimos de la necesidad de una preparación práctica y actualizada, inspirada por
+                    experiencias reales en cabina y evaluaciones técnicas.
+                  </p>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Con feedback de pilotos activos, construimos un sistema de estudio
+                    enfocado en categorías clave, simulación de examen y análisis de
+                    rendimiento.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="surface-mid border-border/50">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-lg mb-4 text-primary">Qué nos diferencia</h3>
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    Contenido específico por aeronave, práctica orientada a objetivos y una
+                    experiencia pulida para maximizar tu tiempo de estudio.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                        A320 - B737
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="bg-success/10 text-success border-success/30">
+                        Simulación real
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
+                        Análisis por categorías
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="bg-info/10 text-info border-info/30">
+                        Enfoque práctico
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" className="py-20">
         <div className="container mx-auto px-4">
@@ -222,20 +461,29 @@ const Index = () => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {pricingPlans.map((plan, index) => (
               <Card key={index} className={`surface-light border-border/50 ${plan.featured ? 'ring-2 ring-primary scale-105' : ''}`}>
                 <CardContent className="p-8">
                   {plan.featured && (
                     <Badge className="mb-4 bg-primary text-primary-foreground">
-                      Más Popular
+                      Popular
+                    </Badge>
+                  )}
+                  {plan.bestValue && (
+                    <Badge className="mb-4 bg-success text-success-foreground">
+                      Mejor valor
                     </Badge>
                   )}
                   <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                   <div className="text-4xl font-bold mb-4">
                     {plan.price}
-                    {plan.price !== "Gratis" && <span className="text-lg text-muted-foreground">/mes</span>}
+                    {plan.price !== "Gratis" && plan.price !== "€250" && <span className="text-lg text-muted-foreground">/mes</span>}
+                    {plan.price === "€250" && <span className="text-lg text-muted-foreground">/año</span>}
                   </div>
+                  {plan.description && (
+                    <p className="text-sm text-muted-foreground mb-6">{plan.description}</p>
+                  )}
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-2">
@@ -245,8 +493,8 @@ const Index = () => {
                     ))}
                   </ul>
                   <Button 
-                    className={`w-full ${plan.featured ? 'bg-primary hover:bg-primary-dark' : ''}`}
-                    variant={plan.featured ? 'default' : 'outline'}
+                    className={`w-full ${plan.featured || plan.bestValue ? 'bg-primary hover:bg-primary-dark' : ''}`}
+                    variant={plan.featured || plan.bestValue ? 'default' : 'outline'}
                   >
                     {plan.cta}
                   </Button>
@@ -339,88 +587,5 @@ const Index = () => {
     </div>
   );
 };
-
-// Data arrays
-const features = [
-  {
-    icon: Target,
-    title: "Simulacros Reales",
-    description: "Exámenes idénticos al formato oficial con tiempo limitado y condiciones reales de evaluación."
-  },
-  {
-    icon: BarChart3,
-    title: "Estadísticas Avanzadas",
-    description: "Análisis detallado de tu rendimiento por categorías, identificando tus fortalezas y debilidades."
-  },
-  {
-    icon: BookOpen,
-    title: "Banco Exclusivo",
-    description: "5,000+ preguntas actualizadas mensualmente, organizadas por sistemas A320 y B737."
-  },
-  {
-    icon: Clock,
-    title: "Práctica Cronometrada",
-    description: "Entrenamientos con tiempo real para desarrollar velocidad y precisión bajo presión."
-  },
-  {
-    icon: Shield,
-    title: "Contenido Certificado",
-    description: "Material validado por pilotos activos con experiencia en A320 y B737."
-  },
-  {
-    icon: TrendingUp,
-    title: "Progreso Inteligente",
-    description: "Sistema adaptativo que ajusta la dificultad según tu nivel de conocimiento."
-  }
-];
-
-const pricingPlans = [
-  {
-    name: "Plan Gratuito",
-    price: "Gratis",
-    featured: false,
-    features: [
-      "100 preguntas de muestra",
-      "1 simulacro básico",
-      "Acceso limitado por categoría",
-      "Soporte por email"
-    ],
-    cta: "Probar Gratis"
-  },
-  {
-    name: "Plan Premium",
-    price: "€29",
-    featured: true,
-    features: [
-      "5,000+ preguntas completas",
-      "Simulacros ilimitados",
-      "Estadísticas avanzadas",
-      "Acceso A320 y B737",
-      "Análisis de debilidades",
-      "Soporte prioritario",
-      "Actualizaciones mensuales",
-      "Garantía de aprobación"
-    ],
-    cta: "Comenzar Premium"
-  }
-];
-
-const testimonials = [
-  {
-    quote: "Aprobé mi examen A320 al primer intento. Las preguntas eran idénticas al examen real. Increíble plataforma.",
-    name: "Carlos Mendoza",
-    role: "Piloto A320 - Iberia"
-  },
-  {
-    quote: "Las estadísticas me ayudaron a enfocarme en mis puntos débiles. En 3 semanas estaba listo para el B737.",
-    name: "Ana García",
-    role: "Primera Oficial B737 - Ryanair"
-  },
-  {
-    quote: "Después de fallar con otros métodos, esta plataforma me dio la confianza y conocimiento necesarios.",
-    name: "Miguel Torres",
-    role: "Piloto B737 - Vueling"
-  }
-];
 
 export default Index;

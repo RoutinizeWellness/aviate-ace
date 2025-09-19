@@ -9,7 +9,8 @@ export const useUserStats = () => {
 
   // Helper function to validate Convex IDs
   const isValidConvexId = (id: string): boolean => {
-    return /^[a-z]+_[a-z2-7]{16}$/.test(id);
+    // Convex IDs are 32-character strings with lowercase letters and digits
+    return /^[a-z0-9]{32}$/.test(id);
   };
 
   // Fetch user statistics

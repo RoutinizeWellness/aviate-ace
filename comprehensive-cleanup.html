@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprehensive Convex ID Cleanup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .log {
+            background-color: #000;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+        button.secondary {
+            background-color: #6c757d;
+        }
+        button.secondary:hover {
+            background-color: #545b62;
+        }
+        button.success {
+            background-color: #28a745;
+        }
+        button.success:hover {
+            background-color: #218838;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .instructions {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Comprehensive Convex ID Cleanup</h1>
+        
+        <div class="warning">
+            <h3>⚠️ Warning</h3>
+            <p>This tool will comprehensively clean up all data related to invalid Convex IDs:</p>
+            <ul>
+                <li><code>users_gbkwz6iehdsho37g</code></li>
+                <li><code>users_jc6vtjsivj62ktfl</code></li>
+            </ul>
+            <p>This includes clearing localStorage and sessionStorage, and generating a new valid user.</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <p>1. Click "Run Comprehensive Cleanup" to remove all data related to invalid IDs</p>
+            <p>2. Click "Show Current Data" to see what's currently stored</p>
+            <p>3. Click "Generate New Valid User" to create a new valid user</p>
+            <p>4. After cleanup, refresh your application</p>
+        </div>
+        
+        <div>
+            <button id="cleanupButton">Run Comprehensive Cleanup</button>
+            <button id="showButton" class="secondary">Show Current Data</button>
+            <button id="generateButton" class="success">Generate New Valid User</button>
+            <button id="clearAllButton" class="secondary">Clear All Storage</button>
+        </div>
+        
+        <div id="log" class="log"></div>
+        
+        <div id="successMessage" style="display: none;" class="success">
+            Comprehensive cleanup completed successfully! Please refresh your application.
+        </div>
+        
+        <div id="errorMessage" style="display: none;" class="error">
+            An error occurred. Please check the console for details.
+        </div>
+    </div>
+
+    <script>
+        // List of known invalid IDs
+        const knownInvalidIds = [
+            'users_gbkwz6iehdsho37g',
+            'users_jc6vtjsivj62ktfl'
+        ];
+        
+        // List of keys to check
+        const keysToCheck = [
+            'convex_user',
+            'convex-auth-dev-user',
+            'user',
+            'auth',
+            'profile',
+            'user_profile',
+            'current_user'
+        ];
+        
+        // Function to show current localStorage data
+        function showCurrentData() {
+            const logElement = document.getElementById('log');
+            logElement.textContent = '=== Current Storage Data ===\n';
+            
+            try {
+                logElement.textContent += `Total localStorage items: ${localStorage.length}\n\n`;
+                
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    logElement.textContent += `Key: ${key}\n`;
+                    
+                    // Show full value only if it's not too long
+                    if (value && value.length < 200) {
+                        logElement.textContent += `Value: ${value}\n`;
+                    } else if (value) {
+                        logElement.textContent += `Value (truncated): ${value.substring(0, 200)}...\n`;
+                    }
+                    logElement.textContent += '\n';
+                }
+                
+                logElement.textContent += `Total sessionStorage items: ${sessionStorage.length}\n\n`;
+                
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    const value = sessionStorage.getItem(key);
+                    logElement.textContent += `Session Key: ${key}\n`;
+                    
+                    // Show full value only if it's not too long
+                    if (value && value.length < 200) {
+                        logElement.textContent += `Session Value: ${value}\n`;
+                    } else if (value) {
+                        logElement.textContent += `Session Value (truncated): ${value.substring(0, 200)}...\n`;
+                    }
+                    logElement.textContent += '\n';
+                }
+            } catch (error) {
+                logElement.textContent += `Error: ${error.message}\n`;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+        
+        // Function to generate a valid Convex ID
+        function generateValidConvexId(table) {
+            const base32Chars = 'abcdefghijklmnopqrstuvwxyz234567';
+            let result = '';
+            for (let i = 0; i < 16; i++) {
+                result += base32Chars.charAt(Math.floor(Math.random() * base32Chars.length));
+            }
+            return `${table}_${result}`;
+        }
+        
+        // Function to generate a new valid user
+        function generateNewValidUser() {
+            const logElement = document.getElementById('log');
+            logElement.textContent = '=== Generating New Valid User ===\n';
+            
+            try {
+                const validUserId = generateValidConvexId('user');
+                const now = Date.now();
+                const newUserData = {
+                    _id: validUserId,
+                    email: 'test@example.com',
+                    displayName: 'Test User',
+                    fullName: 'Test User',
+                    createdAt: now,
+                    updatedAt: now
+                };
+                
+                localStorage.setItem('convex_user', JSON.stringify(newUserData));
+                logElement.textContent += `New valid user created with ID: ${validUserId}\n`;
+                logElement.textContent += `User data: ${JSON.stringify(newUserData, null, 2)}\n`;
+                
+                document.getElementById('successMessage').style.display = 'block';
+            } catch (error) {
+                logElement.textContent += `Error: ${error.message}\n`;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+        
+        // Function to run comprehensive cleanup
+        function runComprehensiveCleanup() {
+            const logElement = document.getElementById('log');
+            logElement.textContent = '=== Comprehensive Convex ID Cleanup ===\n';
+            logElement.textContent += `Known invalid IDs: ${JSON.stringify(knownInvalidIds)}\n`;
+            logElement.textContent += `Keys to check: ${JSON.stringify(keysToCheck)}\n\n`;
+            
+            try {
+                let itemsRemoved = 0;
+                
+                // Check specific keys
+                logElement.textContent += '--- Checking specific keys ---\n';
+                keysToCheck.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    if (value) {
+                        logElement.textContent += `Checking key: ${key}\n`;
+                        let foundInvalid = false;
+                        
+                        knownInvalidIds.forEach(invalidId => {
+                            if (value.includes(invalidId)) {
+                                logElement.textContent += `  Found invalid ID ${invalidId} in ${key}, removing...\n`;
+                                localStorage.removeItem(key);
+                                itemsRemoved++;
+                                foundInvalid = true;
+                            }
+                        });
+                        
+                        if (!foundInvalid) {
+                            logElement.textContent += `  No invalid IDs found in ${key}\n`;
+                        }
+                    }
+                });
+                
+                // Check all localStorage items
+                logElement.textContent += '\n--- Checking all localStorage items ---\n';
+                // Create a copy of keys since we're modifying the collection
+                const allKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    allKeys.push(localStorage.key(i));
+                }
+                
+                allKeys.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    
+                    if (value) {
+                        knownInvalidIds.forEach(invalidId => {
+                            if (value.includes(invalidId)) {
+                                logElement.textContent += `Found invalid ID ${invalidId} in key: ${key}, removing...\n`;
+                                localStorage.removeItem(key);
+                                itemsRemoved++;
+                            }
+                        });
+                    }
+                });
+                
+                logElement.textContent += `\n=== localStorage cleanup complete (${itemsRemoved} items removed) ===\n`;
+                
+                // Clear sessionStorage
+                logElement.textContent += '\n--- Clearing sessionStorage ---\n';
+                const sessionItems = sessionStorage.length;
+                sessionStorage.clear();
+                logElement.textContent += `Cleared ${sessionItems} sessionStorage items\n`;
+                
+                logElement.textContent += '\n=== Comprehensive cleanup complete! ===\n';
+                document.getElementById('successMessage').style.display = 'block';
+                
+            } catch (error) {
+                logElement.textContent += `Error: ${error.message}\n`;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+        
+        // Function to clear all storage
+        function clearAllStorage() {
+            const logElement = document.getElementById('log');
+            logElement.textContent = 'Clearing all storage...\n';
+            
+            try {
+                const localStorageItems = localStorage.length;
+                const sessionStorageItems = sessionStorage.length;
+                
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                logElement.textContent += `Cleared ${localStorageItems} localStorage items\n`;
+                logElement.textContent += `Cleared ${sessionStorageItems} sessionStorage items\n`;
+                logElement.textContent += 'All storage cleared successfully!\n';
+                
+                document.getElementById('successMessage').style.display = 'block';
+            } catch (error) {
+                logElement.textContent += `Error: ${error.message}\n`;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+        
+        // Set up event listeners
+        document.getElementById('cleanupButton').addEventListener('click', runComprehensiveCleanup);
+        document.getElementById('showButton').addEventListener('click', showCurrentData);
+        document.getElementById('generateButton').addEventListener('click', generateNewValidUser);
+        document.getElementById('clearAllButton').addEventListener('click', clearAllStorage);
+        
+        // Show current data on page load
+        showCurrentData();
+    </script>
+</body>
+</html>

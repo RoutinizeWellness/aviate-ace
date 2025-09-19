@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convex Demo</title>
+    <script src="https://unpkg.com/convex@latest/dist/browser.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Convex Direct Usage Demo</h1>
+        <p>This demo shows how to work directly with Convex functions without mock data.</p>
+        
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="user@example.com" value="user@example.com">
+        </div>
+        
+        <div class="form-group">
+            <label for="fullName">Full Name (optional):</label>
+            <input type="text" id="fullName" placeholder="Test User" value="Test User">
+        </div>
+        
+        <button id="loginBtn">Login/Register User</button>
+        <button id="getUserBtn" disabled>Get User Data</button>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script type="module">
+        // Import the Convex client
+        import { ConvexClient } from 'https://unpkg.com/convex@latest/dist/browser.js';
+        
+        // Initialize the Convex client
+        // Replace with your actual Convex deployment URL
+        const convex = new ConvexClient("https://your-convex-deployment-url.convex.cloud");
+        
+        // DOM elements
+        const emailInput = document.getElementById('email');
+        const fullNameInput = document.getElementById('fullName');
+        const loginBtn = document.getElementById('loginBtn');
+        const getUserBtn = document.getElementById('getUserBtn');
+        const resultDiv = document.getElementById('result');
+        
+        // Store user data
+        let currentUser = null;
+        
+        // Function to show result
+        function showResult(message, isError = false) {
+            resultDiv.textContent = message;
+            resultDiv.className = 'result ' + (isError ? 'error' : 'success');
+            resultDiv.style.display = 'block';
+        }
+        
+        // Function to hide result
+        function hideResult() {
+            resultDiv.style.display = 'none';
+        }
+        
+        // Login/Register user
+        loginBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            const fullName = fullNameInput.value.trim();
+            
+            if (!email) {
+                showResult('Please enter an email address', true);
+                return;
+            }
+            
+            try {
+                loginBtn.disabled = true;
+                showResult('Logging in/registering user...');
+                
+                // Call Convex mutation to login/register user
+                const result = await convex.mutation('auth:loginUser', {
+                    email: email
+                });
+                
+                currentUser = result;
+                showResult(`User logged in successfully!\nUser ID: ${result._id}\nEmail: ${result.email}`);
+                getUserBtn.disabled = false;
+            } catch (error) {
+                console.error('Login error:', error);
+                showResult(`Error: ${error.message}`, true);
+            } finally {
+                loginBtn.disabled = false;
+            }
+        });
+        
+        // Get user data
+        getUserBtn.addEventListener('click', async () => {
+            if (!currentUser) {
+                showResult('No user logged in', true);
+                return;
+            }
+            
+            try {
+                getUserBtn.disabled = true;
+                showResult('Fetching user data...');
+                
+                // Call Convex query to get user data
+                const user = await convex.query('auth:getUser', {
+                    userId: currentUser._id
+                });
+                
+                showResult(`User data retrieved:\n${JSON.stringify(user, null, 2)}`);
+            } catch (error) {
+                console.error('Get user error:', error);
+                showResult(`Error: ${error.message}`, true);
+            } finally {
+                getUserBtn.disabled = false;
+            }
+        });
+        
+        // Initialize
+        hideResult();
+    </script>
+</body>
+</html>

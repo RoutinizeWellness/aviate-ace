@@ -124,7 +124,7 @@ const B737TypeRating = () => {
        progress.quizCompleted) : false;
   };
 
-  // Module data structure with dynamic progress
+  // Module data structure with dynamic progress - BOEING 737 SPECIFIC
   const getModulesWithProgress = () => {
     const fundamentosProgress = getModuleProgressById('fundamentos');
     const sistemasProgress = getModuleProgressById('sistemas');
@@ -132,8 +132,8 @@ const B737TypeRating = () => {
     return [
       {
         id: 1,
-        title: "Fundamentos",
-        description: "Completa cada módulo para desbloquear el siguiente",
+        title: "Boeing 737 Fundamentals",
+        description: "Boeing 737 basics and foundational knowledge",
         progress: fundamentosProgress ? Math.round((fundamentosProgress.completedLessons / fundamentosProgress.totalLessons) * 100) : 0,
         totalLessons: 1,
         completedLessons: fundamentosProgress?.completedLessons || 0,
@@ -142,8 +142,8 @@ const B737TypeRating = () => {
         lessons: [
           {
             id: 1,
-            title: "Airplane General",
-            description: "Visión general B737: arquitectura, variantes y filosofía Boeing.",
+            title: "Boeing 737 Overview",
+            description: "General overview of Boeing 737: architecture, variants, and Boeing philosophy.",
             duration: "45m",
             isCompleted: isLessonCompleted(1),
             isUnlocked: true,
@@ -155,8 +155,8 @@ const B737TypeRating = () => {
       },
       {
         id: 2,
-        title: "Sistemas",
-        description: "Sistemas críticos de la aeronave B737",
+        title: "Boeing 737 Systems",
+        description: "Critical Boeing 737 aircraft systems",
         progress: sistemasProgress ? Math.round((sistemasProgress.completedLessons / sistemasProgress.totalLessons) * 100) : 0,
         totalLessons: 14,
         completedLessons: sistemasProgress?.completedLessons || 0,
@@ -165,8 +165,8 @@ const B737TypeRating = () => {
         lessons: [
           {
             id: 2,
-            title: "Air Conditioning & Pressurization",
-            description: "Control de la temperatura, la presión y la calidad del aire en cabina, garantizando confort y seguridad para tripulación y pasajeros",
+            title: "Boeing 737 Air Conditioning & Pressurization",
+            description: "Boeing 737 cabin air conditioning, pressurization, and environmental control systems.",
             duration: "60m",
             isCompleted: isLessonCompleted(2),
             isUnlocked: isLessonUnlocked(2),
@@ -176,8 +176,8 @@ const B737TypeRating = () => {
           },
           {
             id: 3,
-            title: "Anti-ice and Rain",
-            description: "Protege al avión contra hielo y lluvia, asegurando la seguridad y el rendimiento óptimo durante el vuelo en condiciones adversas",
+            title: "Boeing 737 Anti-ice and Rain Protection",
+            description: "Boeing 737 ice protection systems, engine anti-ice, and wing anti-ice systems.",
             duration: "50m",
             isCompleted: isLessonCompleted(3),
             isUnlocked: isLessonUnlocked(3),
@@ -187,8 +187,8 @@ const B737TypeRating = () => {
           },
           {
             id: 4,
-            title: "Automatic Flight",
-            description: "Controla el avión de manera automatizada, gestionando rumbo, altitud y velocidad para un vuelo seguro y eficiente.",
+            title: "Boeing 737 Autopilot & Flight Management",
+            description: "Boeing 737 autopilot systems, FMC operation, and automated flight controls.",
             duration: "55m",
             isCompleted: isLessonCompleted(4),
             isUnlocked: isLessonUnlocked(4),
@@ -198,7 +198,7 @@ const B737TypeRating = () => {
           },
           {
             id: 5,
-            title: "Communication",
+            title: "Boeing 737 Communication Systems",
             description: "Transmisión y recepción de mensajes entre la tripulación, control de tráfico aéreo y otras aeronaves, asegurando coordinación y seguridad",
             duration: "40m",
             isCompleted: isLessonCompleted(5),

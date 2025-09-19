@@ -24,7 +24,9 @@ import QuizDemo from "./pages/QuizDemo";
 import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
+import SubscriptionManagement from "./pages/SubscriptionManagement";
 import NotFound from "./pages/NotFound";
+import { GrantAdminAccess } from "./components/GrantAdminAccess";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
 
@@ -112,6 +114,16 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/admin-setup" element={<AdminSetup />} />
+            <Route path="/subscription-management" element={
+              <ProtectedRoute>
+                <SubscriptionManagement />
+              </ProtectedRoute>
+            } />
+            <Route path="/grant-admin-access" element={
+              <ProtectedRoute>
+                <GrantAdminAccess />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -3,17 +3,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Plane, Mail, Lock, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Plane, Mail, Lock, AlertCircle, AlertTriangle } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useConvexAuth";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { signIn, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement login with Supabase
-    console.log("Login attempt:", { email, password });
+    setError("");
+
+    if (!email) {
+      setError("Please enter your email");
+      return;
+    }
+
+    try {
+      // For this app, we only need the email to sign in
+      // The password field is kept for UI consistency but not used in the actual login
+      const user = await signIn(email);
+      if (user) {
+        navigate("/dashboard");
+      } else {
+        setError("Invalid email or user not found");
+      }
+    } catch (err: any) {
+      console.error("Login error:", err);
+      setError(err.message || "Login failed. Please try again.");
+    }
   };
 
   return (
@@ -50,6 +74,13 @@ const Login = () => {
             <CardTitle className="text-xl">Iniciar Sesión</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
@@ -82,7 +113,6 @@ const Login = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 surface-light border-border/50 focus:border-primary"
-                    required
                   />
                 </div>
               </div>
@@ -100,8 +130,13 @@ const Login = () => {
                 </a>
               </div>
 
-              <Button type="submit" className="w-full" size="lg">
-                Iniciar Sesión
+              <Button 
+                type="submit" 
+                className="w-full" 
+                size="lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Iniciando Sesión..." : "Iniciar Sesión"}
               </Button>
             </form>
 

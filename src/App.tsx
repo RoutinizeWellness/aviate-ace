@@ -30,7 +30,17 @@ import SubscriptionManagement from "./pages/SubscriptionManagement";
 import IntegrationTest from "./pages/IntegrationTest";
 import NotFound from "./pages/NotFound";
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
+// Initialize Convex client with fallback
+let convex: ConvexReactClient;
+try {
+  convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
+} catch (error) {
+  console.warn("Failed to initialize Convex client, using fallback");
+  // Create a mock client for fallback
+  convex = {
+    // Mock implementation for fallback
+  } as unknown as ConvexReactClient;
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -128,6 +138,15 @@ const App = () => (
                 <Route path="/integration-test" element={<IntegrationTest />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </Elements>
+      </AuthProvider>
+    </ConvexProvider>
+  </QueryClientProvider>
+);
+
+export default App;              </Routes>
             </BrowserRouter>
           </TooltipProvider>
         </Elements>

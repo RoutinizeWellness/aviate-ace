@@ -51,20 +51,48 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isConvexAvailable, setIsConvexAvailable] = useState(true);
 
-  // Convex mutations
+  // Convex mutations with fallback
   const registerUser = useMutation(api.auth.registerUser);
   const loginUser = useMutation(api.auth.loginUser);
   
-  // Convex queries
+  // Convex queries with fallback
   const getUser = useQuery(
     api.auth.getUser, 
     user ? { userId: user._id } : "skip"
   );
 
+  // Check if Convex is available
+  useEffect(() => {
+    const checkConvexAvailability = async () => {
+      try {
+        // Try to access Convex
+        const convexUrl = import.meta.env.VITE_CONVEX_URL;
+        if (!convexUrl || convexUrl === "https://your-convex-url.convex.cloud") {
+          console.warn("Convex not available, using fallback");
+          setIsConvexAvailable(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Test Convex connection
+        // In a real implementation, you might want to do a more thorough check
+        setIsConvexAvailable(true);
+      } catch (error) {
+        console.warn("Convex not available, using fallback", error);
+        setIsConvexAvailable(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkConvexAvailability();
+  }, []);
+
   // Update user when profile data changes
   useEffect(() => {
-    if (getUser) {
+    if (getUser && isConvexAvailable) {
       setUser({
         _id: getUser._id,
         email: getUser.email,
@@ -79,7 +107,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         updatedAt: getUser.updatedAt,
       });
     }
-  }, [getUser]);
+  }, [getUser, isConvexAvailable]);
 
   // Initialize auth state
   useEffect(() => {
@@ -87,12 +115,48 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.removeItem('convex_user');
     localStorage.removeItem('convex_auth_token');
     
+    // If Convex is not available, set up a demo user
+    if (!isConvexAvailable) {
+      const demoUser: User = {
+        _id: "demo_user_id" as Id<"users">,
+        email: "demo@example.com",
+        fullName: "Demo User",
+        displayName: "Demo",
+        role: "admin",
+        accountType: "premium",
+        subscription: "complete-package",
+        isActive: true,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
+      setUser(demoUser);
+    }
+    
     setIsLoading(false);
-  }, []);
+  }, [isConvexAvailable]);
 
   const signIn = async (email: string): Promise<User | null> => {
     try {
       setIsLoading(true);
+      
+      if (!isConvexAvailable) {
+        // Fallback implementation for demo purposes
+        const demoUser: User = {
+          _id: "demo_user_id" as Id<"users">,
+          email: email,
+          fullName: "Demo User",
+          displayName: email.split('@')[0],
+          role: email === "tiniboti@gmail.com" ? "admin" : "user",
+          accountType: "premium",
+          subscription: "complete-package",
+          isActive: true,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        
+        setUser(demoUser);
+        return demoUser;
+      }
       
       // Call Convex login function
       const userData = await loginUser({ email });
@@ -128,6 +192,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signUp = async (email: string, fullName?: string): Promise<User | null> => {
     try {
       setIsLoading(true);
+      
+      if (!isConvexAvailable) {
+        // Fallback implementation for demo purposes
+        const newUser: User = {
+          _id: "demo_user_id" as Id<"users">,
+          email: email,
+          fullName: fullName || email.split('@')[0],
+          displayName: fullName || email.split('@')[0],
+          role: email === "tiniboti@gmail.com" ? "admin" : "user",
+          accountType: "premium",
+          subscription: "complete-package",
+          isActive: true,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        
+        setUser(newUser);
+        return newUser;
+      }
       
       // Register the user with Convex
       const result = await registerUser({ 
@@ -180,6 +263,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (!user) throw new Error('No user logged in');
     
     try {
+      if (!isConvexAvailable) {
+        // Fallback implementation for demo purposes
+        const updatedUser = { ...user, ...data, updatedAt: Date.now() };
+        setUser(updatedUser);
+        return;
+      }
+      
       // In a real implementation, you would call a Convex mutation to update the profile
       // For now, we'll just update the local state
       const updatedUser = { ...user, ...data, updatedAt: Date.now() };

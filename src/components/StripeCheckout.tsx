@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useConvexAuth';
 import { useMutation, api } from '@/lib/convex';
 import { PRICING_PLANS, type PricingPlan } from '@/config/pricing';
-import { createPaymentIntent, confirmPayment } from '@/services/stripe/paymentService';
+import { createPaymentIntent as createBackendPaymentIntent } from '@/services/stripe/backend';
 
 interface StripeCheckoutProps {
   plan: PricingPlan;
@@ -73,7 +73,7 @@ export const StripeCheckout: React.FC<StripeCheckoutProps> = ({
       }
 
       // Create payment intent on the backend
-      const paymentIntentData = await createPaymentIntent({
+      const paymentIntentData = await createBackendPaymentIntent({
         planId: plan.id,
         userId: user._id,
         email: user.email

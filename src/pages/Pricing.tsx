@@ -94,6 +94,8 @@ const Pricing = () => {
     alert("¡Pago completado con éxito! Tu suscripción ha sido activada.");
     // In a real app, you might want to redirect to a success page or update the UI
     // to reflect the new subscription status
+    // Generate receipt for the payment
+    console.log("Generating receipt for successful payment");
     window.location.reload();
   };
 

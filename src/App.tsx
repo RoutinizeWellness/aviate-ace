@@ -27,15 +27,32 @@ import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
+import ConvexTest from "./pages/ConvexTest";
 import IntegrationTest from "./pages/IntegrationTest";
 import NotFound from "./pages/NotFound";
 
-// Initialize Convex client with fallback
+// Initialize Convex client with better error handling
 let convex: ConvexReactClient;
+const convexUrl = import.meta.env.VITE_CONVEX_URL;
+
+console.log("Initializing Convex client with URL:", convexUrl);
+
 try {
-  convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
+  if (!convexUrl) {
+    throw new Error("VITE_CONVEX_URL environment variable is not set");
+  }
+  
+  if (convexUrl === "https://your-convex-url.convex.cloud" || 
+      convexUrl === "https://your-actual-convex-url.convex.cloud") {
+    throw new Error("VITE_CONVEX_URL is still set to placeholder value");
+  }
+  
+  convex = new ConvexReactClient(convexUrl);
+  console.log("✅ Convex client initialized successfully");
 } catch (error) {
-  console.warn("Failed to initialize Convex client, using fallback");
+  console.error("❌ Failed to initialize Convex client:", error);
+  console.warn("⚠️ Using fallback mode - some features may not work properly");
+  
   // Create a mock client for fallback
   convex = {
     // Mock implementation for fallback
@@ -130,6 +147,7 @@ const App = () => (
                   </ProtectedRoute>
                 } />
                 <Route path="/admin-setup" element={<AdminSetup />} />
+                <Route path="/convex-test" element={<ConvexTest />} />
                 <Route path="/subscription-management" element={
                   <ProtectedRoute>
                     <SubscriptionManagement />

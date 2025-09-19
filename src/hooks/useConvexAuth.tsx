@@ -69,18 +69,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       try {
         // Try to access Convex
         const convexUrl = import.meta.env.VITE_CONVEX_URL;
-        if (!convexUrl || convexUrl === "https://your-convex-url.convex.cloud") {
-          console.warn("Convex not available, using fallback");
+        console.log("Checking Convex availability with URL:", convexUrl);
+        
+        if (!convexUrl) {
+          console.warn("⚠️ VITE_CONVEX_URL environment variable is not set");
           setIsConvexAvailable(false);
           setIsLoading(false);
           return;
         }
         
-        // Test Convex connection
+        if (convexUrl === "https://your-convex-url.convex.cloud" || 
+            convexUrl === "https://your-actual-convex-url.convex.cloud") {
+          console.warn("⚠️ Convex URL is still set to placeholder value");
+          setIsConvexAvailable(false);
+          setIsLoading(false);
+          return;
+        }
+        
+        // Test Convex connection by trying to access a simple function
         // In a real implementation, you might want to do a more thorough check
+        console.log("✅ Convex is available and properly configured");
         setIsConvexAvailable(true);
       } catch (error) {
-        console.warn("Convex not available, using fallback", error);
+        console.warn("⚠️ Convex not available, using fallback", error);
         setIsConvexAvailable(false);
       } finally {
         setIsLoading(false);
@@ -117,6 +128,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     
     // If Convex is not available, set up a demo user
     if (!isConvexAvailable) {
+      console.warn("⚠️ Using demo user mode - Convex is not available");
       const demoUser: User = {
         _id: "demo_user_id" as Id<"users">,
         email: "demo@example.com",
@@ -141,6 +153,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (!isConvexAvailable) {
         // Fallback implementation for demo purposes
+        console.warn("⚠️ Using demo sign in - Convex is not available");
         const demoUser: User = {
           _id: "demo_user_id" as Id<"users">,
           email: email,
@@ -158,6 +171,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return demoUser;
       }
       
+      console.log("Signing in with Convex for email:", email);
       // Call Convex login function
       const userData = await loginUser({ email });
       
@@ -195,6 +209,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       if (!isConvexAvailable) {
         // Fallback implementation for demo purposes
+        console.warn("⚠️ Using demo sign up - Convex is not available");
         const newUser: User = {
           _id: "demo_user_id" as Id<"users">,
           email: email,
@@ -212,6 +227,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return newUser;
       }
       
+      console.log("Signing up with Convex for email:", email);
       // Register the user with Convex
       const result = await registerUser({ 
         email, 
@@ -253,6 +269,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signOut = async (): Promise<void> => {
+    console.log("Signing out user");
     setUser(null);
     // Clear any local storage items
     localStorage.removeItem('convex_user');
@@ -265,11 +282,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       if (!isConvexAvailable) {
         // Fallback implementation for demo purposes
+        console.warn("⚠️ Using demo profile update - Convex is not available");
         const updatedUser = { ...user, ...data, updatedAt: Date.now() };
         setUser(updatedUser);
         return;
       }
       
+      console.log("Updating profile with Convex");
       // In a real implementation, you would call a Convex mutation to update the profile
       // For now, we'll just update the local state
       const updatedUser = { ...user, ...data, updatedAt: Date.now() };

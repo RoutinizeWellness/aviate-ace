@@ -15,6 +15,7 @@ export const api = {
     updateUserRole: "auth:updateUserRole",
     deleteUser: "auth:deleteUser",
     forceGrantAdminAccess: "auth:forceGrantAdminAccess",
+    updateUserSubscription: "auth:updateUserSubscription",
   },
   courses: {
     getUserCourses: "courses:getUserCourses",

@@ -199,20 +199,20 @@ export const updateUserProfile = mutation({
   },
 });
 
-// Update user subscription
-export const updateUserSubscription = mutation({
-  args: {
-    userId: v.id("users"),
-    subscription: v.string(), // "A320", "BOEING_737", "ALL"
-  },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.userId, {
-      subscription: args.subscription,
-      updatedAt: Date.now(),
-    });
-    return { success: true };
-  },
-});
+// Update user subscription (deprecated - see updateUserSubscription below)
+// export const updateUserSubscription = mutation({
+//   args: {
+//     userId: v.id("users"),
+//     subscription: v.string(), // "A320", "BOEING_737", "ALL"
+//   },
+//   handler: async (ctx, args) => {
+//     await ctx.db.patch(args.userId, {
+//       subscription: args.subscription,
+//       updatedAt: Date.now(),
+//     });
+//     return { success: true };
+//   },
+// });
 
 // Admin Functions
 
@@ -564,6 +564,26 @@ export const updateUserStats = mutation({
         updatedAt: Date.now(),
       });
     }
+
+    return { success: true };
+  },
+});
+
+// Update user subscription after successful payment
+export const updateUserSubscription = mutation({
+  args: {
+    userId: v.id("users"),
+    subscription: v.string(), // "A320", "BOEING_737", "ALL"
+    planId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.userId, {
+      subscription: args.subscription,
+      accountType: args.subscription === "ALL" ? "premium" : "premium",
+      planId: args.planId,
+      subscriptionStartDate: Date.now(),
+      updatedAt: Date.now(),
+    });
 
     return { success: true };
   },

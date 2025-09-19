@@ -5,6 +5,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/hooks/useConvexAuth";
+import { Elements } from '@stripe/react-stripe-js';
+import { getStripe } from '@/lib/stripe';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -25,6 +27,7 @@ import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import AdminPanel from "./pages/AdminPanel";
 import AdminSetup from "./pages/AdminSetup";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
+import IntegrationTest from "./pages/IntegrationTest";
 import NotFound from "./pages/NotFound";
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL || "");
@@ -38,92 +41,98 @@ const queryClient = new QueryClient({
   },
 });
 
+// Initialize Stripe
+const stripePromise = getStripe();
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ConvexProvider client={convex}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/exam" element={
-              <ProtectedRoute>
-                <ExamMode />
-              </ProtectedRoute>
-            } />
-            <Route path="/exams" element={
-              <ProtectedRoute>
-                <Exams />
-              </ProtectedRoute>
-            } />
-            <Route path="/type-rating" element={
-              <ProtectedRoute>
-                <TypeRating />
-              </ProtectedRoute>
-            } />
-            <Route path="/b737-type-rating" element={
-              <ProtectedRoute>
-                <B737TypeRating />
-              </ProtectedRoute>
-            } />
-            <Route path="/lesson/:lessonId" element={
-              <ProtectedRoute>
-                <LessonDetail />
-              </ProtectedRoute>
-            } />
-            <Route path="/flashcards/:aircraft" element={
-              <ProtectedRoute>
-                <Flashcards />
-              </ProtectedRoute>
-            } />
-            <Route path="/progress" element={
-              <ProtectedRoute>
-                <Progress />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/quiz-demo" element={<QuizDemo />} />
-            <Route path="/analytics" element={
-              <ProtectedRoute>
-                <AdvancedAnalytics />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              <ProtectedRoute>
-                <AdminPanel />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin-setup" element={<AdminSetup />} />
-            <Route path="/subscription-management" element={
-              <ProtectedRoute>
-                <SubscriptionManagement />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </ConvexProvider>
+      <AuthProvider>
+        <Elements stripe={stripePromise}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/exam" element={
+                  <ProtectedRoute>
+                    <ExamMode />
+                  </ProtectedRoute>
+                } />
+                <Route path="/exams" element={
+                  <ProtectedRoute>
+                    <Exams />
+                  </ProtectedRoute>
+                } />
+                <Route path="/type-rating" element={
+                  <ProtectedRoute>
+                    <TypeRating />
+                  </ProtectedRoute>
+                } />
+                <Route path="/b737-type-rating" element={
+                  <ProtectedRoute>
+                    <B737TypeRating />
+                  </ProtectedRoute>
+                } />
+                <Route path="/lesson/:lessonId" element={
+                  <ProtectedRoute>
+                    <LessonDetail />
+                  </ProtectedRoute>
+                } />
+                <Route path="/flashcards/:aircraft" element={
+                  <ProtectedRoute>
+                    <Flashcards />
+                  </ProtectedRoute>
+                } />
+                <Route path="/progress" element={
+                  <ProtectedRoute>
+                    <Progress />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                } />
+                <Route path="/quiz-demo" element={<QuizDemo />} />
+                <Route path="/analytics" element={
+                  <ProtectedRoute>
+                    <AdvancedAnalytics />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin" element={
+                  <ProtectedRoute>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin-setup" element={<AdminSetup />} />
+                <Route path="/subscription-management" element={
+                  <ProtectedRoute>
+                    <SubscriptionManagement />
+                  </ProtectedRoute>
+                } />
+                <Route path="/integration-test" element={<IntegrationTest />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </Elements>
+      </AuthProvider>
+    </ConvexProvider>
   </QueryClientProvider>
 );
 

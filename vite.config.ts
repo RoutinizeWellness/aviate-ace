@@ -18,6 +18,9 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       external: ['convex', 'convex/react', 'convex/server', 'convex/values'],
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+      },
     },
   },
 }));

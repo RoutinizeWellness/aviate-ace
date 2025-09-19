@@ -12,8 +12,15 @@ import {
   Target,
   Trophy,
   Users,
-  ArrowRight
+  ArrowRight,
+  X
 } from "lucide-react";
+import { useState } from "react";
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { StripeCheckout } from "@/components/StripeCheckout";
+import { PRICING_PLANS, type PricingPlan } from '@/config/pricing';
+import { getStripe } from '@/lib/stripe';
 
 // Data arrays
 const comparisonFeatures = [
@@ -66,6 +73,34 @@ const premiumTestimonials = [
 ];
 
 const Pricing = () => {
+  const [selectedPlan, setSelectedPlan] = useState<PricingPlan | null>(null);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
+
+  const handleSelectPlan = (plan: PricingPlan) => {
+    setSelectedPlan(plan);
+    setShowCheckout(true);
+  };
+
+  const handleCloseCheckout = () => {
+    setShowCheckout(false);
+    setSelectedPlan(null);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowCheckout(false);
+    setSelectedPlan(null);
+    // Show success message
+    alert("¡Pago completado con éxito! Tu suscripción ha sido activada.");
+    // In a real app, you might want to redirect to a success page or update the UI
+    // to reflect the new subscription status
+    window.location.reload();
+  };
+
+  // For this demo, we'll use the test publishable key directly
+  // In a real app, you should use environment variables
+  const stripePromise = getStripe();
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -115,10 +150,16 @@ const Pricing = () => {
           <div className="flex items-center justify-center gap-4 mb-12">
             <span className="text-sm text-muted-foreground">Mensual</span>
             <div className="relative">
-              <input type="checkbox" className="sr-only" id="pricing-toggle" />
+              <input 
+                type="checkbox" 
+                className="sr-only" 
+                id="pricing-toggle" 
+                checked={isAnnual}
+                onChange={(e) => setIsAnnual(e.target.checked)}
+              />
               <label htmlFor="pricing-toggle" className="flex items-center cursor-pointer">
                 <div className="w-12 h-6 bg-surface-light rounded-full relative">
-                  <div className="w-5 h-5 bg-primary rounded-full absolute top-0.5 left-0.5 transition-transform"></div>
+                  <div className={`w-5 h-5 bg-primary rounded-full absolute top-0.5 transition-transform ${isAnnual ? 'transform translate-x-6' : 'translate-x-0.5'}`}></div>
                 </div>
               </label>
             </div>
@@ -132,8 +173,7 @@ const Pricing = () => {
       {/* Pricing Cards */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 max-w-7xl mx-auto">
-            
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
             {/* Free Plan */}
             <Card className="surface-mid border-border/50 relative">
               <CardHeader className="text-center pb-6">
@@ -144,7 +184,7 @@ const Pricing = () => {
                 <div className="text-4xl font-bold mb-2">
                   €0
                 </div>
-                <p className="text-sm text-muted-foreground">Para empezar tu preparación</p>
+                <p className="text-sm text-muted-foreground">Para siempre</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
@@ -171,196 +211,38 @@ const Pricing = () => {
               </CardContent>
             </Card>
 
-            {/* 1 Month Plan */}
-            <Card className="surface-mid border-primary/50 relative ring-2 ring-primary/20">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-primary text-primary-foreground px-4 py-1">
-                  <Star className="w-3 h-3 mr-1" />
-                  Popular
-                </Badge>
-              </div>
-              <CardHeader className="text-center pb-6 pt-6">
-                <CardTitle className="text-xl mb-2">1 mes</CardTitle>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Por mes - Acceso completo
-                </p>
-                <div className="text-4xl font-bold mb-2">
-                  €29
-                </div>
-                <p className="text-sm text-muted-foreground">Por mes - Acceso completo</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Acceso completo a todos los cursos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Todas las aeronaves disponibles</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Preguntas ilimitadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Estadísticas avanzadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Modo examen completo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Soporte prioritario</span>
-                  </li>
-                </ul>
-                <Button className="w-full" size="sm">
-                  Seleccionar plan
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* 3 Months Plan */}
-            <Card className="surface-mid border-border/50 relative">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="text-xl mb-2">3 meses</CardTitle>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Acceso completo por 3 meses
-                </p>
-                <div className="text-4xl font-bold mb-2">
-                  €79
-                </div>
-                <p className="text-sm text-muted-foreground">Acceso completo por 3 meses</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Acceso completo a todos los cursos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Todas las aeronaves disponibles</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Preguntas ilimitadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Estadísticas avanzadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Modo examen completo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Soporte prioritario</span>
-                  </li>
-                </ul>
-                <Button className="w-full" variant="outline" size="sm">
-                  Seleccionar plan
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* 6 Months Plan */}
-            <Card className="surface-mid border-border/50 relative">
-              <CardHeader className="text-center pb-6">
-                <CardTitle className="text-xl mb-2">6 meses</CardTitle>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Acceso completo por 6 meses
-                </p>
-                <div className="text-4xl font-bold mb-2">
-                  €140
-                </div>
-                <p className="text-sm text-muted-foreground">Acceso completo por 6 meses</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Acceso completo a todos los cursos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Todas las aeronaves disponibles</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Preguntas ilimitadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Estadísticas avanzadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Modo examen completo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Soporte prioritario</span>
-                  </li>
-                </ul>
-                <Button className="w-full" variant="outline" size="sm">
-                  Seleccionar plan
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* 1 Year Plan */}
-            <Card className="surface-mid border-success/50 relative ring-2 ring-success/20">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-success text-success-foreground px-4 py-1">
-                  Mejor valor
-                </Badge>
-              </div>
-              <CardHeader className="text-center pb-6 pt-6">
-                <CardTitle className="text-xl mb-2">1 año</CardTitle>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Acceso completo por 12 meses
-                </p>
-                <div className="text-4xl font-bold mb-2">
-                  €250
-                </div>
-                <p className="text-sm text-muted-foreground">Acceso completo por 12 meses</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Acceso completo a todos los cursos</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Todas las aeronaves disponibles</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Preguntas ilimitadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Estadísticas avanzadas</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Modo examen completo</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm">Soporte prioritario</span>
-                  </li>
-                </ul>
-                <Button className="w-full bg-success hover:bg-success/90" size="sm">
-                  Seleccionar plan
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Our new pricing plans from config */}
+            {PRICING_PLANS.map((plan) => (
+              <Card key={plan.id} className="surface-mid border-primary/50 relative ring-2 ring-primary/20">
+                <CardHeader className="text-center pb-6 pt-6">
+                  <CardTitle className="text-xl mb-2">{plan.name}</CardTitle>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {plan.description}
+                  </p>
+                  <div className="text-4xl font-bold mb-2">
+                    ${plan.price.toFixed(2)}
+                  </div>
+                  <p className="text-sm text-muted-foreground">Por acceso completo</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button 
+                    className="w-full" 
+                    size="sm"
+                    onClick={() => handleSelectPlan(plan)}
+                  >
+                    Seleccionar plan
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -462,6 +344,34 @@ const Pricing = () => {
           </div>
         </div>
       </section>
+
+      {/* Stripe Checkout Modal */}
+      {showCheckout && selectedPlan && stripePromise && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold">Completar Pago</h3>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleCloseCheckout}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              
+              <Elements stripe={stripePromise}>
+                <StripeCheckout 
+                  plan={selectedPlan}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handleCloseCheckout}
+                />
+              </Elements>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="py-12 surface-dark border-t border-border">

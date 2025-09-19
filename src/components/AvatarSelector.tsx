@@ -61,10 +61,13 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
 
   const SelectedIcon = avatarOptions.find(opt => opt.id === selectedAvatar)?.icon || User;
 
+  // If children are provided, wrap them in a span to avoid ref issues
+  const triggerContent = children ? <span>{children}</span> : <Button variant="outline">Change Avatar</Button>;
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {children || <Button variant="outline">Change Avatar</Button>}
+        {triggerContent}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

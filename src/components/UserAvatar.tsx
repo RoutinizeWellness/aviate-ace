@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from 'lucide-react';
 
@@ -9,12 +9,12 @@ interface UserAvatarProps {
   className?: string;
 }
 
-const UserAvatar: React.FC<UserAvatarProps> = ({ 
+const UserAvatar = forwardRef<HTMLSpanElement, UserAvatarProps>(({
   avatarUrl,
   displayName,
   size = 'md',
   className = ''
-}) => {
+}, ref) => {
   // Determine size classes
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
@@ -33,7 +33,7 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
   };
 
   return (
-    <Avatar className={`${sizeClass} ${className}`}>
+    <Avatar ref={ref} className={`${sizeClass} ${className}`}>
       <AvatarImage src={avatarUrl} alt={displayName || 'User avatar'} />
       <AvatarFallback className="bg-primary/10 text-primary">
         {getInitial()}
@@ -41,7 +41,9 @@ const UserAvatar: React.FC<UserAvatarProps> = ({
       </AvatarFallback>
     </Avatar>
   );
-};
+});
+
+UserAvatar.displayName = 'UserAvatar';
 
 export { UserAvatar };
 export default UserAvatar;

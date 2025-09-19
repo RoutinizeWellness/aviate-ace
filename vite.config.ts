@@ -17,6 +17,8 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     rollupOptions: {
+      // Only mark Convex modules as external in production builds
+      external: mode === "production" ? ['convex', 'convex/server', 'convex/values'] : [],
       input: {
         main: path.resolve(__dirname, 'index.html'),
       },

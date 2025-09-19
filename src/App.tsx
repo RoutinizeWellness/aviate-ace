@@ -146,13 +146,4 @@ const App = () => (
   </QueryClientProvider>
 );
 
-export default App;              </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </Elements>
-      </AuthProvider>
-    </ConvexProvider>
-  </QueryClientProvider>
-);
-
 export default App;

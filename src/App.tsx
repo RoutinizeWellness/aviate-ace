@@ -29,6 +29,8 @@ import AdminSetup from "./pages/AdminSetup";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import ConvexTest from "./pages/ConvexTest";
 import IntegrationTest from "./pages/IntegrationTest";
+import { ConvexTestPage } from "./pages/ConvexTestPage";
+import { ComprehensiveConvexTest } from "./pages/ComprehensiveConvexTest";
 import NotFound from "./pages/NotFound";
 
 // Initialize Convex client with better error handling
@@ -151,6 +153,8 @@ const App = () => (
                 } />
                 <Route path="/admin-setup" element={<AdminSetup />} />
                 <Route path="/convex-test" element={<ConvexTest />} />
+                <Route path="/convex-test-page" element={<ConvexTestPage />} />
+                <Route path="/comprehensive-convex-test" element={<ComprehensiveConvexTest />} />
                 <Route path="/subscription-management" element={
                   <ProtectedRoute>
                     <SubscriptionManagement />

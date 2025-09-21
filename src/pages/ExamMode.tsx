@@ -46,7 +46,7 @@ const ExamMode = () => {
   const timeLimit = parseInt(searchParams.get('timeLimit') || '0');
   const questionCount = parseInt(searchParams.get('questionCount') || '20');
   
-  const [selectedExamId, setSelectedExamId] = useState<string | null>(searchParams.get('examId'));
+  const [selectedExamId, setSelectedExamId] = useState<string | null>(searchParams.get('examId') || null);
   const [showExamSelector, setShowExamSelector] = useState(!selectedExamId && examMode === 'practice' && !selectedCategory);
   
   const {
@@ -56,7 +56,7 @@ const ExamMode = () => {
     handleStartExam,
     handleSubmitExam,
     setExamState,
-  } = useExamSession(selectedExamId || '', {
+  } = useExamSession(selectedExamId || undefined, {
     mode: examMode,
     category: selectedCategory,
     difficulty: selectedDifficulty,
@@ -223,9 +223,12 @@ const ExamMode = () => {
     setIsAnswered(true);
     setShowExplanation(true);
     
-    // Track incorrect question for review mode
+    // Track incorrect question for review mode only if we're using Convex data (valid Convex IDs)
     const currentQuestion = getCurrentQuestion();
-    if (currentQuestion && selectedAnswer !== currentQuestion.correctAnswer) {
+    if (currentQuestion && 
+        selectedAnswer !== currentQuestion.correctAnswer && 
+        typeof currentQuestion._id === 'string' && 
+        currentQuestion._id.length === 32) {
       recordIncorrectQuestion({
         userId: user!._id as Id<"users">,
         questionId: currentQuestion._id as Id<"examQuestions">,
@@ -268,6 +271,24 @@ const ExamMode = () => {
         };
       }
     });
+    
+    // Track incorrect question for review mode only if we're using Convex data (valid Convex IDs)
+    const currentQuestion = questions?.find(q => q._id === questionId);
+    if (currentQuestion && 
+        selectedAnswerIndex !== currentQuestion.correctAnswer && 
+        typeof currentQuestion._id === 'string' && 
+        currentQuestion._id.length === 32) {
+      recordIncorrectQuestion({
+        userId: user!._id as Id<"users">,
+        questionId: currentQuestion._id as Id<"examQuestions">,
+        incorrectAnswer: selectedAnswerIndex,
+        correctAnswer: currentQuestion.correctAnswer,
+        sessionType: examMode || 'practice',
+        category: currentQuestion.category,
+        difficulty: currentQuestion.difficulty,
+        aircraftType: currentQuestion.aircraftType,
+      }).catch(error => console.log('Could not track incorrect question:', error));
+    }
   };
 
   // Function to go to next question

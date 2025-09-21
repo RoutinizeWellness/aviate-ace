@@ -241,7 +241,7 @@ interface ExamSessionOptions {
   aircraft?: string;
 }
 
-export const useExamSession = (examId: string, options: ExamSessionOptions = {}) => {
+export const useExamSession = (examId: string | undefined, options: ExamSessionOptions = {}) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -396,53 +396,173 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
       const beforeCount = allQuestions.length;
       const categoryMap: { [key: string]: string[] } = {
         // Official Airbus A320 Categories
-        'aircraft-general': ['General', 'Aircraft General', 'Airplane General', 'General Knowledge'],
-        'load-acceleration-limits': ['Load Limits', 'Acceleration Limits', 'Structural Limits', 'G-Force Limits', 'Load Acceleration Limits'],
-        'environment-limits': ['Environment Limits', 'Environmental Limits', 'Weather Limits', 'Operational Limits'],
-        'weight-limits': ['Weight Limits', 'Weight and Balance', 'Mass Limits', 'CG Limits'],
-        'speed-limits': ['Speed Limits', 'Velocity Limits', 'Airspeed Limits', 'Mach Limits'],
-        'air-bleed-cond-press-vent': ['Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'],
-        'autoflight': ['Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS', 'Autoflight'],
-        'apu': ['APU', 'Auxiliary Power Unit', 'APU Systems'],
-        'engines': ['Engines', 'Engine Systems', 'Motor y APU', 'Powerplant', 'Engine Operations'],
-        'flight-controls': ['Flight Controls', 'Control Systems', 'Primary Controls', 'Secondary Controls', 'Flight Controls'],
-        'fuel': ['Fuel', 'Fuel Systems', 'Fuel Management'],
-        'ice-rain-protection': ['Ice Protection', 'Anti-Ice', 'Rain Protection', 'Ice and Rain Protection', 'Anti-Ice and Rain'],
-        'landing-gear': ['Landing Gear', 'Gear Systems', 'Brakes', 'Landing Gear and Brakes'],
-        'oxygen': ['Oxygen', 'Oxygen Systems', 'Emergency Oxygen', 'Life Support'],
-        'gpws': ['GPWS', 'Ground Proximity Warning', 'Terrain Warning', 'TAWS'],
-        'navigation': ['Navigation', 'Flight Management and Navigation', 'Navegación', 'GPS', 'FMS'],
+        'aircraft-general': [
+          'General', 'Aircraft General', 'Airplane General', 'General Knowledge',
+          'Sistema Eléctrico', 'Sistema Hidráulico', 'Sistema Neumático', 
+          'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos',
+          'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno',
+          'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 
+          'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent',
+          'Aircraft Systems', 'Hydraulic Systems', 'Electrical Systems',
+          'Fuel Systems', 'Oxygen Systems', 'Landing Gear Systems',
+          'Flight Controls', 'APU Systems', 'Engine Systems'
+        ],
+        'load-acceleration-limits': [
+          'Load Limits', 'Acceleration Limits', 'Structural Limits', 'G-Force Limits', 
+          'Load Acceleration Limits', 'Load Factor Limits', 'G-Limits',
+          'Límites de Carga', 'Límites de Aceleración', 'Límites Estructurales'
+        ],
+        'environment-limits': [
+          'Environment Limits', 'Environmental Limits', 'Weather Limits', 
+          'Operational Limits', 'Temperature Limits', 'Altitude Limits',
+          'Límites Ambientales', 'Límites Operacionales'
+        ],
+        'weight-limits': [
+          'Weight Limits', 'Weight and Balance', 'Mass Limits', 'CG Limits',
+          'Límites de Peso', 'Peso y Balance', 'Límites de Masa'
+        ],
+        'speed-limits': [
+          'Speed Limits', 'Velocity Limits', 'Airspeed Limits', 'Mach Limits',
+          'Límites de Velocidad', 'Velocidad Máxima', 'VMO', 'MMO'
+        ],
+        'air-bleed-cond-press-vent': [
+          'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 
+          'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent',
+          'Sistema Neumático', 'Presurización', 'Aire Acondicionado', 
+          'Ventilación', 'Sistema de Aire'
+        ],
+        'autoflight': [
+          'Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS', 'Autoflight',
+          'Autopiloto', 'Sistema de Vuelo Automático', 'Gestión de Vuelo'
+        ],
+        'apu': [
+          'APU', 'Auxiliary Power Unit', 'APU Systems', 'Unidad de Potencia Auxiliar',
+          'Sistema APU'
+        ],
+        'engines': [
+          'Engines', 'Engine Systems', 'Motor y APU', 'Powerplant', 'Engine Operations',
+          'Motores', 'Sistema de Motores', 'Operación de Motores'
+        ],
+        'flight-controls': [
+          'Flight Controls', 'Control Systems', 'Primary Controls', 'Secondary Controls', 
+          'Controles de Vuelo', 'Sistema de Controles'
+        ],
+        'fuel': [
+          'Fuel', 'Fuel Systems', 'Fuel Management', 'Sistema de Combustible',
+          'Gestión de Combustible'
+        ],
+        'ice-rain-protection': [
+          'Ice Protection', 'Anti-Ice', 'Rain Protection', 'Ice and Rain Protection', 
+          'Anti-Ice and Rain', 'Protección contra Hielo', 'Sistema Antihielo'
+        ],
+        'landing-gear': [
+          'Landing Gear', 'Gear Systems', 'Brakes', 'Landing Gear and Brakes',
+          'Tren de Aterrizaje', 'Sistema de Frenos'
+        ],
+        'oxygen': [
+          'Oxygen', 'Oxygen Systems', 'Emergency Oxygen', 'Life Support',
+          'Oxígeno', 'Sistema de Oxígeno', 'Oxígeno de Emergencia'
+        ],
+        'gpws': [
+          'GPWS', 'Ground Proximity Warning', 'Terrain Warning', 'TAWS',
+          'Sistema de Alerta de Proximidad al Terreno'
+        ],
+        'navigation': [
+          'Navigation', 'Flight Management and Navigation', 'Navegación', 'GPS', 'FMS',
+          'Sistema de Navegación', 'Flight Management', 'RNAV', 'RNP', 'ILS'
+        ],
         // Legacy categories for backward compatibility
-        'airplane-general': ['General', 'Aircraft General', 'Airplane General', 'General Knowledge'],
-        'air-systems': ['Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic'],
-        'anti-ice-rain': ['Anti-Ice', 'Rain Protection', 'Ice Protection', 'Anti-Ice and Rain'],
-        'automatic-flight': ['Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS'],
-        'communication': ['Communication', 'Radio', 'ACARS', 'Communications'],
-        'electrical': ['Electrical', 'Power Systems', 'Sistema Eléctrico', 'Electrical Systems'],
-        'engines-apu': ['Engines', 'APU', 'Engine Systems', 'Engines and APU', 'Motor y APU', 'Powerplant'],
-        'fire-protection': ['Fire Protection', 'Fire Systems', 'Fire Detection', 'Fire Suppression', 'Protección de Vuelo'],
-        'flight-instruments': ['Flight Instruments', 'Displays', 'ECAM', 'EICAS', 'Flight Instruments and Displays'],
-        'flight-management': ['Flight Management', 'Navigation', 'FMS', 'Flight Management and Navigation', 'Navegación'],
-        'hydraulics': ['Hydraulics', 'Hydraulic Systems', 'Sistema Hidráulico', 'Hydraulic Power'],
-        'warning-systems': ['Warning Systems', 'Alert Systems', 'ECAM', 'EICAS', 'Alerting Systems'],
+        'airplane-general': [
+          'General', 'Aircraft General', 'Airplane General', 'General Knowledge',
+          'Sistema Eléctrico', 'Sistema Hidráulico'
+        ],
+        'air-systems': [
+          'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic',
+          'Sistema Neumático', 'Presurización'
+        ],
+        'anti-ice-rain': [
+          'Anti-Ice', 'Rain Protection', 'Ice Protection', 'Anti-Ice and Rain',
+          'Protección contra Hielo'
+        ],
+        'automatic-flight': [
+          'Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS',
+          'Autopiloto', 'Sistema de Vuelo Automático'
+        ],
+        'communication': [
+          'Communication', 'Radio', 'ACARS', 'Communications',
+          'Comunicación', 'Sistema de Comunicaciones'
+        ],
+        'electrical': [
+          'Electrical', 'Power Systems', 'Sistema Eléctrico', 'Electrical Systems'
+        ],
+        'engines-apu': [
+          'Engines', 'APU', 'Engine Systems', 'Engines and APU', 'Motor y APU', 'Powerplant',
+          'Motores', 'Sistema APU'
+        ],
+        'fire-protection': [
+          'Fire Protection', 'Fire Systems', 'Fire Detection', 'Fire Suppression', 
+          'Protección de Vuelo', 'Sistema de Protección contra Incendios'
+        ],
+        'flight-instruments': [
+          'Flight Instruments', 'Displays', 'ECAM', 'EICAS', 
+          'Flight Instruments and Displays', 'Instrumentos de Vuelo'
+        ],
+        'flight-management': [
+          'Flight Management', 'Navigation', 'FMS', 'Flight Management and Navigation', 
+          'Navegación', 'Gestión de Vuelo'
+        ],
+        'hydraulics': [
+          'Hydraulics', 'Hydraulic Systems', 'Sistema Hidráulico', 'Hydraulic Power'
+        ],
+        'warning-systems': [
+          'Warning Systems', 'Alert Systems', 'ECAM', 'EICAS', 'Alerting Systems',
+          'Sistemas de Alerta'
+        ],
         // Legacy Spanish categories for backward compatibility
-        'sistemas-aeronave': ['Sistema Eléctrico', 'Sistema Hidráulico', 'Sistema Neumático', 'Sistemas de Alerta', 'Motor y APU'],
-        'proteccion-vuelo': ['Protección de Vuelo', 'Sistema de Vuelo', 'Fire Protection', 'Fire Systems'],
-        'procedimientos-aproximacion': ['Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático'],
-        'procedimientos-emergencia': ['Procedimientos de Emergencia', 'Sistema de Presurización'],
+        'sistemas-aeronave': [
+          'Sistema Eléctrico', 'Sistema Hidráulico', 'Sistema Neumático', 
+          'Sistemas de Alerta', 'Motor y APU'
+        ],
+        'proteccion-vuelo': [
+          'Protección de Vuelo', 'Sistema de Vuelo', 'Fire Protection', 'Fire Systems'
+        ],
+        'procedimientos-aproximacion': [
+          'Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático'
+        ],
+        'procedimientos-emergencia': [
+          'Procedimientos de Emergencia', 'Sistema de Presurización'
+        ],
         'meteorologia': ['Meteorología'],
         'reglamentacion': ['Reglamentación'],
         'navegacion': ['Navegación'],
         'performance': ['Performance', 'Procedimientos de Despegue'],
         // Additional mappings for review system categories
-        'aircraft-systems': ['Aircraft Systems', 'Sistema Hidráulico', 'Sistema Eléctrico', 'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos', 'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno', 'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'],
-        'flight-protection': ['Flight Protection', 'Protección de Vuelo', 'Fire Protection', 'Fire Systems', 'Alpha Protection', 'Overspeed Protection', 'Load Factor Protection'],
-        'approach-procedures': ['Approach Procedures', 'Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático', 'ILS Approach', 'RNAV Approach', 'Autoland'],
-        'emergency-procedures': ['Emergency Procedures', 'Procedimientos de Emergencia', 'Sistema de Presurización', 'Emergency Descent', 'Engine Fire', 'Rapid Decompression'],
-        'meteorology': ['Meteorology', 'Meteorología', 'Weather', 'Wind Shear', 'Turbulence', 'Icing Conditions'],
-        'regulations': ['Regulations', 'Reglamentación', 'EASA', 'ICAO', 'FAA', 'Flight Time Limitations', 'Operating Rules'],
-        'navigation': ['Navigation', 'Navegación', 'Flight Management and Navigation', 'GPS', 'FMS', 'RNAV', 'RNP', 'ILS'],
-        'performance': ['Performance', 'Procedimientos de Despegue', 'Takeoff Performance', 'Landing Performance', 'Climb Performance', 'Fuel Planning']
+        'aircraft-systems': [
+          'Aircraft Systems', 'Sistema Hidráulico', 'Sistema Eléctrico', 
+          'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos', 
+          'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno', 
+          'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 
+          'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'
+        ],
+        'flight-protection': [
+          'Flight Protection', 'Protección de Vuelo', 'Fire Protection', 'Fire Systems', 
+          'Alpha Protection', 'Overspeed Protection', 'Load Factor Protection'
+        ],
+        'approach-procedures': [
+          'Approach Procedures', 'Procedimientos de Aproximación', 
+          'Sistema de Aterrizaje Automático', 'ILS Approach', 'RNAV Approach', 'Autoland'
+        ],
+        'emergency-procedures': [
+          'Emergency Procedures', 'Procedimientos de Emergencia', 
+          'Sistema de Presurización', 'Emergency Descent', 'Engine Fire', 'Rapid Decompression'
+        ],
+        'meteorology': [
+          'Meteorology', 'Meteorología', 'Weather', 'Wind Shear', 'Turbulence', 'Icing Conditions'
+        ],
+        'regulations': [
+          'Regulations', 'Reglamentación', 'EASA', 'ICAO', 'FAA', 
+          'Flight Time Limitations', 'Operating Rules'
+        ]
       };
       
       const targetCategories = categoryMap[category] || [category];
@@ -478,53 +598,173 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
       if (category && category !== 'all') {
         const categoryMap: { [key: string]: string[] } = {
           // Official Airbus A320 Categories
-          'aircraft-general': ['General', 'Aircraft General', 'Airplane General', 'General Knowledge'],
-          'load-acceleration-limits': ['Load Limits', 'Acceleration Limits', 'Structural Limits', 'G-Force Limits', 'Load Acceleration Limits'],
-          'environment-limits': ['Environment Limits', 'Environmental Limits', 'Weather Limits', 'Operational Limits'],
-          'weight-limits': ['Weight Limits', 'Weight and Balance', 'Mass Limits', 'CG Limits'],
-          'speed-limits': ['Speed Limits', 'Velocity Limits', 'Airspeed Limits', 'Mach Limits'],
-          'air-bleed-cond-press-vent': ['Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'],
-          'autoflight': ['Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS', 'Autoflight'],
-          'apu': ['APU', 'Auxiliary Power Unit', 'APU Systems'],
-          'engines': ['Engines', 'Engine Systems', 'Motor y APU', 'Powerplant', 'Engine Operations'],
-          'flight-controls': ['Flight Controls', 'Control Systems', 'Primary Controls', 'Secondary Controls', 'Flight Controls'],
-          'fuel': ['Fuel', 'Fuel Systems', 'Fuel Management'],
-          'ice-rain-protection': ['Ice Protection', 'Anti-Ice', 'Rain Protection', 'Ice and Rain Protection', 'Anti-Ice and Rain'],
-          'landing-gear': ['Landing Gear', 'Gear Systems', 'Brakes', 'Landing Gear and Brakes'],
-          'oxygen': ['Oxygen', 'Oxygen Systems', 'Emergency Oxygen', 'Life Support'],
-          'gpws': ['GPWS', 'Ground Proximity Warning', 'Terrain Warning', 'TAWS'],
-          'navigation': ['Navigation', 'Flight Management and Navigation', 'Navegación', 'GPS', 'FMS'],
+          'aircraft-general': [
+            'General', 'Aircraft General', 'Airplane General', 'General Knowledge',
+            'Sistema Eléctrico', 'Sistema Hidráulico', 'Sistema Neumático', 
+            'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos',
+            'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno',
+            'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 
+            'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent',
+            'Aircraft Systems', 'Hydraulic Systems', 'Electrical Systems',
+            'Fuel Systems', 'Oxygen Systems', 'Landing Gear Systems',
+            'Flight Controls', 'APU Systems', 'Engine Systems'
+          ],
+          'load-acceleration-limits': [
+            'Load Limits', 'Acceleration Limits', 'Structural Limits', 'G-Force Limits', 
+            'Load Acceleration Limits', 'Load Factor Limits', 'G-Limits',
+            'Límites de Carga', 'Límites de Aceleración', 'Límites Estructurales'
+          ],
+          'environment-limits': [
+            'Environment Limits', 'Environmental Limits', 'Weather Limits', 
+            'Operational Limits', 'Temperature Limits', 'Altitude Limits',
+            'Límites Ambientales', 'Límites Operacionales'
+          ],
+          'weight-limits': [
+            'Weight Limits', 'Weight and Balance', 'Mass Limits', 'CG Limits',
+            'Límites de Peso', 'Peso y Balance', 'Límites de Masa'
+          ],
+          'speed-limits': [
+            'Speed Limits', 'Velocity Limits', 'Airspeed Limits', 'Mach Limits',
+            'Límites de Velocidad', 'Velocidad Máxima', 'VMO', 'MMO'
+          ],
+          'air-bleed-cond-press-vent': [
+            'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 
+            'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent',
+            'Sistema Neumático', 'Presurización', 'Aire Acondicionado', 
+            'Ventilación', 'Sistema de Aire'
+          ],
+          'autoflight': [
+            'Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS', 'Autoflight',
+            'Autopiloto', 'Sistema de Vuelo Automático', 'Gestión de Vuelo'
+          ],
+          'apu': [
+            'APU', 'Auxiliary Power Unit', 'APU Systems', 'Unidad de Potencia Auxiliar',
+            'Sistema APU'
+          ],
+          'engines': [
+            'Engines', 'Engine Systems', 'Motor y APU', 'Powerplant', 'Engine Operations',
+            'Motores', 'Sistema de Motores', 'Operación de Motores'
+          ],
+          'flight-controls': [
+            'Flight Controls', 'Control Systems', 'Primary Controls', 'Secondary Controls', 
+            'Controles de Vuelo', 'Sistema de Controles'
+          ],
+          'fuel': [
+            'Fuel', 'Fuel Systems', 'Fuel Management', 'Sistema de Combustible',
+            'Gestión de Combustible'
+          ],
+          'ice-rain-protection': [
+            'Ice Protection', 'Anti-Ice', 'Rain Protection', 'Ice and Rain Protection', 
+            'Anti-Ice and Rain', 'Protección contra Hielo', 'Sistema Antihielo'
+          ],
+          'landing-gear': [
+            'Landing Gear', 'Gear Systems', 'Brakes', 'Landing Gear and Brakes',
+            'Tren de Aterrizaje', 'Sistema de Frenos'
+          ],
+          'oxygen': [
+            'Oxygen', 'Oxygen Systems', 'Emergency Oxygen', 'Life Support',
+            'Oxígeno', 'Sistema de Oxígeno', 'Oxígeno de Emergencia'
+          ],
+          'gpws': [
+            'GPWS', 'Ground Proximity Warning', 'Terrain Warning', 'TAWS',
+            'Sistema de Alerta de Proximidad al Terreno'
+          ],
+          'navigation': [
+            'Navigation', 'Flight Management and Navigation', 'Navegación', 'GPS', 'FMS',
+            'Sistema de Navegación'
+          ],
           // Legacy categories for backward compatibility
-          'airplane-general': ['General', 'Aircraft General', 'Airplane General', 'General Knowledge'],
-          'air-systems': ['Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic'],
-          'anti-ice-rain': ['Anti-Ice', 'Rain Protection', 'Ice Protection', 'Anti-Ice and Rain'],
-          'automatic-flight': ['Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS'],
-          'communication': ['Communication', 'Radio', 'ACARS', 'Communications'],
-          'electrical': ['Electrical', 'Power Systems', 'Sistema Eléctrico', 'Electrical Systems'],
-          'engines-apu': ['Engines', 'APU', 'Engine Systems', 'Engines and APU', 'Motor y APU', 'Powerplant'],
-          'fire-protection': ['Fire Protection', 'Fire Systems', 'Fire Detection', 'Fire Suppression', 'Protección de Vuelo'],
-          'flight-instruments': ['Flight Instruments', 'Displays', 'ECAM', 'EICAS', 'Flight Instruments and Displays'],
-          'flight-management': ['Flight Management', 'Navigation', 'FMS', 'Flight Management and Navigation', 'Navegación'],
-          'hydraulics': ['Hydraulics', 'Hydraulic Systems', 'Sistema Hidráulico', 'Hydraulic Power'],
-          'warning-systems': ['Warning Systems', 'Alert Systems', 'ECAM', 'EICAS', 'Alerting Systems'],
+          'airplane-general': [
+            'General', 'Aircraft General', 'Airplane General', 'General Knowledge',
+            'Sistema Eléctrico', 'Sistema Hidráulico'
+          ],
+          'air-systems': [
+            'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic',
+            'Sistema Neumático', 'Presurización'
+          ],
+          'anti-ice-rain': [
+            'Anti-Ice', 'Rain Protection', 'Ice Protection', 'Anti-Ice and Rain',
+            'Protección contra Hielo'
+          ],
+          'automatic-flight': [
+            'Autopilot', 'Flight Management', 'Automatic Flight', 'AFCS',
+            'Autopiloto', 'Sistema de Vuelo Automático'
+          ],
+          'communication': [
+            'Communication', 'Radio', 'ACARS', 'Communications',
+            'Comunicación', 'Sistema de Comunicaciones'
+          ],
+          'electrical': [
+            'Electrical', 'Power Systems', 'Sistema Eléctrico', 'Electrical Systems'
+          ],
+          'engines-apu': [
+            'Engines', 'APU', 'Engine Systems', 'Engines and APU', 'Motor y APU', 'Powerplant',
+            'Motores', 'Sistema APU'
+          ],
+          'fire-protection': [
+            'Fire Protection', 'Fire Systems', 'Fire Detection', 'Fire Suppression', 
+            'Protección de Vuelo', 'Sistema de Protección contra Incendios'
+          ],
+          'flight-instruments': [
+            'Flight Instruments', 'Displays', 'ECAM', 'EICAS', 
+            'Flight Instruments and Displays', 'Instrumentos de Vuelo'
+          ],
+          'flight-management': [
+            'Flight Management', 'Navigation', 'FMS', 'Flight Management and Navigation', 
+            'Navegación', 'Gestión de Vuelo'
+          ],
+          'hydraulics': [
+            'Hydraulics', 'Hydraulic Systems', 'Sistema Hidráulico', 'Hydraulic Power'
+          ],
+          'warning-systems': [
+            'Warning Systems', 'Alert Systems', 'ECAM', 'EICAS', 'Alerting Systems',
+            'Sistemas de Alerta'
+          ],
           // Legacy Spanish categories for backward compatibility
-          'sistemas-aeronave': ['Sistema Eléctrico', 'Sistema Hidráulico', 'Sistema Neumático', 'Sistemas de Alerta', 'Motor y APU'],
-          'proteccion-vuelo': ['Protección de Vuelo', 'Sistema de Vuelo', 'Fire Protection', 'Fire Systems'],
-          'procedimientos-aproximacion': ['Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático'],
-          'procedimientos-emergencia': ['Procedimientos de Emergencia', 'Sistema de Presurización'],
+          'sistemas-aeronave': [
+            'Sistema Eléctrico', 'Sistema Hidráulico', 'Sistema Neumático', 
+            'Sistemas de Alerta', 'Motor y APU'
+          ],
+          'proteccion-vuelo': [
+            'Protección de Vuelo', 'Sistema de Vuelo', 'Fire Protection', 'Fire Systems'
+          ],
+          'procedimientos-aproximacion': [
+            'Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático'
+          ],
+          'procedimientos-emergencia': [
+            'Procedimientos de Emergencia', 'Sistema de Presurización'
+          ],
           'meteorologia': ['Meteorología'],
           'reglamentacion': ['Reglamentación'],
           'navegacion': ['Navegación'],
           'performance': ['Performance', 'Procedimientos de Despegue'],
           // Additional mappings for review system categories
-          'aircraft-systems': ['Aircraft Systems', 'Sistema Hidráulico', 'Sistema Eléctrico', 'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos', 'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno', 'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'],
-          'flight-protection': ['Flight Protection', 'Protección de Vuelo', 'Fire Protection', 'Fire Systems', 'Alpha Protection', 'Overspeed Protection', 'Load Factor Protection'],
-          'approach-procedures': ['Approach Procedures', 'Procedimientos de Aproximación', 'Sistema de Aterrizaje Automático', 'ILS Approach', 'RNAV Approach', 'Autoland'],
-          'emergency-procedures': ['Emergency Procedures', 'Procedimientos de Emergencia', 'Sistema de Presurización', 'Emergency Descent', 'Engine Fire', 'Rapid Decompression'],
-          'meteorology': ['Meteorology', 'Meteorología', 'Weather', 'Wind Shear', 'Turbulence', 'Icing Conditions'],
-          'regulations': ['Regulations', 'Reglamentación', 'EASA', 'ICAO', 'FAA', 'Flight Time Limitations', 'Operating Rules'],
-          'navigation': ['Navigation', 'Navegación', 'Flight Management and Navigation', 'GPS', 'FMS', 'RNAV', 'RNP', 'ILS'],
-          'performance': ['Performance', 'Procedimientos de Despegue', 'Takeoff Performance', 'Landing Performance', 'Climb Performance', 'Fuel Planning']
+          'aircraft-systems': [
+            'Aircraft Systems', 'Sistema Hidráulico', 'Sistema Eléctrico', 
+            'Sistema de Combustible', 'Sistema de Presurización', 'Sistema de Frenos', 
+            'Controles de Vuelo', 'Tren de Aterrizaje', 'Sistema de Oxígeno', 
+            'Air Systems', 'Pressurization', 'Air Conditioning', 'Pneumatic', 
+            'Bleed Air', 'Ventilation', 'Air Bleed/Cond/Press/Vent'
+          ],
+          'flight-protection': [
+            'Flight Protection', 'Protección de Vuelo', 'Fire Protection', 'Fire Systems', 
+            'Alpha Protection', 'Overspeed Protection', 'Load Factor Protection'
+          ],
+          'approach-procedures': [
+            'Approach Procedures', 'Procedimientos de Aproximación', 
+            'Sistema de Aterrizaje Automático', 'ILS Approach', 'RNAV Approach', 'Autoland'
+          ],
+          'emergency-procedures': [
+            'Emergency Procedures', 'Procedimientos de Emergencia', 
+            'Sistema de Presurización', 'Emergency Descent', 'Engine Fire', 'Rapid Decompression'
+          ],
+          'meteorology': [
+            'Meteorology', 'Meteorología', 'Weather', 'Wind Shear', 'Turbulence', 'Icing Conditions'
+          ],
+          'regulations': [
+            'Regulations', 'Reglamentación', 'EASA', 'ICAO', 'FAA', 
+            'Flight Time Limitations', 'Operating Rules'
+          ]
         };
         
         const targetCategories = categoryMap[category] || [category];
@@ -581,9 +821,12 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
       let sessionId = `real-session-${Date.now()}`;
       
       try {
+        // Only pass examId if it's a valid Convex ID (not empty string)
+        const validExamId = examId && examId.length === 32 ? examId as Id<"exams"> : undefined;
+        
         const session = await startExamMutation({
           userId: user._id as Id<"users">,
-          examId: examId as Id<"exams">,
+          examId: validExamId,
           sessionType: mode, // Use the actual mode (practice, timed, review)
         });
         sessionId = session.sessionId;
@@ -643,7 +886,8 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
         try {
           for (const incorrectAnswer of incorrectAnswers) {
             const question = questions.find(q => q._id === incorrectAnswer.questionId);
-            if (question) {
+            // Only track incorrect questions if we're using Convex data (valid Convex IDs)
+            if (question && typeof question._id === 'string' && question._id.length === 32) {
               await recordIncorrectQuestion({
                 userId: user._id as Id<"users">,
                 questionId: question._id as Id<"examQuestions">,
@@ -671,7 +915,8 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
         try {
           for (const correctAnswer of correctAnswersInReview) {
             const question = questions.find(q => q._id === correctAnswer.questionId);
-            if (question) {
+            // Only mark questions as resolved if we're using Convex data (valid Convex IDs)
+            if (question && typeof question._id === 'string' && question._id.length === 32) {
               await markQuestionResolved({
                 userId: user._id as Id<"users">,
                 questionId: question._id as Id<"examQuestions">,
@@ -684,26 +929,39 @@ export const useExamSession = (examId: string, options: ExamSessionOptions = {})
       }
 
       // Try to save to Convex, fallback to mock if it fails
-      try {
-        await completeExamMutation({
-          userId: user._id as Id<"users">,
-          examId: examId as Id<"exams">,
-          sessionType: mode, // Use the actual mode (practice, timed, review)
-          questionsCount: questions.length,
-          correctAnswers,
-          score,
-          timeSpent: Math.floor((Date.now() - examState.startTime.getTime()) / 1000),
-          answers: finalAnswers.map(answer => ({
-            questionId: answer.questionId as Id<"examQuestions">,
-            selectedAnswer: answer.selectedAnswer,
-            isCorrect: questions.find(q => q._id === answer.questionId)?.correctAnswer === answer.selectedAnswer,
-            timeSpent: answer.timeSpent,
-          })),
-        });
-      } catch (convexError) {
-        console.log('Using mock exam completion (Convex not available)');
-        // Mock completion - just log to console
-        console.log('Exam completed with score:', score);
+      // Only try to save to Convex if we're using Convex data (valid Convex IDs)
+      const hasValidConvexIds = questions.length > 0 && 
+        typeof questions[0]._id === 'string' && 
+        questions[0]._id.length === 32;
+
+      if (hasValidConvexIds) {
+        try {
+          // Only pass examId if it's a valid Convex ID (not empty string)
+          const validExamId = examId && examId.length === 32 ? examId as Id<"exams"> : undefined;
+          
+          await completeExamMutation({
+            userId: user._id as Id<"users">,
+            examId: validExamId,
+            sessionType: mode, // Use the actual mode (practice, timed, review)
+            questionsCount: questions.length,
+            correctAnswers,
+            score,
+            timeSpent: Math.floor((Date.now() - examState.startTime.getTime()) / 1000),
+            answers: finalAnswers.map(answer => ({
+              questionId: answer.questionId as Id<"examQuestions">,
+              selectedAnswer: answer.selectedAnswer,
+              isCorrect: questions.find(q => q._id === answer.questionId)?.correctAnswer === answer.selectedAnswer,
+              timeSpent: answer.timeSpent,
+            })),
+          });
+        } catch (convexError) {
+          console.log('Using mock exam completion (Convex not available)');
+          // Mock completion - just log to console
+          console.log('Exam completed with score:', score);
+        }
+      } else {
+        // Using fallback data, just log to console
+        console.log('Using fallback exam data, exam completed with score:', score);
       }
 
       setExamState(prev => ({

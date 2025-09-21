@@ -109,7 +109,7 @@ const MobileNavigation = () => {
               </Button>
               
               {/* Admin Panel - Only show for admins */}
-              {isAdmin(user) && (
+              {isAdmin(user) ? (
                 <Button 
                   variant="ghost" 
                   className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
@@ -117,6 +117,15 @@ const MobileNavigation = () => {
                 >
                   <Shield className="w-5 h-5" />
                   <span>Panel Admin</span>
+                </Button>
+              ) : (
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start gap-3 h-12 text-muted-foreground"
+                  onClick={() => navigate('/admin-setup')}
+                >
+                  <Shield className="w-5 h-5" />
+                  <span>Configurar Admin</span>
                 </Button>
               )}
             </nav>
@@ -330,7 +339,7 @@ const Dashboard = () => {
                 </Button>
                 
                 {/* Admin Panel - Only show for admins */}
-                {isAdmin(user) && (
+                {isAdmin(user) ? (
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
@@ -338,6 +347,15 @@ const Dashboard = () => {
                   >
                     <Shield className="w-5 h-5" />
                     <span>Panel Admin</span>
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    className="w-full justify-start gap-3 h-12 text-muted-foreground"
+                    onClick={() => navigate('/admin-setup')}
+                  >
+                    <Shield className="w-5 h-5" />
+                    <span>Configurar Admin</span>
                   </Button>
                 )}
               </nav>

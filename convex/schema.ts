@@ -118,21 +118,6 @@ export default defineSchema({
     .index("by_module", ["module"])
     .index("by_order", ["courseId", "lessonOrder"]),
 
-  // User Lesson Progress table
-  userLessonProgress: defineTable({
-    userId: v.id("users"),
-    lessonId: v.id("lessons"),
-    theoryCompleted: v.boolean(),
-    flashcardsCompleted: v.boolean(),
-    quizCompleted: v.boolean(),
-    quizScore: v.optional(v.number()),
-    completedAt: v.optional(v.number()),
-    lastAccessedAt: v.number(),
-  })
-    .index("by_user", ["userId"])
-    .index("by_lesson", ["lessonId"])
-    .index("by_user_lesson", ["userId", "lessonId"]),
-
   // Exams table
   exams: defineTable({
     title: v.string(),
@@ -150,7 +135,7 @@ export default defineSchema({
     .index("by_aircraft", ["aircraftType"])
     .index("by_category", ["category"]),
 
-  // Exam Questions table
+  // Exam Questions table - Updated to include new fields
   examQuestions: defineTable({
     examId: v.optional(v.id("exams")),
     question: v.string(),
@@ -162,6 +147,8 @@ export default defineSchema({
     difficulty: v.string(),
     isActive: v.boolean(),
     createdAt: v.number(),
+    reference: v.optional(v.string()), // Official reference documentation
+    regulationCode: v.optional(v.string()), // Applicable regulation
   })
     .index("by_exam", ["examId"])
     .index("by_aircraft", ["aircraftType"])

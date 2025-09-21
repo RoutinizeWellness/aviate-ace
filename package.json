@@ -11,7 +11,11 @@
     "preview": "vite preview",
     "deploy:netlify": "node connect-convex-netlify.js",
     "verify:convex": "node verify-convex-connection.js",
-    "verify:config": "node scripts/verify-convex-config.js"
+    "verify:config": "node scripts/verify-convex-config.js",
+    "verify:netlify": "node scripts/verify-netlify-convex.js",
+    "seed:convex": "node scripts/seed-convex-db.js",
+    "test:seed": "node scripts/test-convex-seed.js",
+    "check:convex": "node scripts/check-convex-status.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

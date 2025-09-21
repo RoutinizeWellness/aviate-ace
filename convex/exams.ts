@@ -58,6 +58,8 @@ export const createExamQuestion = mutation({
     aircraftType: v.string(),
     category: v.string(),
     difficulty: v.string(),
+    reference: v.optional(v.string()), // Official reference documentation
+    regulationCode: v.optional(v.string()), // Applicable regulation
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("examQuestions", {

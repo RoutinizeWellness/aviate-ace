@@ -56,6 +56,7 @@ const AdminPanel = () => {
 
   // Redirect if not admin
   useEffect(() => {
+    // Only redirect if we have a definitive answer that the user is not admin
     if (adminCheck && !adminCheck.isAdmin) {
       toast({
         title: "Acceso Denegado",
@@ -66,7 +67,17 @@ const AdminPanel = () => {
     }
   }, [adminCheck, navigate, toast]);
 
-  if (!user || !adminCheck?.isAdmin) {
+  // Show loading state while checking admin status
+  if (!user || adminCheck === undefined) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Redirect if not admin (after we have a definitive answer)
+  if (!adminCheck?.isAdmin) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="surface-mid border-border/50 p-8 text-center max-w-md">

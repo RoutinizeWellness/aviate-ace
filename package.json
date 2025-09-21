@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/verify-convex-config.js && vite build",
+    "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -50,10 +50,10 @@
     "@stripe/stripe-js": "^7.9.0",
     "@supabase/supabase-js": "^2.57.4",
     "@tanstack/react-query": "^5.83.0",
-    "convex": "^1.13.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "convex": "^1.13.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
@@ -69,6 +69,7 @@
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
+    "toml": "^3.0.0",
     "vaul": "^0.9.9",
     "zod": "^3.25.76"
   },

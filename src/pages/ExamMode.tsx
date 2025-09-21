@@ -65,17 +65,74 @@ const ExamMode = () => {
     aircraft: selectedAircraft
   });
 
-  // Auto-start exam if we have category/difficulty or examId
-  useEffect(() => {
-    if ((selectedCategory || selectedExamId) && !examState.sessionId && questions && questions.length > 0) {
-      handleStartExam();
-    }
-  }, [selectedCategory, selectedExamId, questions, examState.sessionId, handleStartExam]);
-
   // State for loading and error handling
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [questionsError, setQuestionsError] = useState<Error | null>(null);
   const [isSubmittingExam, setIsSubmittingExam] = useState(false);
+
+  // State for answer verification
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+
+  // State for dynamically loaded questions
+  const [dynamicQuestions, setDynamicQuestions] = useState<any[]>([]);
+  const [isLoadingDynamicQuestions, setIsLoadingDynamicQuestions] = useState(false);
+
+  // Load questions dynamically when category is selected but no examId is provided
+  useEffect(() => {
+    const loadQuestions = async () => {
+      if (!selectedExamId && selectedCategory && examMode === 'practice') {
+        setIsLoadingDynamicQuestions(true);
+        try {
+          // Dynamically import the question loader
+          const { loadAndFilterQuestions } = await import('@/utils/questionLoader');
+          const loadedQuestions = await loadAndFilterQuestions(
+            examMode,
+            selectedCategory,
+            selectedAircraft,
+            selectedDifficulty,
+            questionCount
+          );
+          setDynamicQuestions(loadedQuestions);
+        } catch (error) {
+          console.error('Error loading questions:', error);
+          setQuestionsError(error as Error);
+        } finally {
+          setIsLoadingDynamicQuestions(false);
+        }
+      }
+    };
+
+    loadQuestions();
+  }, [selectedExamId, selectedCategory, examMode, selectedAircraft, selectedDifficulty, questionCount]);
+
+  // Initialize selected answer when question changes
+  useEffect(() => {
+    const currentQuestions = questions || dynamicQuestions;
+    if (examMode === 'practice' && currentQuestions && currentQuestions.length > 0) {
+      const currentQuestion = currentQuestions[examState.currentQuestionIndex];
+      const existingAnswer = examState.answers.find(a => a.questionId === currentQuestion?._id);
+      
+      if (existingAnswer) {
+        setSelectedAnswer(existingAnswer.selectedAnswer);
+        setIsAnswered(true);
+        setShowExplanation(true);
+      } else {
+        setSelectedAnswer(null);
+        setIsAnswered(false);
+        setShowExplanation(false);
+      }
+    }
+  }, [examState.currentQuestionIndex, examState.answers, questions, dynamicQuestions, examMode]);
+
+  // Auto-start exam if we have category/difficulty or examId
+  useEffect(() => {
+    const currentQuestions = questions || dynamicQuestions;
+    if ((selectedCategory || selectedExamId) && !examState.sessionId && currentQuestions && currentQuestions.length > 0) {
+      handleStartExam();
+    }
+  }, [selectedCategory, selectedExamId, questions, dynamicQuestions, examState.sessionId, handleStartExam]);
 
   // Timer countdown effect
   useEffect(() => {
@@ -120,7 +177,8 @@ const ExamMode = () => {
 
   // Get current question based on current index
   const getCurrentQuestion = () => {
-    return questions && questions.length > 0 ? questions[examState.currentQuestionIndex] : null;
+    const currentQuestions = questions || dynamicQuestions;
+    return currentQuestions && currentQuestions.length > 0 ? currentQuestions[examState.currentQuestionIndex] : null;
   };
   
   // Get current answer for the current question
@@ -177,11 +235,6 @@ const ExamMode = () => {
   const handleExitExam = () => {
     navigate('/exams');
   };
-
-  // State for answer verification
-  const [isAnswered, setIsAnswered] = useState(false);
-  const [showExplanation, setShowExplanation] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
 
   // Function to select an answer (in practice mode)
   const selectAnswer = (questionId: string, answerIndex: number) => {
@@ -273,7 +326,8 @@ const ExamMode = () => {
     });
     
     // Track incorrect question for review mode only if we're using Convex data (valid Convex IDs)
-    const currentQuestion = questions?.find(q => q._id === questionId);
+    const currentQuestions = questions || dynamicQuestions;
+    const currentQuestion = currentQuestions?.find(q => q._id === questionId);
     if (currentQuestion && 
         selectedAnswerIndex !== currentQuestion.correctAnswer && 
         typeof currentQuestion._id === 'string' && 
@@ -293,18 +347,12 @@ const ExamMode = () => {
 
   // Function to go to next question
   const nextQuestion = () => {
-    if (examState.currentQuestionIndex < (questions?.length || 1) - 1) {
+    const currentQuestions = questions || dynamicQuestions;
+    if (examState.currentQuestionIndex < (currentQuestions?.length || 1) - 1) {
       setExamState(prev => ({
         ...prev,
         currentQuestionIndex: prev.currentQuestionIndex + 1
       }));
-      
-      // Reset practice mode state
-      if (examMode === 'practice') {
-        setIsAnswered(false);
-        setShowExplanation(false);
-        setSelectedAnswer(null);
-      }
     }
   };
 
@@ -315,24 +363,18 @@ const ExamMode = () => {
         ...prev,
         currentQuestionIndex: prev.currentQuestionIndex - 1
       }));
-      
-      // Reset practice mode state
-      if (examMode === 'practice') {
-        setIsAnswered(false);
-        setShowExplanation(false);
-        const previousAnswer = examState.answers.find(a => a.questionId === questions?.[examState.currentQuestionIndex - 1]?._id);
-        setSelectedAnswer(previousAnswer?.selectedAnswer ?? null);
-        setShowExplanation(!!previousAnswer);
-        setIsAnswered(!!previousAnswer);
-      }
     }
   };
 
+  // Determine which questions to use
+  const currentQuestions = questions || dynamicQuestions;
+  const isUsingDynamicQuestions = !questions && dynamicQuestions.length > 0;
+
   // Main exam interface
-  if (!examState.isCompleted && questions && questions.length > 0) {
+  if (!examState.isCompleted && currentQuestions && currentQuestions.length > 0) {
     const currentQuestion = getCurrentQuestion();
     const currentAnswer = getCurrentAnswer();
-    const progressPercentage = ((examState.currentQuestionIndex + 1) / questions.length) * 100;
+    const progressPercentage = ((examState.currentQuestionIndex + 1) / currentQuestions.length) * 100;
     const answeredCount = examState.answers.length;
 
     return (
@@ -369,7 +411,7 @@ const ExamMode = () => {
                 </div>
                 
                 <Badge variant="outline" className="bg-primary/10 text-primary">
-                  Pregunta {examState.currentQuestionIndex + 1} de {questions.length}
+                  Pregunta {examState.currentQuestionIndex + 1} de {currentQuestions.length}
                 </Badge>
               </div>
             </div>
@@ -583,7 +625,7 @@ const ExamMode = () => {
                       <Target className="w-4 h-4 mr-2" />
                       Confirmar Respuesta
                     </Button>
-                  ) : examState.currentQuestionIndex === questions.length - 1 ? (
+                  ) : examState.currentQuestionIndex === currentQuestions.length - 1 ? (
                     <Button 
                       onClick={handleSubmitExamClick}
                       disabled={isSubmittingExam}
@@ -628,7 +670,7 @@ const ExamMode = () => {
               <CardContent className="p-4 text-center">
                 <Target className="w-8 h-8 text-primary mx-auto mb-2" />
                 <h3 className="font-semibold text-sm mb-1">Respondidas</h3>
-                <p className="text-lg font-bold text-primary">{answeredCount}/{questions.length}</p>
+                <p className="text-lg font-bold text-primary">{answeredCount}/{currentQuestions.length}</p>
               </CardContent>
             </Card>
 
@@ -658,6 +700,19 @@ const ExamMode = () => {
     );
   }
 
+  // Loading state for dynamic questions
+  if (isLoadingDynamicQuestions) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card className="surface-mid border-border/50 p-8 text-center max-w-md">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+          <h2 className="text-lg font-semibold mb-2">Cargando Preguntas</h2>
+          <p className="text-muted-foreground">Preparando tu examen...</p>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       <Card className="surface-mid border-border/50 p-8 text-center max-w-md">
@@ -683,7 +738,7 @@ const ExamMode = () => {
                 - Examen seleccionado: {exam?.title || 'No encontrado'}<br/>
                 - ID del examen: {selectedExamId}<br/>
                 - Estado de carga: {isLoadingQuestions ? 'Cargando...' : 'Completado'}<br/>
-                - Preguntas encontradas: {questions?.length || 0}<br/>
+                - Preguntas encontradas: {currentQuestions?.length || 0}<br/>
                 {questionsError && `- Error: ${questionsError.message}`}
               </p>
             </div>

@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useSupabaseProfile } from "@/hooks/useSupabaseProfile";
 import { useUserStats } from "@/hooks/useStats";
 import { useCourses } from "@/hooks/useCourses";
 import { useState } from "react";
@@ -35,7 +35,7 @@ import { useState } from "react";
 const Progress = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { profile, userStats } = useUserProfile();
+  const { profile, userStats } = useSupabaseProfile();
   const { userCourses } = useCourses();
   const { examStats, recentProgress, userAchievements } = useUserStats();
   const [weeklyGoal, setWeeklyGoal] = useState(20); // Default 20 questions per week

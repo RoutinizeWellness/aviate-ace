@@ -42,10 +42,9 @@ export const loadAndFilterQuestions = async (
     allQuestions = allQuestions.filter(q => {
       // Include questions that match the aircraft type or are general
       return q.aircraftType === aircraft || 
-             q.aircraftType === 'COMMERCIAL_AIRCRAFT' || 
-             q.aircraftType === 'GENERAL_AVIATION' ||
-             q.aircraftType === 'REGULATORY' ||
-             (aircraft === 'A320_FAMILY' && q.aircraftType === 'A320_FAMILY');
+             q.aircraftType === 'GENERAL' || 
+             (aircraft === 'A320_FAMILY' && q.aircraftType === 'A320_FAMILY') ||
+             (aircraft === 'B737_FAMILY' && q.aircraftType === 'B737_FAMILY');
     });
     console.log('After aircraft filter:', beforeCount, '->', allQuestions.length);
   }

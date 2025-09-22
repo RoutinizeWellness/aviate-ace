@@ -1,23 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from './useConvexAuth';
-
-interface UserProfile {
-  id: string;
-  email: string;
-  fullName?: string;
-  displayName?: string;
-  avatarUrl?: string;
-  role?: 'user' | 'admin' | 'premium';
-  accountType?: 'free' | 'premium' | 'enterprise';
-  subscription?: string;
-  isActive?: boolean;
-  createdAt: number;
-  updatedAt: number;
-}
+import { UserProfile, ConvexUserProfile, UserStats } from '../types/userProfile';
 
 export const useUserProfile = () => {
   const { user, isLoading } = useAuth();
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<ConvexUserProfile | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -42,7 +29,7 @@ export const useUserProfile = () => {
   return {
     profile,
     isLoading,
-    updateProfile: async (data: Partial<UserProfile>) => {
+    updateProfile: async (data: Partial<ConvexUserProfile>) => {
       // In a real implementation, this would call an API to update the profile
       if (profile) {
         setProfile({ ...profile, ...data, updatedAt: Date.now() });

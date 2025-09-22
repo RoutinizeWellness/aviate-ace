@@ -2,7 +2,8 @@
 // This would typically be implemented as a serverless function
 
 import { handleWebhook } from './backend';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request } from 'express';
+import type { Response } from 'express';
 
 // In a real implementation, you would get this from environment variables
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_mock1234567890';

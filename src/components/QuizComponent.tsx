@@ -110,6 +110,9 @@ export const QuizComponent: React.FC<QuizComponentProps> = ({
       await markQuestionForReview(
         questionConvexId as any,
         currentQuestion.category || 'General',
+        selectedAnswer || 0, // incorrectAnswer
+        currentQuestion.correctAnswer, // correctAnswer
+        'practice', // sessionType
         currentQuestion.difficulty || 'Medium',
         currentQuestion.aircraftType || 'General'
       );

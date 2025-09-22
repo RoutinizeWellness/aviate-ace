@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useSupabaseProfile } from "@/hooks/useSupabaseProfile";
 import { useUserStats } from "@/hooks/useStats";
 import { useState, useEffect } from "react";
 import { UserAvatar } from "@/components/UserAvatar";
@@ -33,7 +33,7 @@ import { AvatarSelector } from "@/components/AvatarSelector";
 const Profile = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { profile, userStats, updateProfile, updateAvatar, isUpdatingProfile } = useUserProfile();
+  const { profile, userStats, updateProfile, updateAvatar, isUpdatingProfile } = useSupabaseProfile();
   const { examStats, userAchievements } = useUserStats();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -211,7 +211,7 @@ const Profile = () => {
                       <UserAvatar 
                         avatarUrl={profile?.avatar_url} 
                         displayName={displayName}
-                        size="xl"
+                        size="lg"
                         className="cursor-pointer hover:opacity-80 transition-opacity"
                       />
                     </AvatarSelector>

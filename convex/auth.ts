@@ -580,8 +580,6 @@ export const updateUserSubscription = mutation({
     await ctx.db.patch(args.userId, {
       subscription: args.subscription,
       accountType: args.subscription === "ALL" ? "premium" : "premium",
-      planId: args.planId,
-      subscriptionStartDate: Date.now(),
       updatedAt: Date.now(),
     });
 

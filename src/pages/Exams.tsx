@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useExams } from "@/hooks/useExam";
-import { useUserProfile } from "@/hooks/useUserProfile";
+import { useSupabaseProfile } from "@/hooks/useSupabaseProfile";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useState } from "react";
 import {
@@ -46,7 +46,7 @@ const Exams = () => {
   const { user, signOut } = useAuth();
   const { hasAccessTo, getCurrentSubscription, isAdmin, getSubscriptionDisplayName } = useSubscription();
   const { exams, isLoadingExams, userExamSessions } = useExams();
-  const { profile } = useUserProfile();
+  const { profile } = useSupabaseProfile();
   
   // Check access permissions
   const canAccessA320 = hasAccessTo('A320_FAMILY');
@@ -170,7 +170,7 @@ const Exams = () => {
     navigate('/login');
   };
 
-  const displayName = profile?.display_name || 
+  const displayName = profile?.displayName || 
                      user?.fullName || 
                      user?.email?.split('@')[0] || 
                      'Usuario';

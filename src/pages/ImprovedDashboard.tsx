@@ -1,5 +1,5 @@
 import React from 'react';
-import useConvexAuth from '@/hooks/useConvexAuth';
+import { useAuth } from '@/hooks/useConvexAuth';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -23,7 +23,7 @@ interface DashboardProps {
 }
 
 export default function ImprovedDashboard({ className }: DashboardProps) {
-  const { user, isLoading } = useConvexAuth();
+  const { user, isLoading } = useAuth();
 
   const navigationItems = [
     { icon: Home, label: 'Dashboard', active: true },

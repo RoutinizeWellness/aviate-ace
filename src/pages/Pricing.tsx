@@ -390,9 +390,9 @@ const Pricing = () => {
             </div>
             
             <div className="flex gap-8 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">Términos</a>
-              <a href="#" className="hover:text-primary transition-colors">Privacidad</a>
-              <a href="#" className="hover:text-primary transition-colors">Contacto</a>
+              <a href="/terms" className="hover:text-primary transition-colors">Términos</a>
+              <a href="/privacy" className="hover:text-primary transition-colors">Privacidad</a>
+              <a href="/contact" className="hover:text-primary transition-colors">Contacto</a>
             </div>
           </div>
           

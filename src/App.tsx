@@ -10,6 +10,7 @@ import { getStripe } from '@/lib/stripe';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import ImprovedDashboard from "./pages/ImprovedDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Pricing from "./pages/Pricing";
@@ -31,6 +32,9 @@ import ConvexTest from "./pages/ConvexTest";
 import IntegrationTest from "./pages/IntegrationTest";
 import { ConvexTestPage } from "./pages/ConvexTestPage";
 import { ComprehensiveConvexTest } from "./pages/ComprehensiveConvexTest";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
 // Initialize Convex client with better error handling
@@ -92,7 +96,7 @@ const App = () => (
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <ImprovedDashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="/exam" element={
@@ -161,6 +165,9 @@ const App = () => (
                   </ProtectedRoute>
                 } />
                 <Route path="/integration-test" element={<IntegrationTest />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

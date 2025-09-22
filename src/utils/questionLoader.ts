@@ -12,7 +12,7 @@ export const loadAndFilterQuestions = async (
   questionCount: number
 ): Promise<RealAviationQuestion[]> => {
   // Dynamically import the large data file only when needed
-  const { allRealAviationQuestions } = await import('@/data/realAviationQuestions');
+  const { allRealAviationQuestions } = await import('@/data/cleanAviationQuestions');
   
   let allQuestions = [...allRealAviationQuestions];
   

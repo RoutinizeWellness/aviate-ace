@@ -11,29 +11,14 @@ export interface PricingPlan {
 
 export const PRICING_PLANS: PricingPlan[] = [
   {
-    id: 'a320-basic',
-    name: 'A320 Type Rating - Basic',
-    description: 'Essential preparation materials for Airbus A320 type rating',
-    price: 99.99,
-    currency: 'USD',
-    aircraftType: 'A320_FAMILY',
-    features: [
-      'Access to A320 theory lessons',
-      'Practice exams (limited attempts)',
-      'Basic progress tracking',
-      'Email support'
-    ],
-    stripePriceId: 'price_a320_basic_test' // Replace with actual Stripe price ID
-  },
-  {
     id: 'a320-premium',
     name: 'A320 Type Rating - Premium',
     description: 'Complete preparation package for Airbus A320 type rating',
-    price: 199.99,
-    currency: 'USD',
+    price: 29.99,
+    currency: 'EUR',
     aircraftType: 'A320_FAMILY',
     features: [
-      'All Basic features',
+      'Access to A320 theory lessons',
       'Unlimited practice exams',
       'Advanced analytics and progress tracking',
       'Personalized study recommendations',
@@ -44,29 +29,14 @@ export const PRICING_PLANS: PricingPlan[] = [
     stripePriceId: 'price_a320_premium_test' // Replace with actual Stripe price ID
   },
   {
-    id: 'b737-basic',
-    name: 'B737 Type Rating - Basic',
-    description: 'Essential preparation materials for Boeing 737 type rating',
-    price: 99.99,
-    currency: 'USD',
-    aircraftType: 'BOEING_737',
-    features: [
-      'Access to B737 theory lessons',
-      'Practice exams (limited attempts)',
-      'Basic progress tracking',
-      'Email support'
-    ],
-    stripePriceId: 'price_b737_basic_test' // Replace with actual Stripe price ID
-  },
-  {
     id: 'b737-premium',
     name: 'B737 Type Rating - Premium',
     description: 'Complete preparation package for Boeing 737 type rating',
-    price: 199.99,
-    currency: 'USD',
-    aircraftType: 'BOEING_737',
+    price: 29.99,
+    currency: 'EUR',
+    aircraftType: 'B737_FAMILY',
     features: [
-      'All Basic features',
+      'Access to B737 theory lessons',
       'Unlimited practice exams',
       'Advanced analytics and progress tracking',
       'Personalized study recommendations',
@@ -78,10 +48,10 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'complete-package',
-    name: 'Complete Package',
-    description: 'Full access to all aircraft types and premium features',
+    name: 'Complete Package - Annual',
+    description: 'Full access to all aircraft types and premium features for 1 year',
     price: 299.99,
-    currency: 'USD',
+    currency: 'EUR',
     aircraftType: 'ALL',
     features: [
       'Access to all aircraft type ratings',

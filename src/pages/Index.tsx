@@ -15,6 +15,7 @@ import {
   BookOpen,
   TrendingUp
 } from "lucide-react";
+import { PRICING_PLANS } from "@/config/pricing";
 import heroCockpit from "@/assets/hero-cockpit.jpg";
 
 interface PricingPlan {
@@ -61,7 +62,7 @@ const features = [
   }
 ];
 
-const pricingPlans: PricingPlan[] = [
+const pricingPlans = [
   {
     name: "Gratuito",
     price: "€0",
@@ -70,76 +71,23 @@ const pricingPlans: PricingPlan[] = [
     description: "Para empezar tu preparación",
     features: [
       "Acceso a cursos básicos",
-      "Primera lección de cada curso",
+      "Primera lección de cada curso", 
       "Máximo 10 preguntas por examen",
       "Categorías limitadas (A320, B737)"
     ],
     cta: "Empezar gratis"
   },
-  {
-    name: "1 mes",
-    price: "€29",
-    featured: true,
-    bestValue: false,
-    description: "Por mes - Acceso completo",
-    features: [
-      "Acceso completo a todos los cursos",
-      "Todas las aeronaves disponibles",
-      "Preguntas ilimitadas",
-      "Estadísticas avanzadas",
-      "Modo examen completo",
-      "Soporte prioritario"
-    ],
+  ...PRICING_PLANS.map(plan => ({
+    name: plan.name.includes('A320') ? '1 mes A320' : 
+          plan.name.includes('B737') ? '1 mes B737' :
+          plan.name.includes('Complete') ? '1 año - Mejor Valor' : plan.name,
+    price: `€${plan.price.toFixed(0)}`,
+    featured: plan.name.includes('Premium'),
+    bestValue: plan.name.includes('Complete'),
+    description: plan.description,
+    features: plan.features,
     cta: "Seleccionar plan"
-  },
-  {
-    name: "3 meses",
-    price: "€79",
-    featured: false,
-    bestValue: false,
-    description: "Acceso completo por 3 meses",
-    features: [
-      "Acceso completo a todos los cursos",
-      "Todas las aeronaves disponibles",
-      "Preguntas ilimitadas",
-      "Estadísticas avanzadas",
-      "Modo examen completo",
-      "Soporte prioritario"
-    ],
-    cta: "Seleccionar plan"
-  },
-  {
-    name: "6 meses",
-    price: "€140",
-    featured: false,
-    bestValue: false,
-    description: "Acceso completo por 6 meses",
-    features: [
-      "Acceso completo a todos los cursos",
-      "Todas las aeronaves disponibles",
-      "Preguntas ilimitadas",
-      "Estadísticas avanzadas",
-      "Modo examen completo",
-      "Soporte prioritario"
-    ],
-    cta: "Seleccionar plan"
-  },
-  {
-    name: "1 año",
-    price: "€250",
-    featured: false,
-    bestValue: true,
-    description: "Acceso completo por 12 meses",
-    features: [
-      "Acceso completo a todos los cursos",
-      "Todas las aeronaves disponibles",
-      "Preguntas ilimitadas",
-      "Estadísticas avanzadas",
-      "Modo examen completo",
-      "Soporte prioritario"
-    ],
-    cta: "Seleccionar plan"
-  }
+  }))
 ];
 
 const testimonials = [
@@ -573,9 +521,9 @@ const Index = () => {
             </div>
             
             <div className="flex gap-8 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">Términos</a>
-              <a href="#" className="hover:text-primary transition-colors">Privacidad</a>
-              <a href="#" className="hover:text-primary transition-colors">Contacto</a>
+              <a href="/terms" className="hover:text-primary transition-colors">Términos</a>
+              <a href="/privacy" className="hover:text-primary transition-colors">Privacidad</a>
+              <a href="/contact" className="hover:text-primary transition-colors">Contacto</a>
             </div>
           </div>
           

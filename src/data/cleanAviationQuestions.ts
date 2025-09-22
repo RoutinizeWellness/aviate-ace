@@ -84,35 +84,8 @@ export const b737Questions: RealAviationQuestion[] = [
   }
 ];
 
-// Hydraulic System Questions
-export const hydraulicSystemQuestions: RealAviationQuestion[] = [
-  {
-    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
-    question: "How many independent hydraulic systems does the A320 have?",
-    options: [
-      "2 systems (Green and Blue)",
-      "3 systems (Green, Blue, and Yellow)",
-      "1 system with backup",
-      "4 systems for redundancy"
-    ],
-    correctAnswer: 1,
-    explanation: "The A320 has three independent hydraulic systems: Green (engine 1 driven), Blue (electric pump), and Yellow (engine 2 driven, with manual backup).",
-    aircraftType: "A320_FAMILY",
-    category: "Hydraulics",
-    difficulty: "basic",
-    isActive: true,
-    _creationTime: Date.now(),
-    reference: "A320 FCOM 2.29.10 - Hydraulic System",
-    regulationCode: "EASA CS-25.1301"
-  }
-];
-
 // Export combined questions
 export const allAviationQuestions: RealAviationQuestion[] = [
   ...electricalSystemQuestions,
-  ...b737Questions,
-  ...hydraulicSystemQuestions
+  ...b737Questions
 ];
-
-// Legacy exports for compatibility
-export const allRealAviationQuestions = allAviationQuestions;

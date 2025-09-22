@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { PRICING_PLANS } from "@/config/pricing";
 import heroCockpit from "@/assets/hero-cockpit.jpg";
+import { useAuth } from "@/hooks/useConvexAuth";
 
 interface PricingPlan {
   name: string;
@@ -109,9 +110,21 @@ const testimonials = [
 ];
 
 const Index = () => {
+  const { user } = useAuth();
+
+  const handlePlanSelect = (planName: string) => {
+    if (user) {
+      // If user is already logged in, go directly to pricing page
+      window.location.href = '/pricing';
+    } else {
+      // If user is not logged in, redirect to login with return URL
+      window.location.href = `/login?returnUrl=/pricing`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      {/* Simplified Header without navigation links */}
       <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -124,13 +137,6 @@ const Index = () => {
             </div>
           </div>
           
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium hover:text-primary transition-colors">Características</a>
-            <a href="#about" className="text-sm font-medium hover:text-primary transition-colors">Sobre Nosotros</a>
-            <a href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">Planes</a>
-            <a href="#testimonials" className="text-sm font-medium hover:text-primary transition-colors">Testimonios</a>
-          </nav>
-
           <div className="flex items-center gap-3">
             <Button variant="outline" size="sm">
               <a href="/login" className="no-underline">Iniciar Sesión</a>
@@ -194,6 +200,45 @@ const Index = () => {
               <div className="text-3xl font-bold text-primary mb-2">1,200+</div>
               <div className="text-sm text-muted-foreground">Pilotos Certificados</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Aircraft Selection */}
+      <section className="py-12 surface-light border-t border-b border-border">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Entrenamiento Especializado para 
+              <span className="text-primary"> A320 & B737</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Selecciona tu aeronave para comenzar tu preparación específica
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={() => window.location.href = '/type-rating'}>
+              <CardContent className="p-8 text-center">
+                <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Plane className="w-10 h-10 text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Airbus A320</h3>
+                <p className="text-muted-foreground mb-6">Entrenamiento completo para habilitación de tipo en Airbus A320</p>
+                <Button className="w-full max-w-xs mx-auto">Iniciar A320</Button>
+              </CardContent>
+            </Card>
+
+            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={() => window.location.href = '/b737-type-rating'}>
+              <CardContent className="p-8 text-center">
+                <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Plane className="w-10 h-10 text-blue-500" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3">Boeing 737</h3>
+                <p className="text-muted-foreground mb-6">Entrenamiento completo para habilitación de tipo en Boeing 737</p>
+                <Button variant="outline" className="w-full max-w-xs mx-auto">Iniciar B737</Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -443,6 +488,7 @@ const Index = () => {
                   <Button 
                     className={`w-full ${plan.featured || plan.bestValue ? 'bg-primary hover:bg-primary-dark' : ''}`}
                     variant={plan.featured || plan.bestValue ? 'default' : 'outline'}
+                    onClick={() => handlePlanSelect(plan.name)}
                   >
                     {plan.cta}
                   </Button>

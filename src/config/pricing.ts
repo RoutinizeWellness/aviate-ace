@@ -6,7 +6,7 @@ export interface PricingPlan {
   currency: string;
   features: string[];
   aircraftType: string;
-  stripePriceId?: string;
+  productId?: string;
 }
 
 export const PRICING_PLANS: PricingPlan[] = [
@@ -26,7 +26,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Offline access to materials',
       'Exam simulation mode'
     ],
-    stripePriceId: 'price_a320_premium_test' // Replace with actual Stripe price ID
+    productId: 'a320-premium'
   },
   {
     id: 'b737-premium',
@@ -44,13 +44,13 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Offline access to materials',
       'Exam simulation mode'
     ],
-    stripePriceId: 'price_b737_premium_test' // Replace with actual Stripe price ID
+    productId: 'b737-premium'
   },
   {
     id: 'complete-package',
-    name: 'Complete Package - Annual',
-    description: 'Full access to all aircraft types and premium features for 1 year',
-    price: 299.99,
+    name: 'Complete Package',
+    description: 'Full access to all aircraft types and premium features',
+    price: 49.99,
     currency: 'EUR',
     aircraftType: 'ALL',
     features: [
@@ -64,7 +64,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Exam simulation mode for all aircraft',
       'Early access to new content'
     ],
-    stripePriceId: 'price_complete_package_test' // Replace with actual Stripe price ID
+    productId: 'complete-package'
   }
 ];
 

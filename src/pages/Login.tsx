@@ -6,11 +6,12 @@ import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plane, Mail, Lock, AlertCircle, AlertTriangle } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signIn, isLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +31,10 @@ const Login = () => {
       // The password field is kept for UI consistency but not used in the actual login
       const user = await signIn(email);
       if (user) {
-        navigate("/dashboard");
+        // Check if there's a return URL in the state or query parameters
+        const searchParams = new URLSearchParams(location.search);
+        const returnUrl = searchParams.get('returnUrl') || '/dashboard';
+        navigate(returnUrl);
       } else {
         setError("Invalid email or user not found");
       }

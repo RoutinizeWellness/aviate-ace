@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useConvexAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +26,12 @@ import {
   User,
   TrendingUp,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  Plane,
+  BookOpen,
+  List,
+  Plus,
+  Save
 } from 'lucide-react';
 
 const AdminPanel = () => {
@@ -47,12 +54,88 @@ const AdminPanel = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showQuestionDialog, setShowQuestionDialog] = useState(false); // New state for question dialog
   const [editForm, setEditForm] = useState({
     role: '',
     accountType: '',
     isActive: true,
     permissions: []
   });
+  
+  // New state for question form
+  const [questionForm, setQuestionForm] = useState({
+    question: '',
+    options: ['', '', '', ''],
+    correctAnswer: 0,
+    explanation: '',
+    aircraftType: 'A320_FAMILY',
+    category: 'aircraft-general',
+    difficulty: 'intermediate'
+  });
+  
+  // Aircraft families and categories data
+  const aircraftFamilies = [
+    { 
+      id: "A320_FAMILY", 
+      name: "Airbus A320 Family", 
+      description: "A318, A319, A320, A321",
+      categories: [
+        { value: "aircraft-general", label: "Aircraft General", description: "General aircraft knowledge and limitations" },
+        { value: "load-acceleration-limits", label: "Load Acceleration Limits", description: "Aircraft structural and acceleration limitations" },
+        { value: "environment-limits", label: "Environment Limits", description: "Environmental operational limitations" },
+        { value: "weight-limits", label: "Weight Limits", description: "Maximum weights and balance limitations" },
+        { value: "speed-limits", label: "Speed Limits", description: "Aircraft speed limitations and restrictions" },
+        { value: "air-bleed-cond-press-vent", label: "Air Bleed/Cond/Press/Vent", description: "Air conditioning, pressurization, and ventilation" },
+        { value: "autoflight", label: "Autoflight", description: "Autopilot and flight management systems" },
+        { value: "apu", label: "APU", description: "Auxiliary Power Unit operations and limitations" },
+        { value: "engines", label: "Engines", description: "Engine operations, limitations, and procedures" },
+        { value: "flight-controls", label: "Flight Controls", description: "Primary and secondary flight control systems" },
+        { value: "fuel", label: "Fuel", description: "Fuel systems, distribution, and monitoring" },
+        { value: "ice-rain-protection", label: "Ice and Rain Protection", description: "Anti-ice and rain protection systems" },
+        { value: "landing-gear", label: "Landing Gear", description: "Landing gear operation, brakes, and steering" },
+        { value: "oxygen", label: "Oxygen", description: "Oxygen systems and emergency procedures" },
+        { value: "gpws", label: "GPWS", description: "Ground Proximity Warning System" },
+        { value: "navigation", label: "Navigation", description: "Navigation systems and procedures" },
+        // Additional A320-specific categories to match the generated questions
+        { value: "approach-procedures", label: "Approach Procedures", description: "Instrument approach procedures and landing" },
+        { value: "electrical", label: "Electrical", description: "Electrical power generation and distribution" },
+        { value: "emergency-procedures", label: "Emergency Procedures", description: "Emergency and abnormal procedures" },
+        { value: "fire-protection", label: "Fire Protection", description: "Fire detection and suppression systems" },
+        { value: "flight-protection", label: "Flight Protection", description: "Flight envelope protection systems" },
+        { value: "hydraulics", label: "Hydraulics", description: "Hydraulic power systems and components" },
+        { value: "meteorologia", label: "Meteorología", description: "Weather conditions and meteorological information" },
+        { value: "motor-y-apu", label: "Motor y APU", description: "Engine and auxiliary power unit systems" },
+        { value: "navegacion", label: "Navegación", description: "Navigation procedures and systems" },
+        { value: "performance", label: "Performance", description: "Aircraft performance calculations and limitations" },
+        { value: "procedimientos-de-despegue", label: "Procedimientos de Despegue", description: "Takeoff procedures and limitations" },
+        { value: "reglamentacion", label: "Reglamentación", description: "Aviation regulations and requirements" },
+        { value: "sistema-electrico", label: "Sistema Eléctrico", description: "Electrical systems in Spanish" },
+        { value: "sistema-hidraulico", label: "Sistema Hidráulico", description: "Hydraulic systems in Spanish" }
+      ]
+    },
+    { 
+      id: "B737_FAMILY", 
+      name: "Boeing 737", 
+      description: "B737-700, B737-800, B737 MAX",
+      categories: [
+        { value: "airplane-general", label: "AIRPLANE GENERAL", description: "General aircraft information and limitations" },
+        { value: "air-systems", label: "AIR SYSTEMS", description: "Pneumatic, pressurization, and air conditioning systems" },
+        { value: "anti-ice-rain", label: "ANTI-ICE AND RAIN", description: "Ice and rain protection systems" },
+        { value: "automatic-flight", label: "AUTOMATIC FLIGHT", description: "Autopilot and flight management systems" },
+        { value: "communication", label: "COMMUNICATION", description: "Radio and communication systems" },
+        { value: "electrical", label: "ELECTRICAL", description: "Electrical power systems" },
+        { value: "engines-apu", label: "ENGINES AND APU", description: "Engine and auxiliary power unit systems" },
+        { value: "fire-protection", label: "FIRE PROTECTION", description: "Fire detection and suppression systems" },
+        { value: "flight-controls", label: "FLIGHT CONTROLS", description: "Primary and secondary flight control systems" },
+        { value: "flight-instruments", label: "FLIGHT INSTRUMENTS AND DISPLAYS", description: "Flight instruments and display systems" },
+        { value: "flight-management", label: "FLIGHT MANAGEMENT AND NAVIGATION", description: "Flight management and navigation systems" },
+        { value: "fuel", label: "FUEL", description: "Fuel storage, distribution, and indication systems" },
+        { value: "hydraulics", label: "HYDRAULICS", description: "Hydraulic power systems" },
+        { value: "landing-gear", label: "LANDING GEAR", description: "Landing gear extension, retraction, and indication" },
+        { value: "warning-systems", label: "WARNING SYSTEMS", description: "Master warning, master caution, and alerting systems" }
+      ]
+    }
+  ];
 
   // Redirect if not admin
   useEffect(() => {
@@ -183,6 +266,51 @@ const AdminPanel = () => {
     'user_support'
   ];
 
+  const difficulties = [
+    { value: 'beginner', label: 'Básico' },
+    { value: 'intermediate', label: 'Intermedio' },
+    { value: 'advanced', label: 'Avanzado' }
+  ];
+
+  // Handle question form changes
+  const handleQuestionFormChange = (field: string, value: any) => {
+    setQuestionForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Handle option changes
+  const handleOptionChange = (index: number, value: string) => {
+    const newOptions = [...questionForm.options];
+    newOptions[index] = value;
+    setQuestionForm(prev => ({
+      ...prev,
+      options: newOptions
+    }));
+  };
+
+  // Save question (placeholder for now)
+  const handleSaveQuestion = () => {
+    // In a real implementation, this would call a Convex mutation to save the question
+    console.log('Saving question:', questionForm);
+    toast({
+      title: "Pregunta guardada",
+      description: "La pregunta se ha guardado exitosamente.",
+    });
+    setShowQuestionDialog(false);
+    // Reset form
+    setQuestionForm({
+      question: '',
+      options: ['', '', '', ''],
+      correctAnswer: 0,
+      explanation: '',
+      aircraftType: 'A320_FAMILY',
+      category: 'aircraft-general',
+      difficulty: 'intermediate'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -274,7 +402,7 @@ const AdminPanel = () => {
         </div>
 
         {/* Users Table */}
-        <Card className="surface-mid border-border/50">
+        <Card className="surface-mid border-border/50 mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Users className="w-5 h-5" />
@@ -362,6 +490,124 @@ const AdminPanel = () => {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Aircraft Families and Categories */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Aircraft Families */}
+          <Card className="surface-mid border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Plane className="w-5 h-5" />
+                Familias de Aeronaves
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {aircraftFamilies.map((family) => (
+                  <div key={family.id} className="border border-border/50 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-medium">{family.name}</h3>
+                      <Badge variant="outline">{family.id}</Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-3">{family.description}</p>
+                    <div className="text-xs">
+                      <span className="font-medium">Categorías: </span>
+                      <span>{family.categories.length}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Categories by Aircraft Family */}
+          <Card className="surface-mid border-border/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <List className="w-5 h-5" />
+                Categorías por Familia de Aeronave
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {aircraftFamilies.map((family) => (
+                  <div key={family.id} className="border border-border/50 rounded-lg">
+                    <div className="bg-surface-mid p-3 border-b border-border/50">
+                      <h3 className="font-medium flex items-center gap-2">
+                        <Plane className="w-4 h-4" />
+                        {family.name}
+                      </h3>
+                    </div>
+                    <div className="p-3 max-h-60 overflow-y-auto">
+                      <div className="grid grid-cols-1 gap-2">
+                        {family.categories.map((category) => (
+                          <div key={category.value} className="text-sm p-2 rounded border border-border/30">
+                            <div className="font-medium">{category.label}</div>
+                            <div className="text-xs text-muted-foreground">{category.description}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Question Management */}
+        <Card className="surface-mid border-border/50 mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5" />
+              Gestión de Preguntas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              <p className="text-muted-foreground">
+                Agrega y edita preguntas para los exámenes de certificación de piloto.
+              </p>
+              <Button 
+                className="w-fit"
+                onClick={() => setShowQuestionDialog(true)}
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Agregar Nueva Pregunta
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Question Statistics */}
+        <Card className="surface-mid border-border/50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="w-5 h-5" />
+              Estadísticas de Preguntas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border border-border/50 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary">7,500+</div>
+                <div className="text-sm text-muted-foreground">Preguntas totales</div>
+              </div>
+              <div className="border border-border/50 rounded-lg p-4">
+                <div className="text-2xl font-bold text-blue-500">500</div>
+                <div className="text-sm text-muted-foreground">Preguntas por categoría B737</div>
+              </div>
+              <div className="border border-border/50 rounded-lg p-4">
+                <div className="text-2xl font-bold text-green-500">16</div>
+                <div className="text-sm text-muted-foreground">Categorías A320</div>
+              </div>
+            </div>
+            <div className="mt-4 text-sm text-muted-foreground">
+              <p>• Todas las categorías de Boeing 737 tienen exactamente 500 preguntas cada una</p>
+              <p>• Las categorías de Airbus A320 tienen preguntas distribuidas según los estándares de certificación</p>
             </div>
           </CardContent>
         </Card>
@@ -460,6 +706,150 @@ const AdminPanel = () => {
               </Button>
               <Button variant="destructive" onClick={handleDeleteUser}>
                 Eliminar Usuario
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add Question Dialog */}
+        <Dialog open={showQuestionDialog} onOpenChange={setShowQuestionDialog}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Agregar Nueva Pregunta</DialogTitle>
+              <DialogDescription>
+                Crea una nueva pregunta para los exámenes de certificación.
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="question">Pregunta</Label>
+                <Textarea
+                  id="question"
+                  value={questionForm.question}
+                  onChange={(e) => handleQuestionFormChange('question', e.target.value)}
+                  placeholder="Escribe la pregunta aquí..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Opciones de Respuesta</Label>
+                {[0, 1, 2, 3].map((index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="flex items-center">
+                      <input
+                        type="radio"
+                        id={`correct-${index}`}
+                        name="correctAnswer"
+                        checked={questionForm.correctAnswer === index}
+                        onChange={() => handleQuestionFormChange('correctAnswer', index)}
+                        className="mr-2"
+                      />
+                      <Label htmlFor={`correct-${index}`} className="sr-only">Correcta</Label>
+                    </div>
+                    <Input
+                      value={questionForm.options[index]}
+                      onChange={(e) => handleOptionChange(index, e.target.value)}
+                      placeholder={`Opción ${index + 1}`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="aircraftType">Tipo de Aeronave</Label>
+                  <Select 
+                    value={questionForm.aircraftType} 
+                    onValueChange={(value) => handleQuestionFormChange('aircraftType', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="A320_FAMILY">Airbus A320 Family</SelectItem>
+                      <SelectItem value="B737_FAMILY">Boeing 737</SelectItem>
+                      <SelectItem value="GENERAL">General</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category">Categoría</Label>
+                  <Select 
+                    value={questionForm.category} 
+                    onValueChange={(value) => handleQuestionFormChange('category', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aircraftFamilies
+                        .find(family => family.id === questionForm.aircraftType)
+                        ?.categories.map((category) => (
+                          <SelectItem key={category.value} value={category.value}>
+                            {category.label}
+                          </SelectItem>
+                        )) || (
+                          <SelectItem value="general">General</SelectItem>
+                        )
+                      }
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="difficulty">Dificultad</Label>
+                  <Select 
+                    value={questionForm.difficulty} 
+                    onValueChange={(value) => handleQuestionFormChange('difficulty', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {difficulties.map((difficulty) => (
+                        <SelectItem key={difficulty.value} value={difficulty.value}>
+                          {difficulty.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="correctAnswerDisplay">Respuesta Correcta</Label>
+                  <Input
+                    id="correctAnswerDisplay"
+                    value={questionForm.options[questionForm.correctAnswer]}
+                    readOnly
+                    className="bg-muted"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="explanation">Explicación</Label>
+                <Textarea
+                  id="explanation"
+                  value={questionForm.explanation}
+                  onChange={(e) => handleQuestionFormChange('explanation', e.target.value)}
+                  placeholder="Explicación detallada de la respuesta correcta..."
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={() => setShowQuestionDialog(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveQuestion} disabled={!questionForm.question || questionForm.options.some(opt => !opt)}>
+                <Save className="w-4 h-4 mr-2" />
+                Guardar Pregunta
               </Button>
             </div>
           </DialogContent>

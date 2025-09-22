@@ -15,12 +15,10 @@ import {
   ArrowRight,
   X
 } from "lucide-react";
-import { useState } from "react";
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import { StripeCheckout } from "@/components/StripeCheckout";
+import { useState, useEffect } from "react";
+import { AutumnCheckout } from "@/components/StripeCheckout";
 import { PRICING_PLANS, type PricingPlan } from '@/config/pricing';
-import { getStripe } from '@/lib/stripe';
+// import { getStripe } from '@/lib/stripe';
 
 // Data arrays
 const comparisonFeatures = [
@@ -77,6 +75,27 @@ const Pricing = () => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [isAnnual, setIsAnnual] = useState(false);
 
+  // Check for saved plan selection from localStorage
+  useEffect(() => {
+    const savedPlan = localStorage.getItem('selectedPlan');
+    if (savedPlan) {
+      try {
+        const planData = JSON.parse(savedPlan);
+        // Find the matching plan in PRICING_PLANS
+        const matchingPlan = PRICING_PLANS.find(plan => plan.id === planData.id);
+        if (matchingPlan) {
+          setSelectedPlan(matchingPlan);
+          setShowCheckout(true);
+        }
+        // Remove the saved plan from localStorage
+        localStorage.removeItem('selectedPlan');
+      } catch (e) {
+        console.error('Error parsing saved plan:', e);
+        localStorage.removeItem('selectedPlan');
+      }
+    }
+  }, []);
+
   const handleSelectPlan = (plan: PricingPlan) => {
     setSelectedPlan(plan);
     setShowCheckout(true);
@@ -99,9 +118,14 @@ const Pricing = () => {
     window.location.reload();
   };
 
+  const handlePaymentError = (error: any) => {
+    console.error('Payment error in Pricing page:', error);
+    // You could show a more detailed error message to the user here
+  };
+
   // For this demo, we'll use the test publishable key directly
   // In a real app, you should use environment variables
-  const stripePromise = getStripe();
+  // const stripePromise = getStripe();
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,27 +172,7 @@ const Pricing = () => {
             su certificación con nosotros. ¿Cuál será tu historia de éxito?
           </p>
 
-          {/* Pricing Toggle */}
-          <div className="flex items-center justify-center gap-4 mb-12">
-            <span className="text-sm text-muted-foreground">Mensual</span>
-            <div className="relative">
-              <input 
-                type="checkbox" 
-                className="sr-only" 
-                id="pricing-toggle" 
-                checked={isAnnual}
-                onChange={(e) => setIsAnnual(e.target.checked)}
-              />
-              <label htmlFor="pricing-toggle" className="flex items-center cursor-pointer">
-                <div className="w-12 h-6 bg-surface-light rounded-full relative">
-                  <div className={`w-5 h-5 bg-primary rounded-full absolute top-0.5 transition-transform ${isAnnual ? 'transform translate-x-6' : 'translate-x-0.5'}`}></div>
-                </div>
-              </label>
-            </div>
-            <span className="text-sm text-muted-foreground">
-              Anual <Badge className="ml-2 bg-primary/10 text-primary text-xs">-30%</Badge>
-            </span>
-          </div>
+          {/* Pricing Toggle - REMOVED ANNUAL TOGGLE */}
         </div>
       </section>
 
@@ -186,7 +190,9 @@ const Pricing = () => {
                 <div className="text-4xl font-bold mb-2">
                   €0
                 </div>
-                <p className="text-sm text-muted-foreground">Para siempre</p>
+                <p className="text-sm text-muted-foreground">
+                  Para siempre
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
@@ -222,9 +228,11 @@ const Pricing = () => {
                     {plan.description}
                   </p>
                   <div className="text-4xl font-bold mb-2">
-                    ${plan.price.toFixed(2)}
+                    €{plan.price.toFixed(0)}
                   </div>
-                  <p className="text-sm text-muted-foreground">Por acceso completo</p>
+                  <p className="text-sm text-muted-foreground">
+                    Por acceso completo
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <ul className="space-y-3">
@@ -347,10 +355,16 @@ const Pricing = () => {
         </div>
       </section>
 
-      {/* Stripe Checkout Modal */}
-      {showCheckout && selectedPlan && stripePromise && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+      {/* Autumn Checkout Modal */}
+      {showCheckout && selectedPlan && (
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] p-4"
+          onClick={handleCloseCheckout} // Close modal when clicking on backdrop
+        >
+          <div 
+            className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+          >
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold">Completar Pago</h3>
@@ -363,13 +377,11 @@ const Pricing = () => {
                 </Button>
               </div>
               
-              <Elements stripe={stripePromise}>
-                <StripeCheckout 
-                  plan={selectedPlan}
-                  onSuccess={handlePaymentSuccess}
-                  onCancel={handleCloseCheckout}
-                />
-              </Elements>
+              <AutumnCheckout 
+                plan={selectedPlan}
+                onSuccess={handlePaymentSuccess}
+                onCancel={handleCloseCheckout}
+              />
             </div>
           </div>
         </div>

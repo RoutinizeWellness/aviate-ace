@@ -3,7 +3,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '@/lib/stripe';
 import { PRICING_PLANS } from '@/config/pricing';
-import { StripeCheckout } from './StripeCheckout';
+import { AutumnCheckout } from './StripeCheckout';
 
 const TestStripeIntegration = () => {
   const stripePromise = getStripe();
@@ -29,7 +29,7 @@ const TestStripeIntegration = () => {
             <p className="text-2xl font-bold mb-4">${plan.price.toFixed(2)} {plan.currency}</p>
             
             <Elements stripe={stripePromise}>
-              <StripeCheckout 
+              <AutumnCheckout 
                 plan={plan}
                 onSuccess={handleSuccess}
                 onCancel={handleCancel}

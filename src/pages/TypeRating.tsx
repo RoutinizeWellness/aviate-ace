@@ -2,15 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { 
-  BookOpen, 
-  Target, 
-  BarChart3, 
-  User, 
-  Settings, 
-  LogOut,
-  Plane,
   ArrowLeft,
   Lock,
   Play,
@@ -18,7 +10,9 @@ import {
   CheckCircle2,
   Star,
   Lightbulb,
-  Menu
+  Target,
+  BookOpen,
+  Plane
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -26,6 +20,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
+import { UnifiedSidebar } from "@/components/UnifiedSidebar"; // Added import for UnifiedSidebar
 
 const TypeRating = () => {
   const navigate = useNavigate();
@@ -36,10 +31,6 @@ const TypeRating = () => {
   const hasA320Access = hasAccessTo('A320_FAMILY');
   const userSubscription = getCurrentSubscription();
   const adminUser = isAdmin();
-  
-  // Convex queries for user data - temporarily disabled due to mock auth
-  // const userProfile = useQuery(api.auth.getUserProfile, user ? { userId: user._id as Id<"users"> } : "skip");
-  // const userStats = useQuery(api.auth.getUserStats, user ? { userId: user._id as Id<"users"> } : "skip");
   
   // Mock data for development
   const userProfile = {
@@ -58,11 +49,6 @@ const TypeRating = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [moduleProgress, setModuleProgress] = useState<any[]>([]);
   const [lessonProgress, setLessonProgress] = useState<any[]>([]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
 
   // Load progress data when component mounts - using localStorage for now
   useEffect(() => {
@@ -340,104 +326,6 @@ const TypeRating = () => {
     );
   }
 
-  // Mobile Navigation Component
-  const MobileNavigation = () => (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-6 w-6" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0">
-        <div className="p-6">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Plane className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-              <p className="text-xs text-muted-foreground">Type Rating</p>
-            </div>
-          </div>
-
-          {/* User Profile */}
-          <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-            <UserAvatar 
-              avatarUrl={userProfile?.user?.avatarUrl} 
-              displayName={displayName}
-              size="md"
-            />
-            <div>
-              <h2 className="font-medium text-sm">{displayName}</h2>
-              <p className="text-xs text-muted-foreground">Nivel {userStats?.currentLevel || 1} • {userStats?.totalPoints || 0} puntos</p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/dashboard')}
-            >
-              <BookOpen className="w-5 h-5" />
-              <span>Inicio</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/exams')}
-            >
-              <Target className="w-5 h-5" />
-              <span>Exámenes</span>
-            </Button>
-            <Button variant="default" className="w-full justify-start gap-3 h-12">
-              <Star className="w-5 h-5" />
-              <span>Type Rating</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/progress')}
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span>Progreso</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/profile')}
-            >
-              <User className="w-5 h-5" />
-              <span>Perfil</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/settings')}
-            >
-              <Settings className="w-5 h-5" />
-              <span>Configuración</span>
-            </Button>
-          </nav>
-
-          {/* Logout */}
-          <div className="mt-8">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Cerrar Sesión</span>
-            </Button>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-
   const handleLessonClick = (lesson: any) => {
     if (lesson.isUnlocked) {
       // Navigate to lesson content
@@ -447,104 +335,15 @@ const TypeRating = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar - Hidden on mobile */}
-      {!isMobile && (
-        <aside className="fixed left-0 top-0 h-full w-64 surface-dark border-r border-border z-40">
-          <div className="p-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Plane className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-                <p className="text-xs text-muted-foreground">Type Rating</p>
-              </div>
-            </div>
-
-            {/* User Profile */}
-            <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-              <UserAvatar 
-                avatarUrl={userProfile?.user?.avatarUrl} 
-                displayName={displayName}
-                size="md"
-              />
-              <div>
-                <h2 className="font-medium text-sm">{displayName}</h2>
-                <p className="text-xs text-muted-foreground">Nivel {userStats?.currentLevel || 1} • {userStats?.totalPoints || 0} puntos</p>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <nav className="space-y-2">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/dashboard')}
-              >
-                <BookOpen className="w-5 h-5" />
-                <span>Inicio</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/exams')}
-              >
-                <Target className="w-5 h-5" />
-                <span>Exámenes</span>
-              </Button>
-              <Button variant="default" className="w-full justify-start gap-3 h-12">
-                <Star className="w-5 h-5" />
-                <span>Type Rating</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/progress')}
-              >
-                <BarChart3 className="w-5 h-5" />
-                <span>Progreso</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/profile')}
-              >
-                <User className="w-5 h-5" />
-                <span>Perfil</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/settings')}
-              >
-                <Settings className="w-5 h-5" />
-                <span>Configuración</span>
-              </Button>
-            </nav>
-
-            {/* Logout */}
-            <div className="absolute bottom-6 left-6 right-6">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Cerrar Sesión</span>
-              </Button>
-            </div>
-          </div>
-        </aside>
-      )}
-
+      {/* Unified Sidebar */}
+      <UnifiedSidebar activePage="type-rating" />
+      
       {/* Main Content */}
       <main className={`${isMobile ? 'p-4' : 'ml-64 p-8'}`}>
         {/* Mobile Header */}
         {isMobile && (
           <div className="flex items-center justify-between mb-6 bg-background/95 backdrop-blur sticky top-0 z-30 py-4 border-b">
             <div className="flex items-center gap-3">
-              <MobileNavigation />
               <div>
                 <h1 className="font-bold text-lg">Type Rating</h1>
                 <p className="text-xs text-muted-foreground">A320 Training</p>

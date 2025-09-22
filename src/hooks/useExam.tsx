@@ -394,8 +394,9 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
       let sessionId = `real-session-${Date.now()}`;
       
       try {
-        // Only pass examId if it's a valid Convex ID (not empty string)
-        const validExamId = examId && examId.length === 32 ? examId as Id<"exams"> : undefined;
+        // Only pass examId if it's a valid Convex ID (not empty string and not a temporary ID)
+        const isTempId = examId && examId.startsWith('temp_exam_');
+        const validExamId = examId && examId.length === 32 && !isTempId ? examId as Id<"exams"> : undefined;
         
         const session = await startExamMutation({
           userId: user._id as Id<"users">,

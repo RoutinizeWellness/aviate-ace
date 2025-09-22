@@ -574,7 +574,6 @@ export const updateUserSubscription = mutation({
   args: {
     userId: v.id("users"),
     subscription: v.string(), // "A320", "BOEING_737", "ALL"
-    planId: v.string(),
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.userId, {

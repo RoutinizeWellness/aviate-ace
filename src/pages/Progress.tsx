@@ -31,6 +31,7 @@ import { useSupabaseProfile } from "@/hooks/useSupabaseProfile";
 import { useUserStats } from "@/hooks/useStats";
 import { useCourses } from "@/hooks/useCourses";
 import { useState } from "react";
+import { UnifiedSidebar } from "@/components/UnifiedSidebar";
 
 const Progress = () => {
   const navigate = useNavigate();
@@ -61,94 +62,8 @@ const Progress = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 surface-dark border-r border-border z-40">
-        <div className="p-6">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Plane className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-              <p className="text-xs text-muted-foreground">Progreso</p>
-            </div>
-          </div>
-
-          {/* User Profile */}
-          <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-            <UserAvatar 
-              avatarUrl={profile?.avatar_url} 
-              displayName={displayName}
-              size="md"
-            />
-            <div>
-              <h2 className="font-medium text-sm">{displayName}</h2>
-              <p className="text-xs text-muted-foreground">Nivel {currentLevel} • {totalPoints} puntos</p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/dashboard')}
-            >
-              <BookOpen className="w-5 h-5" />
-              <span>Inicio</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/exams')}
-            >
-              <Target className="w-5 h-5" />
-              <span>Exámenes</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/type-rating')}
-            >
-              <Star className="w-5 h-5" />
-              <span>Type Rating</span>
-            </Button>
-            <Button variant="default" className="w-full justify-start gap-3 h-12">
-              <BarChart3 className="w-5 h-5" />
-              <span>Progreso</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/profile')}
-            >
-              <User className="w-5 h-5" />
-              <span>Perfil</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/settings')}
-            >
-              <Settings className="w-5 h-5" />
-              <span>Configuración</span>
-            </Button>
-          </nav>
-
-          {/* Logout */}
-          <div className="absolute bottom-6 left-6 right-6">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Cerrar Sesión</span>
-            </Button>
-          </div>
-        </div>
-      </aside>
+      {/* Unified Sidebar */}
+      <UnifiedSidebar activePage="progress" />
 
       {/* Main Content */}
       <main className="ml-64 p-8">

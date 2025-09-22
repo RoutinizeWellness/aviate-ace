@@ -18,7 +18,8 @@ import {
   Star,
   Award,
   Gamepad2,
-  Shield
+  Shield,
+  Menu
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -28,9 +29,9 @@ import { api } from "../../convex/_generated/api";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
 import { ConvexStatusIndicator } from "@/components/ConvexStatusIndicator";
+import { UnifiedSidebar } from "@/components/UnifiedSidebar";
 import type { Id } from "../../convex/_generated/dataModel";
 
 // Helper function to validate Convex IDs
@@ -276,127 +277,30 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-        {/* Sidebar - hidden on mobile */}
-        <div className="hidden md:block w-64 border-r bg-background">
-          <div className="flex flex-col h-full">
-            <div className="p-6 border-b">
+        {/* Unified Sidebar */}
+        <UnifiedSidebar activePage="dashboard" />
+        
+        {/* Main Content */}
+        <main className={`${isMobile ? 'p-4' : 'ml-64 p-8'} flex-1`}>
+          {/* Mobile Header */}
+          {isMobile && (
+            <div className="flex items-center justify-between mb-6 bg-background/95 backdrop-blur sticky top-0 z-30 py-4 border-b">
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground">
-                  <Plane className="w-6 h-6" />
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h1 className="text-lg font-bold">PilotPrepFlightX</h1>
-                  <p className="text-xs text-muted-foreground">Professional Training</p>
+                  <h1 className="font-bold text-lg">Dashboard</h1>
+                  <p className="text-xs text-muted-foreground">Resumen de tu progreso</p>
                 </div>
               </div>
+              <UserAvatar 
+                avatarUrl={userProfile?.profile?.avatarUrl} 
+                displayName={displayName}
+                size="sm"
+              />
             </div>
-            
-            <div className="flex-1 overflow-auto p-4">
-              <nav className="space-y-2">
-                <Button variant="default" className="w-full justify-start gap-3 h-12">
-                  <BookOpen className="w-5 h-5" />
-                  <span>Inicio</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 h-12"
-                  onClick={() => navigate('/exams')}
-                >
-                  <Target className="w-5 h-5" />
-                  <span>Exámenes</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 h-12"
-                  onClick={() => navigate('/type-rating')}
-                >
-                  <Star className="w-5 h-5" />
-                  <span>Type Rating</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 h-12"
-                  onClick={() => navigate('/progress')}
-                >
-                  <BarChart3 className="w-5 h-5" />
-                  <span>Progreso</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 h-12"
-                  onClick={() => navigate('/profile')}
-                >
-                  <User className="w-5 h-5" />
-                  <span>Perfil</span>
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start gap-3 h-12"
-                  onClick={() => navigate('/settings')}
-                >
-                  <Settings className="w-5 h-5" />
-                  <span>Configuración</span>
-                </Button>
-                
-                {/* Admin Panel - Only show for admins */}
-                {isAdmin(user) ? (
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start gap-3 h-12 text-destructive hover:text-destructive"
-                    onClick={() => navigate('/admin')}
-                  >
-                    <Shield className="w-5 h-5" />
-                    <span>Panel Admin</span>
-                  </Button>
-                ) : (
-                  <Button 
-                    variant="ghost" 
-                    className="w-full justify-start gap-3 h-12 text-muted-foreground"
-                    onClick={() => navigate('/admin-setup')}
-                  >
-                    <Shield className="w-5 h-5" />
-                    <span>Configurar Admin</span>
-                  </Button>
-                )}
-              </nav>
-            </div>
-            
-            <div className="p-4 border-t">
-              {/* Convex Status Indicator */}
-              <div className="mb-4">
-                <ConvexStatusIndicator />
-              </div>
-              
-              <Button 
-                variant="outline" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Cerrar Sesión</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-        
-        {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Mobile header */}
-          <header className="md:hidden border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
-            <div className="flex items-center justify-between p-4">
-              <MobileNavigation />
-              <div className="flex items-center gap-3">
-                <UserAvatar 
-                  avatarUrl={user?.avatarUrl}
-                  displayName={user?.displayName || user?.email?.split('@')[0]}
-                  size="sm" 
-                />
-                <div className="text-sm font-medium">
-                  {user?.displayName || user?.email?.split('@')[0] || 'User'}
-                </div>
-              </div>
-            </div>
-          </header>
+          )}
           
           {/* Desktop header */}
           <header className="hidden md:flex items-center justify-between p-6 border-b">
@@ -421,7 +325,7 @@ const Dashboard = () => {
           </header>
           
           {/* Main content area */}
-          <main className="flex-1 overflow-auto p-4 md:p-6">
+          <div className="flex-1 overflow-auto p-4 md:p-6">
             {/* Main Dashboard Tabs */}
             <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
@@ -741,8 +645,8 @@ const Dashboard = () => {
                 </TabsContent>
               )}
             </Tabs>
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );

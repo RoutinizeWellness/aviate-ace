@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useConvexAuth';
 import { Plane, UserPlus, Mail, User, AlertCircle } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signUp, isLoading } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
@@ -29,7 +30,10 @@ const Register = () => {
     try {
       const user = await signUp(formData.email, formData.fullName);
       if (user) {
-        navigate('/dashboard');
+        // Check if there's a return URL in the state or query parameters
+        const searchParams = new URLSearchParams(location.search);
+        const returnUrl = searchParams.get('returnUrl') || '/dashboard';
+        navigate(returnUrl);
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed');

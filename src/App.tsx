@@ -10,7 +10,6 @@ import { getStripe } from '@/lib/stripe';
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
-import ImprovedDashboard from "./pages/ImprovedDashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Pricing from "./pages/Pricing";
@@ -93,10 +92,14 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/pricing" element={
+                  <ProtectedRoute>
+                    <Pricing />
+                  </ProtectedRoute>
+                } />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
-                    <ImprovedDashboard />
+                    <Dashboard />
                   </ProtectedRoute>
                 } />
                 <Route path="/exam" element={

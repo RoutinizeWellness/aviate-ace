@@ -40,7 +40,16 @@ const ExamMode = () => {
   const rawMode = searchParams.get('mode') || 'practice';
   const examMode: 'practice' | 'timed' | 'review' = 
     rawMode === 'timed' || rawMode === 'review' ? rawMode : 'practice';
+  
+  // Handle both single category and multiple categories (comma-separated)
   let selectedCategory = searchParams.get('category') || '';
+  const categoriesParam = searchParams.get('categories') || '';
+  
+  // If we have multiple categories, use them; otherwise use single category
+  if (categoriesParam) {
+    selectedCategory = categoriesParam;
+  }
+  
   const selectedDifficulty = searchParams.get('difficulty') || '';
   const selectedAircraft = searchParams.get('aircraft') || 'A320_FAMILY';
   const timeLimit = parseInt(searchParams.get('timeLimit') || '0');
@@ -57,55 +66,31 @@ const ExamMode = () => {
     
     // Map common category names to their proper keys
     const categoryMap: { [key: string]: string } = {
-      'aircraft-general': 'aircraft-general',
-      'airplane-general': 'airplane-general',
-      'aircraft-systems': 'aircraft-systems',
       'electrical': 'electrical',
       'hydraulic': 'hydraulics',
       'hydraulics': 'hydraulics',
-      'pneumatic': 'air-systems',
-      'fuel': 'fuel',
-      'flight-controls': 'flight-controls',
-      'engines': 'engines',
-      'apu': 'apu',
-      'navigation': 'navigation',
-      'autopilot': 'autoflight',
-      'autoflight': 'autoflight',
       'performance': 'performance',
-      // Additional category mappings for completeness
-      'load-acceleration-limits': 'load-acceleration-limits',
-      'environment-limits': 'environment-limits',
-      'weight-limits': 'weight-limits',
-      'speed-limits': 'speed-limits',
-      'air-bleed-cond-press-vent': 'air-bleed-cond-press-vent',
-      'ice-rain-protection': 'ice-rain-protection',
-      'landing-gear': 'landing-gear',
-      'oxygen': 'oxygen',
-      'gpws': 'gpws',
-      'air-systems': 'air-systems',
-      'anti-ice-rain': 'anti-ice-rain',
-      'automatic-flight': 'automatic-flight',
-      'communication': 'communication',
-      'engines-apu': 'engines-apu',
-      'fire-protection': 'fire-protection',
-      'flight-instruments': 'flight-instruments',
-      'flight-management': 'flight-management',
-      'warning-systems': 'warning-systems',
-      // Spanish category mappings
-      'sistemas-aeronave': 'sistemas-aeronave',
-      'proteccion-vuelo': 'proteccion-vuelo',
-      'procedimientos-aproximacion': 'procedimientos-aproximacion',
-      'procedimientos-emergencia': 'procedimientos-emergencia',
-      'meteorologia': 'meteorologia',
-      'reglamentacion': 'reglamentacion',
-      'navegacion': 'navegacion'
+      'sistema-eléctrico': 'electrical',
+      'sistema-hidráulico': 'hydraulics',
+      'sistema-electrico': 'electrical',
+      'sistema-hidraulico': 'hydraulics'
     };
     
     selectedCategory = categoryMap[categoryFromTitle] || categoryFromTitle;
     console.log('Mapped category:', selectedCategory);
   }
   
-  const [selectedExamId, setSelectedExamId] = useState<string | null>(searchParams.get('examId') || null);
+  // Generate a temporary exam ID for practice sessions without a real exam
+  const generateTempExamId = (): string => {
+    const randomPart = Math.random().toString(36).substring(2, 10);
+    const timestamp = Date.now().toString(36).substring(0, 8);
+    return `temp_exam_${randomPart}${timestamp}`;
+  };
+  
+  const [selectedExamId, setSelectedExamId] = useState<string | null>(searchParams.get('examId') || 
+    (!searchParams.get('examId') && (selectedCategory || examMode === 'practice' || examMode === 'timed' || examMode === 'review') 
+      ? generateTempExamId() 
+      : null));
   const [showExamSelector, setShowExamSelector] = useState(!selectedExamId && examMode === 'practice' && !selectedCategory);
   
   const {
@@ -159,7 +144,7 @@ const ExamMode = () => {
           
           // Handle special case for "Aircraft General" category
           let effectiveCategory = selectedCategory;
-          if (selectedCategory === 'aircraft-general' || selectedCategory.includes('aircraft') && selectedCategory.includes('general')) {
+          if (selectedCategory === 'aircraft-general' || (selectedCategory && selectedCategory.includes('aircraft') && selectedCategory.includes('general'))) {
             effectiveCategory = 'aircraft-general';
           }
           
@@ -199,7 +184,7 @@ const ExamMode = () => {
             console.log('Loaded', relaxedQuestions.length, 'questions with relaxed filters');
             
             // If still no questions, try with 'aircraft-general' specifically
-            if (relaxedQuestions.length === 0 && (selectedCategory.includes('aircraft') || selectedCategory.includes('general'))) {
+            if (relaxedQuestions.length === 0 && (selectedCategory && (selectedCategory.includes('aircraft') || selectedCategory.includes('general')))) {
               console.log('Trying with aircraft-general category specifically');
               const aircraftGeneralQuestions = await loadAndFilterQuestions(
                 examMode,
@@ -261,19 +246,44 @@ const ExamMode = () => {
   // Auto-start exam if we have category/difficulty or examId
   useEffect(() => {
     const currentQuestions = questions || dynamicQuestions;
+    const hasCategories = !!selectedCategory;
+    
+    // Don't auto-start if we're still loading dynamic questions
+    const isStillLoading = !selectedExamId && (selectedCategory || examMode === 'timed' || examMode === 'review') && isLoadingDynamicQuestions;
+    
     console.log('Auto-start check:', {
-      hasCategory: !!selectedCategory,
+      hasCategory: hasCategories,
       hasExamId: !!selectedExamId,
       hasQuestions: !!currentQuestions && currentQuestions.length > 0,
       hasSessionId: !!examState.sessionId,
-      examMode
+      examMode,
+      isStillLoading,
+      isLoadingDynamicQuestions,
+      questionsLength: questions?.length || 0,
+      dynamicQuestionsLength: dynamicQuestions.length
     });
     
-    if ((selectedCategory || selectedExamId || examMode === 'timed' || examMode === 'review') && !examState.sessionId && currentQuestions && currentQuestions.length > 0) {
+    // Auto-start if we have:
+    // 1. An exam ID (real or temporary)
+    // 2. Or categories/difficulty/mode that require questions
+    // 3. And we're not still loading
+    // 4. And we have questions
+    // 5. And we don't already have a session
+    const shouldAutoStart = 
+      (selectedExamId || hasCategories || examMode === 'timed' || examMode === 'review') &&
+      !isStillLoading &&
+      !examState.sessionId && 
+      currentQuestions && 
+      currentQuestions.length > 0;
+    
+    if (shouldAutoStart) {
       console.log('Auto-starting exam...');
-      handleStartExam();
+      // Add a small delay to ensure state is properly updated
+      setTimeout(() => {
+        handleStartExam();
+      }, 100);
     }
-  }, [selectedCategory, selectedExamId, questions, dynamicQuestions, examState.sessionId, handleStartExam, examMode]);
+  }, [selectedCategory, selectedExamId, questions, dynamicQuestions.length, examState.sessionId, handleStartExam, examMode, isLoadingDynamicQuestions]);
 
   // Timer countdown effect
   useEffect(() => {
@@ -524,117 +534,136 @@ const ExamMode = () => {
   // Main exam interface
   if (!examState.isCompleted && currentQuestions && currentQuestions.length > 0) {
     console.log('Showing main exam interface with questions:', currentQuestions.length);
-    const currentQuestion = getCurrentQuestion();
-    const currentAnswer = getCurrentAnswer();
-    const progressPercentage = ((examState.currentQuestionIndex + 1) / currentQuestions.length) * 100;
-    const answeredCount = examState.answers.length;
+    // Only show the exam interface if we have a session ID (exam has started)
+    // or if we're in a mode that should auto-start
+    const shouldShowExamInterface = examState.sessionId || 
+      (selectedCategory || selectedExamId || examMode === 'timed' || examMode === 'review');
+      
+    if (!shouldShowExamInterface) {
+      // If we don't have a session ID yet, show loading state
+      console.log('Not showing exam interface yet - waiting for session start');
+    } else {
+      const currentQuestion = getCurrentQuestion();
+      const currentAnswer = getCurrentAnswer();
+      const progressPercentage = ((examState.currentQuestionIndex + 1) / currentQuestions.length) * 100;
+      const answeredCount = examState.answers.length;
 
-    return (
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b border-border bg-surface-dark sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm" onClick={handleExitExam}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Salir del Examen
-                </Button>
-                
-                <div className="flex items-center gap-3">
-                  <Plane className="w-6 h-6 text-primary" />
-                  <div>
-                    <h1 className="font-bold">{exam?.title}</h1>
-                    <p className="text-xs text-muted-foreground">
-                      {examMode === 'timed' ? 'Modo Examen Cronometrado' : 
-                       examMode === 'review' ? 'Modo Repaso' : 
-                       'Modo Práctica'}
-                    </p>
+      return (
+        <div className="min-h-screen bg-background">
+          {/* Header */}
+          <header className="border-b border-border bg-surface-dark sticky top-0 z-50">
+            <div className="container mx-auto px-4 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Button variant="ghost" size="sm" onClick={handleExitExam}>
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Salir del Examen
+                  </Button>
+                  
+                  <div className="flex items-center gap-3">
+                    <Plane className="w-6 h-6 text-primary" />
+                    <div>
+                      <h1 className="font-bold">{exam?.title || 'Examen de Práctica'}</h1>
+                      <p className="text-xs text-muted-foreground">
+                        {examMode === 'timed' ? 'Modo Examen Cronometrado' : 
+                         examMode === 'review' ? 'Modo Repaso' : 
+                         'Modo Práctica'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2 text-sm">
-                  <Clock className="w-4 h-4 text-warning" />
-                  <span className="font-mono text-lg font-bold text-warning">
-                    {formatTime(examState.timeRemaining)}
-                  </span>
-                </div>
-                
-                <Badge variant="outline" className="bg-primary/10 text-primary">
-                  Pregunta {examState.currentQuestionIndex + 1} de {currentQuestions.length}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Progress Bar */}
-        <div className="border-b border-border bg-surface-mid">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center justify-between mb-2 text-sm">
-              <span className="text-muted-foreground">Progreso del examen</span>
-              <span className="font-medium">{Math.round(progressPercentage)}% completado</span>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-          </div>
-        </div>
-
-        {/* Main Content */}
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
-          <Card className="surface-mid border-border/50">
-            <CardContent className="p-8">
-              {/* Question Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="bg-primary/10 text-primary">
-                    <Target className="w-3 h-3 mr-1" />
-                    {currentQuestion?.category}
-                  </Badge>
-                  <Badge variant="outline" className="bg-warning/10 text-warning">
-                    {currentQuestion?.difficulty === 'advanced' ? 'Avanzado' : currentQuestion?.difficulty === 'intermediate' ? 'Intermedio' : 'Básico'}
-                  </Badge>
-                </div>
-                
-                <Button variant="ghost" size="sm">
-                  <Bookmark className="w-4 h-4 mr-2" />
-                  Marcar
-                </Button>
-              </div>
-
-              {/* Question */}
-              <div className="mb-8">
-                <h2 className="text-xl font-semibold leading-relaxed mb-6">
-                  {currentQuestion?.question}
-                </h2>
-              </div>
-
-              {/* Answer Options */}
-              <div className="space-y-4 mb-8">
-                {currentQuestion?.options && (currentQuestion.options as string[]).map((option, index) => {
-                  let optionClass = 'flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all';
-                  let borderClass = '';
-                  let bgClass = '';
-                  let isDisabled = false;
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Clock className="w-4 h-4 text-warning" />
+                    <span className="font-mono text-lg font-bold text-warning">
+                      {formatTime(examState.timeRemaining)}
+                    </span>
+                  </div>
                   
-                  if (examMode === 'practice') {
-                    // Practice mode - show verification after answering
-                    if (isAnswered) {
-                      isDisabled = true;
-                      if (index === currentQuestion.correctAnswer) {
-                        borderClass = 'border-success';
-                        bgClass = 'bg-success/10';
-                      } else if (index === selectedAnswer && index !== currentQuestion.correctAnswer) {
-                        borderClass = 'border-destructive';
-                        bgClass = 'bg-destructive/10';
+                  <Badge variant="outline" className="bg-primary/10 text-primary">
+                    Pregunta {examState.currentQuestionIndex + 1} de {currentQuestions.length}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          {/* Progress Bar */}
+          <div className="border-b border-border bg-surface-mid">
+            <div className="container mx-auto px-4 py-3">
+              <div className="flex items-center justify-between mb-2 text-sm">
+                <span className="text-muted-foreground">Progreso del examen</span>
+                <span className="font-medium">{Math.round(progressPercentage)}% completado</span>
+              </div>
+              <Progress value={progressPercentage} className="h-2" />
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <main className="container mx-auto px-4 py-8 max-w-4xl">
+            <Card className="surface-mid border-border/50">
+              <CardContent className="p-8">
+                {/* Question Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <Badge variant="outline" className="bg-primary/10 text-primary">
+                      <Target className="w-3 h-3 mr-1" />
+                      {currentQuestion?.category || 'General'}
+                    </Badge>
+                    <Badge variant="outline" className="bg-warning/10 text-warning">
+                      {currentQuestion?.difficulty === 'advanced' ? 'Avanzado' : currentQuestion?.difficulty === 'intermediate' ? 'Intermedio' : 'Básico'}
+                    </Badge>
+                  </div>
+                  
+                  <Button variant="ghost" size="sm">
+                    <Bookmark className="w-4 h-4 mr-2" />
+                    Marcar
+                  </Button>
+                </div>
+
+                {/* Question */}
+                <div className="mb-8">
+                  <h2 className="text-xl font-semibold leading-relaxed mb-6">
+                    {currentQuestion?.question}
+                  </h2>
+                </div>
+
+                {/* Answer Options */}
+                <div className="space-y-4 mb-8">
+                  {currentQuestion?.options && (currentQuestion.options as string[]).map((option, index) => {
+                    let optionClass = 'flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all';
+                    let borderClass = '';
+                    let bgClass = '';
+                    let isDisabled = false;
+                    
+                    if (examMode === 'practice') {
+                      // Practice mode - show verification after answering
+                      if (isAnswered) {
+                        isDisabled = true;
+                        if (index === currentQuestion.correctAnswer) {
+                          borderClass = 'border-success';
+                          bgClass = 'bg-success/10';
+                        } else if (index === selectedAnswer && index !== currentQuestion.correctAnswer) {
+                          borderClass = 'border-destructive';
+                          bgClass = 'bg-destructive/10';
+                        } else {
+                          borderClass = 'border-border';
+                          bgClass = 'bg-surface-light';
+                        }
                       } else {
-                        borderClass = 'border-border';
-                        bgClass = 'bg-surface-light';
+                        // Not answered yet
+                        if (selectedAnswer === index) {
+                          borderClass = 'border-primary';
+                          bgClass = 'bg-primary/5';
+                        } else {
+                          borderClass = 'border-border hover:border-primary/50';
+                          bgClass = 'hover:bg-surface-light';
+                        }
                       }
                     } else {
-                      // Not answered yet
-                      if (selectedAnswer === index) {
+                      // Timed/Review modes - immediate selection
+                      if (currentAnswer?.selectedAnswer === index) {
                         borderClass = 'border-primary';
                         bgClass = 'bg-primary/5';
                       } else {
@@ -642,214 +671,205 @@ const ExamMode = () => {
                         bgClass = 'hover:bg-surface-light';
                       }
                     }
-                  } else {
-                    // Timed/Review modes - immediate selection
-                    if (currentAnswer?.selectedAnswer === index) {
-                      borderClass = 'border-primary';
-                      bgClass = 'bg-primary/5';
-                    } else {
-                      borderClass = 'border-border hover:border-primary/50';
-                      bgClass = 'hover:bg-surface-light';
-                    }
-                  }
-                  
-                  optionClass += ` ${borderClass} ${bgClass}`;
-                  
-                  return (
-                    <label
-                      key={index}
-                      className={optionClass}
-                    >
-                      <input
-                        type="radio"
-                        name="answer"
-                        value={index}
-                        checked={examMode === 'practice' ? selectedAnswer === index : currentAnswer?.selectedAnswer === index}
-                        onChange={() => examMode === 'practice' ? selectAnswer(currentQuestion._id, index) : answerQuestion(currentQuestion._id, index)}
-                        disabled={isDisabled}
-                        className="sr-only"
-                      />
-                      <div className={`
-                        w-6 h-6 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center
-                        ${
-                          examMode === 'practice'
-                            ? isAnswered
-                              ? index === currentQuestion.correctAnswer
-                                ? 'border-success bg-success'
-                                : index === selectedAnswer && index !== currentQuestion.correctAnswer
-                                ? 'border-destructive bg-destructive'
+                    
+                    optionClass += ` ${borderClass} ${bgClass}`;
+                    
+                    return (
+                      <label
+                        key={index}
+                        className={optionClass}
+                      >
+                        <input
+                          type="radio"
+                          name="answer"
+                          value={index}
+                          checked={examMode === 'practice' ? selectedAnswer === index : currentAnswer?.selectedAnswer === index}
+                          onChange={() => examMode === 'practice' ? selectAnswer(currentQuestion._id, index) : answerQuestion(currentQuestion._id, index)}
+                          disabled={isDisabled}
+                          className="sr-only"
+                        />
+                        <div className={`
+                          w-6 h-6 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center
+                          ${
+                            examMode === 'practice'
+                              ? isAnswered
+                                ? index === currentQuestion.correctAnswer
+                                  ? 'border-success bg-success'
+                                  : index === selectedAnswer && index !== currentQuestion.correctAnswer
+                                  ? 'border-destructive bg-destructive'
+                                  : 'border-muted-foreground'
+                                : selectedAnswer === index
+                                ? 'border-primary bg-primary'
                                 : 'border-muted-foreground'
-                              : selectedAnswer === index
+                              : currentAnswer?.selectedAnswer === index
                               ? 'border-primary bg-primary'
                               : 'border-muted-foreground'
-                            : currentAnswer?.selectedAnswer === index
-                            ? 'border-primary bg-primary'
-                            : 'border-muted-foreground'
-                        }
-                      `}>
-                        {((examMode === 'practice' && (selectedAnswer === index || (isAnswered && index === currentQuestion.correctAnswer))) ||
-                          (examMode !== 'practice' && currentAnswer?.selectedAnswer === index)) && (
-                          <div className={`w-2 h-2 rounded-full ${
-                            examMode === 'practice' && isAnswered
-                              ? index === currentQuestion.correctAnswer
-                                ? 'bg-primary-foreground'
-                                : index === selectedAnswer
-                                ? 'bg-primary-foreground'
+                          }
+                        `}>
+                          {((examMode === 'practice' && (selectedAnswer === index || (isAnswered && index === currentQuestion.correctAnswer))) ||
+                            (examMode !== 'practice' && currentAnswer?.selectedAnswer === index)) && (
+                            <div className={`w-2 h-2 rounded-full ${
+                              examMode === 'practice' && isAnswered
+                                ? index === currentQuestion.correctAnswer
+                                  ? 'bg-primary-foreground'
+                                  : index === selectedAnswer
+                                  ? 'bg-primary-foreground'
+                                  : 'bg-primary-foreground'
                                 : 'bg-primary-foreground'
-                              : 'bg-primary-foreground'
-                          }`}></div>
-                        )}
-                        {examMode === 'practice' && isAnswered && (
-                          index === currentQuestion.correctAnswer ? (
-                            <CheckCircle2 className="w-4 h-4 text-success" />
-                          ) : index === selectedAnswer && index !== currentQuestion.correctAnswer ? (
-                            <XCircle className="w-4 h-4 text-destructive" />
-                          ) : null
-                        )}
-                      </div>
-                      <span className="text-sm leading-relaxed font-medium">
-                        {String.fromCharCode(65 + index)}. {option}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-
-              {/* Answer Explanation for Practice Mode */}
-              {examMode === 'practice' && showExplanation && currentQuestion?.explanation && (
-                <Card className="mb-8 surface-light border-border/50">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-3 mb-4">
-                      {selectedAnswer === currentQuestion.correctAnswer ? (
-                        <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-0.5" />
-                      ) : (
-                        <XCircle className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" />
-                      )}
-                      <div>
-                        <h3 className="font-semibold text-lg mb-2">
-                          {selectedAnswer === currentQuestion.correctAnswer ? '¡Correcto!' : 'Incorrecto'}
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {currentQuestion.explanation}
-                        </p>
-                        {selectedAnswer !== currentQuestion.correctAnswer && (
-                          <div className="mt-3 p-3 bg-success/10 border border-success/20 rounded-lg">
-                            <p className="text-sm">
-                              <span className="font-medium text-success">Respuesta correcta:</span>{' '}
-                              <span className="font-medium">
-                                {String.fromCharCode(65 + currentQuestion.correctAnswer)}. {(currentQuestion.options as string[])[currentQuestion.correctAnswer]}
-                              </span>
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-6 border-t border-border">
-                <div className="flex items-center gap-4">
-                  <Button 
-                    variant="outline" 
-                    onClick={previousQuestion}
-                    disabled={examState.currentQuestionIndex === 0}
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Anterior
-                  </Button>
-                  
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    <Flag className="w-4 h-4 mr-2" />
-                    Marcar para revisión
-                  </Button>
+                            }`}></div>
+                          )}
+                          {examMode === 'practice' && isAnswered && (
+                            index === currentQuestion.correctAnswer ? (
+                              <CheckCircle2 className="w-4 h-4 text-success" />
+                            ) : index === selectedAnswer && index !== currentQuestion.correctAnswer ? (
+                              <XCircle className="w-4 h-4 text-destructive" />
+                            ) : null
+                          )}
+                        </div>
+                        <span className="text-sm leading-relaxed font-medium">
+                          {String.fromCharCode(65 + index)}. {option}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
 
-                <div className="flex items-center gap-4">
-                  {examMode === 'practice' && !isAnswered ? (
+                {/* Answer Explanation for Practice Mode */}
+                {examMode === 'practice' && showExplanation && currentQuestion?.explanation && (
+                  <Card className="mb-8 surface-light border-border/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-3 mb-4">
+                        {selectedAnswer === currentQuestion.correctAnswer ? (
+                          <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0 mt-0.5" />
+                        ) : (
+                          <XCircle className="w-6 h-6 text-destructive flex-shrink-0 mt-0.5" />
+                        )}
+                        <div>
+                          <h3 className="font-semibold text-lg mb-2">
+                            {selectedAnswer === currentQuestion.correctAnswer ? '¡Correcto!' : 'Incorrecto'}
+                          </h3>
+                          <p className="text-muted-foreground leading-relaxed">
+                            {currentQuestion.explanation}
+                          </p>
+                          {selectedAnswer !== currentQuestion.correctAnswer && (
+                            <div className="mt-3 p-3 bg-success/10 border border-success/20 rounded-lg">
+                              <p className="text-sm">
+                                <span className="font-medium text-success">Respuesta correcta:</span>{' '}
+                                <span className="font-medium">
+                                  {String.fromCharCode(65 + currentQuestion.correctAnswer)}. {(currentQuestion.options as string[])[currentQuestion.correctAnswer]}
+                                </span>
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Navigation */}
+                <div className="flex items-center justify-between pt-6 border-t border-border">
+                  <div className="flex items-center gap-4">
                     <Button 
-                      onClick={() => currentQuestion && confirmAnswer(currentQuestion._id)}
-                      disabled={selectedAnswer === null}
-                      className="bg-primary hover:bg-primary/90"
-                      size="lg"
+                      variant="outline" 
+                      onClick={previousQuestion}
+                      disabled={examState.currentQuestionIndex === 0}
                     >
-                      <Target className="w-4 h-4 mr-2" />
-                      Confirmar Respuesta
+                      <ArrowLeft className="w-4 h-4 mr-2" />
+                      Anterior
                     </Button>
-                  ) : examState.currentQuestionIndex === currentQuestions.length - 1 ? (
-                    <Button 
-                      onClick={handleSubmitExamClick}
-                      disabled={isSubmittingExam}
-                      className="bg-success hover:bg-success/90" 
-                      size="lg"
-                    >
-                      {isSubmittingExam ? (
-                        "Enviando..."
-                      ) : (
-                        <>
-                          <Target className="w-4 h-4 mr-2" />
-                          Finalizar Examen
-                        </>
-                      )}
+                    
+                    <Button variant="ghost" size="sm" className="text-muted-foreground">
+                      <Flag className="w-4 h-4 mr-2" />
+                      Marcar para revisión
                     </Button>
-                  ) : (
-                    <Button 
-                      onClick={nextQuestion}
-                      disabled={examMode === 'practice' && !isAnswered}
-                      size="lg"
-                    >
-                      Siguiente
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  )}
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    {examMode === 'practice' && !isAnswered ? (
+                      <Button 
+                        onClick={() => currentQuestion && confirmAnswer(currentQuestion._id)}
+                        disabled={selectedAnswer === null}
+                        className="bg-primary hover:bg-primary/90"
+                        size="lg"
+                      >
+                        <Target className="w-4 h-4 mr-2" />
+                        Confirmar Respuesta
+                      </Button>
+                    ) : examState.currentQuestionIndex === currentQuestions.length - 1 ? (
+                      <Button 
+                        onClick={handleSubmitExamClick}
+                        disabled={isSubmittingExam}
+                        className="bg-success hover:bg-success/90" 
+                        size="lg"
+                      >
+                        {isSubmittingExam ? (
+                          "Enviando..."
+                        ) : (
+                          <>
+                            <Target className="w-4 h-4 mr-2" />
+                            Finalizar Examen
+                          </>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={nextQuestion}
+                        disabled={examMode === 'practice' && !isAnswered}
+                        size="lg"
+                      >
+                        Siguiente
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Exam Info Sidebar */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="surface-light border-border/50">
-              <CardContent className="p-4 text-center">
-                <Clock className="w-8 h-8 text-warning mx-auto mb-2" />
-                <h3 className="font-semibold text-sm mb-1">Tiempo Restante</h3>
-                <p className="text-lg font-bold text-warning">{formatTime(examState.timeRemaining)}</p>
               </CardContent>
             </Card>
 
-            <Card className="surface-light border-border/50">
-              <CardContent className="p-4 text-center">
-                <Target className="w-8 h-8 text-primary mx-auto mb-2" />
-                <h3 className="font-semibold text-sm mb-1">Respondidas</h3>
-                <p className="text-lg font-bold text-primary">{answeredCount}/{currentQuestions.length}</p>
-              </CardContent>
-            </Card>
+            {/* Exam Info Sidebar */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="surface-light border-border/50">
+                <CardContent className="p-4 text-center">
+                  <Clock className="w-8 h-8 text-warning mx-auto mb-2" />
+                  <h3 className="font-semibold text-sm mb-1">Tiempo Restante</h3>
+                  <p className="text-lg font-bold text-warning">{formatTime(examState.timeRemaining)}</p>
+                </CardContent>
+              </Card>
 
-            <Card className="surface-light border-border/50">
-              <CardContent className="p-4 text-center">
-                <Bookmark className="w-8 h-8 text-warning mx-auto mb-2" />
-                <h3 className="font-semibold text-sm mb-1">Progreso</h3>
-                <p className="text-lg font-bold text-warning">{Math.round(progressPercentage)}%</p>
-              </CardContent>
-            </Card>
-          </div>
+              <Card className="surface-light border-border/50">
+                <CardContent className="p-4 text-center">
+                  <Target className="w-8 h-8 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold text-sm mb-1">Respondidas</h3>
+                  <p className="text-lg font-bold text-primary">{answeredCount}/{currentQuestions.length}</p>
+                </CardContent>
+              </Card>
 
-          {/* Success Notice */}
-          <div className="mt-8 p-4 surface-light rounded-lg border border-success/20 bg-success/5">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
-                <p className="font-medium text-success mb-1">¡Funcionalidad Completa Activada!</p>
-                <p className="text-muted-foreground">
-                  Cronómetro real activo, guardado automático funcionando, banco completo de preguntas cargado desde Supabase.
-                </p>
+              <Card className="surface-light border-border/50">
+                <CardContent className="p-4 text-center">
+                  <Bookmark className="w-8 h-8 text-warning mx-auto mb-2" />
+                  <h3 className="font-semibold text-sm mb-1">Progreso</h3>
+                  <p className="text-lg font-bold text-warning">{Math.round(progressPercentage)}%</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Success Notice */}
+            <div className="mt-8 p-4 surface-light rounded-lg border border-success/20 bg-success/5">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-success mb-1">¡Funcionalidad Completa Activada!</p>
+                  <p className="text-muted-foreground">
+                    Cronómetro real activo, guardado automático funcionando, banco completo de preguntas cargado.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
-    );
+          </main>
+        </div>
+      );
+    }
   }
 
   // Loading state for dynamic questions

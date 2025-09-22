@@ -4,16 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { 
-  BookOpen, 
-  Target, 
-  BarChart3, 
-  User, 
-  Settings, 
-  LogOut,
-  Plane,
   ArrowLeft,
   Edit,
-  Camera,
   Mail,
   Phone,
   MapPin,
@@ -29,6 +21,7 @@ import { useUserStats } from "@/hooks/useStats";
 import { useState, useEffect } from "react";
 import { UserAvatar } from "@/components/UserAvatar";
 import { AvatarSelector } from "@/components/AvatarSelector";
+import { UnifiedSidebar } from "@/components/UnifiedSidebar"; // Added import for UnifiedSidebar
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -74,95 +67,9 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 surface-dark border-r border-border z-40">
-        <div className="p-6">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Plane className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-              <p className="text-xs text-muted-foreground">Perfil</p>
-            </div>
-          </div>
-
-          {/* User Profile */}
-          <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-            <UserAvatar 
-              avatarUrl={profile?.avatar_url} 
-              displayName={displayName}
-              size="md"
-            />
-            <div>
-              <h2 className="font-medium text-sm">{displayName}</h2>
-              <p className="text-xs text-muted-foreground">Nivel {userStats?.current_level || 1} • {userStats?.total_points || 0} puntos</p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/dashboard')}
-            >
-              <BookOpen className="w-5 h-5" />
-              <span>Inicio</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/exams')}
-            >
-              <Target className="w-5 h-5" />
-              <span>Exámenes</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/type-rating')}
-            >
-              <Star className="w-5 h-5" />
-              <span>Type Rating</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/progress')}
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span>Progreso</span>
-            </Button>
-            <Button variant="default" className="w-full justify-start gap-3 h-12">
-              <User className="w-5 h-5" />
-              <span>Perfil</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/settings')}
-            >
-              <Settings className="w-5 h-5" />
-              <span>Configuración</span>
-            </Button>
-          </nav>
-
-          {/* Logout */}
-          <div className="absolute bottom-6 left-6 right-6">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Cerrar Sesión</span>
-            </Button>
-          </div>
-        </div>
-      </aside>
-
+      {/* Unified Sidebar */}
+      <UnifiedSidebar activePage="profile" />
+      
       {/* Main Content */}
       <main className="ml-64 p-8">
         {/* Header */}
@@ -381,7 +288,7 @@ const Profile = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-success" />
+                    <Star className="w-4 h-4 text-success" />
                     <span className="text-sm">Exámenes completados</span>
                   </div>
                   <Badge className="bg-success/10 text-success">{userStats?.total_exams_taken || 0}</Badge>
@@ -395,7 +302,7 @@ const Profile = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-info" />
+                    <Trophy className="w-4 h-4 text-info" />
                     <span className="text-sm">Puntos totales</span>
                   </div>
                   <Badge className="bg-info/10 text-info">{userStats?.total_points || 0}</Badge>

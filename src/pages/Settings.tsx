@@ -17,6 +17,7 @@ import {
   Save,
   Settings as SettingsIcon
 } from 'lucide-react';
+import { UnifiedSidebar } from '@/components/UnifiedSidebar'; // Added import for UnifiedSidebar
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -90,8 +91,12 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background">
+      {/* Unified Sidebar */}
+      <UnifiedSidebar activePage="settings" />
+      
+      {/* Main Content */}
+      <main className="ml-64 p-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button 
@@ -376,7 +381,7 @@ const Settings = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

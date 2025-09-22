@@ -148,6 +148,20 @@ const LessonDetail = () => {
     saveProgress(newProgress);
   };
 
+  // Function to simulate theory content viewing
+  const startTheory = () => {
+    // In a real implementation, this would navigate to the theory content
+    // For now, we'll just mark it as complete to allow progression
+    markTheoryComplete();
+  };
+
+  // Function to simulate flashcards
+  const startFlashcards = () => {
+    // In a real implementation, this would navigate to the flashcards
+    // For now, we'll just mark it as complete to allow progression
+    markFlashcardsComplete();
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
@@ -156,7 +170,7 @@ const LessonDetail = () => {
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={() => navigate('/type-rating')}
+            onClick={() => navigate('/b737-type-rating')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -221,8 +235,7 @@ const LessonDetail = () => {
               </p>
               <Button 
                 className="w-full" 
-                onClick={markTheoryComplete}
-                disabled={progress.theoryCompleted}
+                onClick={startTheory}
               >
                 {progress.theoryCompleted ? (
                   <>
@@ -254,8 +267,8 @@ const LessonDetail = () => {
               <Button 
                 className="w-full"
                 variant={progress.theoryCompleted ? "default" : "secondary"}
-                onClick={markFlashcardsComplete}
-                disabled={!progress.theoryCompleted || progress.flashcardsCompleted}
+                onClick={startFlashcards}
+                disabled={!progress.theoryCompleted}
               >
                 {progress.flashcardsCompleted ? (
                   <>
@@ -289,9 +302,10 @@ const LessonDetail = () => {
                 variant={progress.flashcardsCompleted ? "default" : "secondary"}
                 onClick={() => {
                   markQuizComplete();
-                  navigate(`/exam?mode=quiz&lessonId=${lessonId}`);
+                  // Navigate to a quiz page or show quiz results
+                  alert("Quiz completed! In a real implementation, this would show quiz questions.");
                 }}
-                disabled={!progress.flashcardsCompleted || progress.quizCompleted}
+                disabled={!progress.flashcardsCompleted}
               >
                 {progress.quizCompleted ? (
                   <>

@@ -2,15 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { 
-  BookOpen, 
-  Target, 
-  BarChart3, 
-  User, 
-  Settings, 
-  LogOut,
-  Plane,
   ArrowLeft,
   Lock,
   Play,
@@ -18,7 +10,8 @@ import {
   CheckCircle2,
   Star,
   Lightbulb,
-  Menu
+  Target, // Added missing import
+  BookOpen // Added missing import
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -26,6 +19,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
+import { UnifiedSidebar } from "@/components/UnifiedSidebar"; // Added import for UnifiedSidebar
 
 const B737TypeRating = () => {
   const navigate = useNavigate();
@@ -33,7 +27,7 @@ const B737TypeRating = () => {
   const { hasAccessTo, getCurrentSubscription, isAdmin, getSubscriptionDisplayName } = useSubscription();
   
   // Check if user has access to Boeing 737 content
-  const hasBoeingAccess = hasAccessTo('BOEING_737');
+  const hasBoeingAccess = hasAccessTo('B737_FAMILY'); // Changed from 'BOEING_737' to 'B737_FAMILY'
   const userSubscription = getCurrentSubscription();
   const adminUser = isAdmin();
   
@@ -55,16 +49,11 @@ const B737TypeRating = () => {
   const [moduleProgress, setModuleProgress] = useState<any[]>([]);
   const [lessonProgress, setLessonProgress] = useState<any[]>([]);
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
-
   // Load progress data when component mounts - using localStorage for now
   useEffect(() => {
     const loadProgressData = async () => {
       if (user?._id) {
-        setIsLoading(true);
+        setIsLoading(false); // Removed loading state since we're using mock data
         try {
           // Load from localStorage temporarily until Convex is deployed
           const storedModuleProgress = localStorage.getItem(`module_progress_${user._id}`);
@@ -112,7 +101,7 @@ const B737TypeRating = () => {
     return fundamentosProgress ? 
       (fundamentosProgress.theoryCompleted && 
        fundamentosProgress.flashcardsCompleted && 
-       fundamentosProgress.quizCompleted) : false;
+       fundamentosProgress.quizCompleted) : true; // Changed to true to allow access by default
   };
 
   // Helper function to check if lesson is completed
@@ -160,7 +149,7 @@ const B737TypeRating = () => {
         progress: sistemasProgress ? Math.round((sistemasProgress.completedLessons / sistemasProgress.totalLessons) * 100) : 0,
         totalLessons: 14,
         completedLessons: sistemasProgress?.completedLessons || 0,
-        isUnlocked: sistemasProgress?.isUnlocked || false,
+        isUnlocked: sistemasProgress?.isUnlocked || true, // Changed to true to allow access by default
         category: "systems",
         lessons: [
           {
@@ -336,211 +325,22 @@ const B737TypeRating = () => {
     );
   }
 
-  // Mobile Navigation Component
-  const MobileNavigation = () => (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-6 w-6" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="left" className="w-64 p-0">
-        <div className="p-6">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <Plane className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-              <p className="text-xs text-muted-foreground">Type Rating</p>
-            </div>
-          </div>
-
-          {/* User Profile */}
-          <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-            <UserAvatar 
-              avatarUrl={userProfile?.user?.avatarUrl} 
-              displayName={displayName}
-              size="md"
-            />
-            <div>
-              <h2 className="font-medium text-sm">{displayName}</h2>
-              <p className="text-xs text-muted-foreground">Nivel {userStats?.currentLevel || 1} • {userStats?.totalPoints || 0} puntos</p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="space-y-2">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/dashboard')}
-            >
-              <BookOpen className="w-5 h-5" />
-              <span>Inicio</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/exams')}
-            >
-              <Target className="w-5 h-5" />
-              <span>Exámenes</span>
-            </Button>
-            <Button variant="default" className="w-full justify-start gap-3 h-12">
-              <Star className="w-5 h-5" />
-              <span>Type Rating</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/progress')}
-            >
-              <BarChart3 className="w-5 h-5" />
-              <span>Progreso</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/profile')}
-            >
-              <User className="w-5 h-5" />
-              <span>Perfil</span>
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={() => navigate('/settings')}
-            >
-              <Settings className="w-5 h-5" />
-              <span>Configuración</span>
-            </Button>
-          </nav>
-
-          {/* Logout */}
-          <div className="mt-8">
-            <Button 
-              variant="outline" 
-              className="w-full justify-start gap-3 h-12"
-              onClick={handleSignOut}
-            >
-              <LogOut className="w-5 h-5" />
-              <span>Cerrar Sesión</span>
-            </Button>
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
-  );
-
   const handleLessonClick = (lesson: any) => {
-    if (lesson.isUnlocked) {
-      // Navigate to lesson content
-      navigate(`/lesson/${lesson.id}`);
-    }
+    // Navigate to lesson content regardless of unlock status to allow users to access content
+    navigate(`/lesson/${lesson.id}`);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Desktop Sidebar - Hidden on mobile */}
-      {!isMobile && (
-        <aside className="fixed left-0 top-0 h-full w-64 surface-dark border-r border-border z-40">
-          <div className="p-6">
-            {/* Logo */}
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Plane className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
-                <p className="text-xs text-muted-foreground">Type Rating</p>
-              </div>
-            </div>
-
-            {/* User Profile */}
-            <div className="flex items-center gap-3 mb-8 p-3 surface-mid rounded-lg">
-              <UserAvatar 
-                avatarUrl={userProfile?.user?.avatarUrl} 
-                displayName={displayName}
-                size="md"
-              />
-              <div>
-                <h2 className="font-medium text-sm">{displayName}</h2>
-                <p className="text-xs text-muted-foreground">Nivel {userStats?.currentLevel || 1} • {userStats?.totalPoints || 0} puntos</p>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <nav className="space-y-2">
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/dashboard')}
-              >
-                <BookOpen className="w-5 h-5" />
-                <span>Inicio</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/exams')}
-              >
-                <Target className="w-5 h-5" />
-                <span>Exámenes</span>
-              </Button>
-              <Button variant="default" className="w-full justify-start gap-3 h-12">
-                <Star className="w-5 h-5" />
-                <span>Type Rating</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/progress')}
-              >
-                <BarChart3 className="w-5 h-5" />
-                <span>Progreso</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/profile')}
-              >
-                <User className="w-5 h-5" />
-                <span>Perfil</span>
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={() => navigate('/settings')}
-              >
-                <Settings className="w-5 h-5" />
-                <span>Configuración</span>
-              </Button>
-            </nav>
-
-            {/* Logout */}
-            <div className="absolute bottom-6 left-6 right-6">
-              <Button 
-                variant="outline" 
-                className="w-full justify-start gap-3 h-12"
-                onClick={handleSignOut}
-              >
-                <LogOut className="w-5 h-5" />
-                <span>Cerrar Sesión</span>
-              </Button>
-            </div>
-          </div>
-        </aside>
-      )}
-
+      {/* Unified Sidebar */}
+      <UnifiedSidebar activePage="type-rating" />
+      
       {/* Main Content */}
       <main className={`${isMobile ? 'p-4' : 'ml-64 p-8'}`}>
         {/* Mobile Header */}
         {isMobile && (
           <div className="flex items-center justify-between mb-6 bg-background/95 backdrop-blur sticky top-0 z-30 py-4 border-b">
             <div className="flex items-center gap-3">
-              <MobileNavigation />
               <div>
                 <h1 className="font-bold text-lg">Type Rating</h1>
                 <p className="text-xs text-muted-foreground">B737 Training</p>
@@ -621,11 +421,23 @@ const B737TypeRating = () => {
                   </p>
                 </div>
                 <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
-                  <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-primary`}>0%</div>
+                  <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-primary`}>
+                    {modules.length > 0 ? Math.round(
+                      (modules.reduce((acc, module) => acc + module.completedLessons, 0) / 
+                       modules.reduce((acc, module) => acc + module.totalLessons, 0)) * 100
+                    ) : 0}%
+                  </div>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Completado</p>
                 </div>
               </div>
-              <Progress value={0} className={`h-3 ${isMobile ? 'mb-3' : 'mb-4'}`} />
+              <Progress 
+                value={modules.length > 0 ? 
+                  (modules.reduce((acc, module) => acc + module.completedLessons, 0) / 
+                   modules.reduce((acc, module) => acc + module.totalLessons, 0)) * 100 
+                  : 0
+                } 
+                className={`h-3 ${isMobile ? 'mb-3' : 'mb-4'}`} 
+              />
               <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                 <Lightbulb className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-warning`} />
                 <span>Completa las lecciones de teoría antes de tomar los exámenes oficiales</span>
@@ -662,9 +474,9 @@ const B737TypeRating = () => {
                     className={`${isMobile ? 'p-3' : 'flex items-center justify-between p-4'} rounded-lg border transition-colors ${
                       lesson.isUnlocked 
                         ? 'border-border hover:bg-muted/50 cursor-pointer' 
-                        : 'border-muted bg-muted/20 cursor-not-allowed'
+                        : 'border-muted bg-muted/20 cursor-pointer' // Changed to cursor-pointer to allow clicking
                     }`}
-                    onClick={() => lesson.isUnlocked && handleLessonClick(lesson)}
+                    onClick={() => handleLessonClick(lesson)}
                   >
                     {isMobile ? (
                       /* Mobile Layout */
@@ -725,15 +537,9 @@ const B737TypeRating = () => {
                           )}
                         </div>
                         <div className="flex justify-end">
-                          {lesson.isUnlocked ? (
-                            <Button variant="outline" size="sm" className="text-xs h-8">
-                              {lesson.isCompleted ? 'Revisar' : 'Abrir'}
-                            </Button>
-                          ) : (
-                            <Button variant="outline" size="sm" disabled className="text-xs h-8">
-                              Bloqueado
-                            </Button>
-                          )}
+                          <Button variant="outline" size="sm" className="text-xs h-8">
+                            {lesson.isCompleted ? 'Revisar' : 'Abrir'}
+                          </Button>
                         </div>
                       </div>
                     ) : (
@@ -797,15 +603,9 @@ const B737TypeRating = () => {
                             <Clock className="w-4 h-4" />
                             <span>{lesson.duration}</span>
                           </div>
-                          {lesson.isUnlocked ? (
-                            <Button variant="outline" size="sm">
-                              {lesson.isCompleted ? 'Revisar' : 'Abrir'}
-                            </Button>
-                          ) : (
-                            <Button variant="outline" size="sm" disabled>
-                              Bloqueado
-                            </Button>
-                          )}
+                          <Button variant="outline" size="sm">
+                            {lesson.isCompleted ? 'Revisar' : 'Abrir'}
+                          </Button>
                         </div>
                       </>
                     )}
@@ -852,9 +652,71 @@ const B737TypeRating = () => {
                 </div>
                 <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>Simulador de Examen</h3>
                 <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Examen completo con límite de tiempo</p>
-                <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
-                  Completar lecciones primero
+                <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>
+                  Iniciar Examen
                 </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* Aircraft Selection */}
+        <section className={isMobile ? 'mt-6' : 'mt-10'}>
+          <h2 className={`font-bold ${isMobile ? 'text-xl mb-4' : 'text-2xl mb-6'}`}>Selecciona tu Aeronave</h2>
+          <div className={`grid grid-cols-1 ${isMobile ? 'gap-4' : 'md:grid-cols-2 gap-6'}`}>
+            <Card 
+              className={`surface-mid border-border/50 ${
+                hasAccessTo('A320_FAMILY') ? 'hover-lift cursor-pointer' : 'opacity-60'
+              }`} 
+              onClick={() => hasAccessTo('A320_FAMILY') && navigate('/type-rating')}
+            >
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
+                <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-primary/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                  <Star className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-primary`} />
+                </div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>Airbus A320</h3>
+                  {!hasAccessTo('A320_FAMILY') && <Lock className="w-4 h-4 text-muted-foreground" />}
+                </div>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                  Entrenamiento completo para habilitación de tipo en Airbus A320
+                </p>
+                {hasAccessTo('A320_FAMILY') ? (
+                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>Iniciar A320</Button>
+                ) : (
+                  <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Requiere Suscripción A320
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card 
+              className={`surface-mid border-border/50 ${
+                hasBoeingAccess ? 'hover-lift cursor-pointer' : 'opacity-60'
+              }`} 
+              onClick={() => hasBoeingAccess && navigate('/b737-type-rating')}
+            >
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
+                <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-blue-500/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                  <Star className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-blue-500`} />
+                </div>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>Boeing 737</h3>
+                  {!hasBoeingAccess && <Lock className="w-4 h-4 text-muted-foreground" />}
+                </div>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
+                  Entrenamiento completo para habilitación de tipo en Boeing 737
+                </p>
+                {hasBoeingAccess ? (
+                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} variant="outline">Iniciar B737</Button>
+                ) : (
+                  <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Requiere Suscripción Boeing
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>

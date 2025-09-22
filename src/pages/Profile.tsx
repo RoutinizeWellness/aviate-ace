@@ -68,7 +68,7 @@ const Profile = () => {
   };
 
   const displayName = profile?.display_name || 
-                     user?.user_metadata?.full_name || 
+                     user?.fullName || 
                      user?.email?.split('@')[0] || 
                      'Usuario';
 
@@ -411,16 +411,13 @@ const Profile = () => {
               <CardContent className="space-y-3">
                 {userAchievements && userAchievements.length > 0 ? (
                   userAchievements.slice(0, 3).map((userAchievement) => {
-                    const achievement = userAchievement.achievements;
-                    if (!achievement) return null;
-                    
                     return (
-                      <div key={achievement.id} className="flex items-center gap-3">
+                      <div key={userAchievement.id} className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                           <Trophy className="w-4 h-4 text-primary" />
                         </div>
                         <div>
-                          <p className="text-sm font-medium">{achievement.title}</p>
+                          <p className="text-sm font-medium">Logro #{userAchievement.achievement_id}</p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(userAchievement.unlocked_at).toLocaleDateString('es-ES', {
                               day: 'numeric',

@@ -170,7 +170,7 @@ const Exams = () => {
     navigate('/login');
   };
 
-  const displayName = profile?.displayName || 
+  const displayName = profile?.display_name || 
                      user?.fullName || 
                      user?.email?.split('@')[0] || 
                      'Usuario';

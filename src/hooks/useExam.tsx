@@ -362,13 +362,13 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
 
   // Real questions data - filter based on mode, category, difficulty, and aircraft
   const getFilteredQuestions = () => {
-    // Return empty array initially, will be populated when needed
+    // Import and return real questions when needed
     return [];
   };
 
   const realQuestions: ConvexExamQuestion[] = examId 
     ? [] // Will be populated dynamically when examId is provided
-    : getFilteredQuestions(); // Will be populated when needed
+    : []; // Will be populated by the ExamMode component through dynamic import
 
   // Use Convex data if available, otherwise use real data
   const exam = convexExam || realExam;

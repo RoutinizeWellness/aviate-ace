@@ -40,11 +40,70 @@ const ExamMode = () => {
   const rawMode = searchParams.get('mode') || 'practice';
   const examMode: 'practice' | 'timed' | 'review' = 
     rawMode === 'timed' || rawMode === 'review' ? rawMode : 'practice';
-  const selectedCategory = searchParams.get('category') || '';
+  let selectedCategory = searchParams.get('category') || '';
   const selectedDifficulty = searchParams.get('difficulty') || '';
   const selectedAircraft = searchParams.get('aircraft') || 'A320_FAMILY';
   const timeLimit = parseInt(searchParams.get('timeLimit') || '0');
   const questionCount = parseInt(searchParams.get('questionCount') || '20');
+  
+  // If no category is provided but we have an exam title pattern, extract category from title
+  const examTitle = searchParams.get('title') || '';
+  console.log('Exam title from URL params:', examTitle);
+  console.log('Initial selectedCategory:', selectedCategory);
+  
+  if (!selectedCategory && examTitle.startsWith('Práctica: ')) {
+    const categoryFromTitle = examTitle.replace('Práctica: ', '').toLowerCase().replace(/\s+/g, '-');
+    console.log('Extracted category from title:', categoryFromTitle);
+    
+    // Map common category names to their proper keys
+    const categoryMap: { [key: string]: string } = {
+      'aircraft-general': 'aircraft-general',
+      'airplane-general': 'airplane-general',
+      'aircraft-systems': 'aircraft-systems',
+      'electrical': 'electrical',
+      'hydraulic': 'hydraulics',
+      'hydraulics': 'hydraulics',
+      'pneumatic': 'air-systems',
+      'fuel': 'fuel',
+      'flight-controls': 'flight-controls',
+      'engines': 'engines',
+      'apu': 'apu',
+      'navigation': 'navigation',
+      'autopilot': 'autoflight',
+      'autoflight': 'autoflight',
+      'performance': 'performance',
+      // Additional category mappings for completeness
+      'load-acceleration-limits': 'load-acceleration-limits',
+      'environment-limits': 'environment-limits',
+      'weight-limits': 'weight-limits',
+      'speed-limits': 'speed-limits',
+      'air-bleed-cond-press-vent': 'air-bleed-cond-press-vent',
+      'ice-rain-protection': 'ice-rain-protection',
+      'landing-gear': 'landing-gear',
+      'oxygen': 'oxygen',
+      'gpws': 'gpws',
+      'air-systems': 'air-systems',
+      'anti-ice-rain': 'anti-ice-rain',
+      'automatic-flight': 'automatic-flight',
+      'communication': 'communication',
+      'engines-apu': 'engines-apu',
+      'fire-protection': 'fire-protection',
+      'flight-instruments': 'flight-instruments',
+      'flight-management': 'flight-management',
+      'warning-systems': 'warning-systems',
+      // Spanish category mappings
+      'sistemas-aeronave': 'sistemas-aeronave',
+      'proteccion-vuelo': 'proteccion-vuelo',
+      'procedimientos-aproximacion': 'procedimientos-aproximacion',
+      'procedimientos-emergencia': 'procedimientos-emergencia',
+      'meteorologia': 'meteorologia',
+      'reglamentacion': 'reglamentacion',
+      'navegacion': 'navegacion'
+    };
+    
+    selectedCategory = categoryMap[categoryFromTitle] || categoryFromTitle;
+    console.log('Mapped category:', selectedCategory);
+  }
   
   const [selectedExamId, setSelectedExamId] = useState<string | null>(searchParams.get('examId') || null);
   const [showExamSelector, setShowExamSelector] = useState(!selectedExamId && examMode === 'practice' && !selectedCategory);
@@ -82,22 +141,95 @@ const ExamMode = () => {
   // Load questions dynamically when category is selected but no examId is provided
   useEffect(() => {
     const loadQuestions = async () => {
-      if (!selectedExamId && selectedCategory && examMode === 'practice') {
+      console.log('Dynamic question loading triggered with:', {
+        selectedExamId,
+        selectedCategory,
+        examMode,
+        selectedAircraft,
+        selectedDifficulty,
+        questionCount
+      });
+      
+      if (!selectedExamId && (selectedCategory || examMode === 'timed' || examMode === 'review')) {
         setIsLoadingDynamicQuestions(true);
+        setQuestionsError(null);
         try {
           // Dynamically import the question loader
           const { loadAndFilterQuestions } = await import('@/utils/questionLoader');
-          const loadedQuestions = await loadAndFilterQuestions(
+          
+          // Handle special case for "Aircraft General" category
+          let effectiveCategory = selectedCategory;
+          if (selectedCategory === 'aircraft-general' || selectedCategory.includes('aircraft') && selectedCategory.includes('general')) {
+            effectiveCategory = 'aircraft-general';
+          }
+          
+          console.log('Loading questions with parameters:', {
             examMode,
-            selectedCategory,
+            effectiveCategory,
+            selectedAircraft,
+            selectedDifficulty,
+            questionCount
+          });
+          
+          let loadedQuestions = await loadAndFilterQuestions(
+            examMode,
+            effectiveCategory,
             selectedAircraft,
             selectedDifficulty,
             questionCount
           );
-          setDynamicQuestions(loadedQuestions);
+          
+          console.log('Loaded questions count:', loadedQuestions.length);
+          
+          // Validate that we have questions
+          if (loadedQuestions && loadedQuestions.length > 0) {
+            setDynamicQuestions(loadedQuestions);
+            console.log('Successfully loaded', loadedQuestions.length, 'questions');
+          } else {
+            // Try with relaxed filters
+            console.log('No questions found with current filters, trying with relaxed filters');
+            const relaxedQuestions = await loadAndFilterQuestions(
+              examMode,
+              effectiveCategory || 'all',
+              'ALL',
+              'all',
+              questionCount
+            );
+            setDynamicQuestions(relaxedQuestions);
+            console.log('Loaded', relaxedQuestions.length, 'questions with relaxed filters');
+            
+            // If still no questions, try with 'aircraft-general' specifically
+            if (relaxedQuestions.length === 0 && (selectedCategory.includes('aircraft') || selectedCategory.includes('general'))) {
+              console.log('Trying with aircraft-general category specifically');
+              const aircraftGeneralQuestions = await loadAndFilterQuestions(
+                examMode,
+                'aircraft-general',
+                'ALL',
+                'all',
+                questionCount
+              );
+              setDynamicQuestions(aircraftGeneralQuestions);
+              console.log('Loaded', aircraftGeneralQuestions.length, 'aircraft-general questions');
+            }
+          }
         } catch (error) {
           console.error('Error loading questions:', error);
           setQuestionsError(error as Error);
+          
+          // Provide fallback questions
+          try {
+            const { allRealAviationQuestions } = await import('@/data/realAviationQuestions');
+            const fallbackQuestions = allRealAviationQuestions
+              .slice(0, questionCount)
+              .map((q, index) => ({
+                ...q,
+                _id: `fallback_${index}_${Date.now()}`
+              }));
+            setDynamicQuestions(fallbackQuestions);
+            console.log('Provided', fallbackQuestions.length, 'fallback questions');
+          } catch (fallbackError) {
+            console.error('Error loading fallback questions:', fallbackError);
+          }
         } finally {
           setIsLoadingDynamicQuestions(false);
         }
@@ -129,10 +261,19 @@ const ExamMode = () => {
   // Auto-start exam if we have category/difficulty or examId
   useEffect(() => {
     const currentQuestions = questions || dynamicQuestions;
-    if ((selectedCategory || selectedExamId) && !examState.sessionId && currentQuestions && currentQuestions.length > 0) {
+    console.log('Auto-start check:', {
+      hasCategory: !!selectedCategory,
+      hasExamId: !!selectedExamId,
+      hasQuestions: !!currentQuestions && currentQuestions.length > 0,
+      hasSessionId: !!examState.sessionId,
+      examMode
+    });
+    
+    if ((selectedCategory || selectedExamId || examMode === 'timed' || examMode === 'review') && !examState.sessionId && currentQuestions && currentQuestions.length > 0) {
+      console.log('Auto-starting exam...');
       handleStartExam();
     }
-  }, [selectedCategory, selectedExamId, questions, dynamicQuestions, examState.sessionId, handleStartExam]);
+  }, [selectedCategory, selectedExamId, questions, dynamicQuestions, examState.sessionId, handleStartExam, examMode]);
 
   // Timer countdown effect
   useEffect(() => {
@@ -369,9 +510,20 @@ const ExamMode = () => {
   // Determine which questions to use
   const currentQuestions = questions || dynamicQuestions;
   const isUsingDynamicQuestions = !questions && dynamicQuestions.length > 0;
+  
+  console.log('Question sources status:', {
+    hasQuestions: !!questions,
+    hasDynamicQuestions: dynamicQuestions.length > 0,
+    isUsingDynamicQuestions,
+    dynamicQuestionsCount: dynamicQuestions.length,
+    questionsCount: questions?.length || 0,
+    selectedCategory,
+    selectedExamId
+  });
 
   // Main exam interface
   if (!examState.isCompleted && currentQuestions && currentQuestions.length > 0) {
+    console.log('Showing main exam interface with questions:', currentQuestions.length);
     const currentQuestion = getCurrentQuestion();
     const currentAnswer = getCurrentAnswer();
     const progressPercentage = ((examState.currentQuestionIndex + 1) / currentQuestions.length) * 100;
@@ -708,6 +860,11 @@ const ExamMode = () => {
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
           <h2 className="text-lg font-semibold mb-2">Cargando Preguntas</h2>
           <p className="text-muted-foreground">Preparando tu examen...</p>
+          <div className="mt-4 text-xs text-muted-foreground">
+            <p>Selected Category: {selectedCategory || 'none'}</p>
+            <p>Dynamic Questions: {dynamicQuestions.length}</p>
+            <p>Is Loading: {isLoadingDynamicQuestions ? 'true' : 'false'}</p>
+          </div>
         </Card>
       </div>
     );
@@ -739,11 +896,14 @@ const ExamMode = () => {
                 - ID del examen: {selectedExamId}<br/>
                 - Estado de carga: {isLoadingQuestions ? 'Cargando...' : 'Completado'}<br/>
                 - Preguntas encontradas: {currentQuestions?.length || 0}<br/>
+                - Selected Category: {selectedCategory || 'none'}<br/>
+                - Dynamic Questions: {dynamicQuestions.length}<br/>
+                - Is Loading Dynamic: {isLoadingDynamicQuestions ? 'true' : 'false'}<br/>
                 {questionsError && `- Error: ${questionsError.message}`}
               </p>
             </div>
             <div className="flex gap-4 justify-center">
-              <Button variant="outline" onClick={() => setShowExamSelector(true)}>
+              <Button variant="outline" onClick={() => navigate('/exams')}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Seleccionar Otro Examen
               </Button>

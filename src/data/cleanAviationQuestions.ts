@@ -1,8 +1,8 @@
 import { Id } from "convex/_generated/dataModel";
 import { allB737Questions } from "./b737Questions";
 
-export interface RealAviationQuestion {
-  _id: Id<"examQuestions">;
+interface RealAviationQuestion {
+  _id: string;
   question: string;
   options: string[];
   correctAnswer: number;
@@ -23,7 +23,7 @@ function generateQuestionId(table: string): string {
 // A320 Electrical System Questions
 export const electricalSystemQuestions: RealAviationQuestion[] = [
   {
-    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    _id: generateQuestionId("examQuestions"),
     question: "What is the normal AC power source priority sequence in the A320 electrical system?",
     options: [
       "Engine generators, APU generator, external power, RAT",

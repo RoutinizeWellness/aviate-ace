@@ -1,141 +1,139 @@
-  };
-};,
-oadQuestionste,
-    l  setStatate,
-    snfig,
-  {
-    co
-  return tions]);
-DynamicQuesouldLoadshonfig,  }, [c
- ;
-    }))e }falsstions: QuedingLoa...prev, is ({ (prev =>State   set
-    } finally {}
-   r);
-      backErrons:', fallk questiollbacloading far ('Erroe.error     consol  
- kError) {allbac} catch (f
-      ));uestions }: fallbackQQuestionsrev, dynamic{ ...pprev => (tate(     setS;
-         }))  }`
-  e.now()ndex}_${Datk_${iid: `fallbac _
-           ..q,       .({
-     > (q, index) =   .map(      ount)
- ionCuest0, config.q    .slice(s
-      ionQuestionallRealAviatuestions = ckQconst fallba    ;
-    nQuestions')Aviatioa/real/datrt('@mpo } = await iuestionsealAviationQt { allR        cons   try {
-stions
-   lback quevide fal  // Pro  
-      }));
-  s Error  error aor:ionsErrev, quest> ({ ...prv =ate(pretStse {
-      atch (error) c }
-   ));
-      }ons }stielaxedQueuestions: r dynamicQrev,v => ({ ...pState(pre   set
-         );  
-  ountonCfig.questi con         'all',
-         'ALL',
-           all',
-egory || ' config.cat       de,
-  g.monfi       coons(
-   tiuesrQadAndFilte = await loonsxedQuesti const rela      c
-  logilback   // Fal   {
-   else );
-      }uestions })ons: loadedQnamicQuesti.prev, dy ({ ..rev =>e(p setStat     
-  th > 0) {stions.lengoadedQue&& ldQuestions  (loade  if  
-      
-  
-      });g.examTitleonfiitle: c examT      t,
- stionCoun config.quetionCount:ques,
-        lty.difficu configty:icul        diffaircraft,
-config.craft:       air
-  gory,catey: config.  categore,
-      : config.mod    mode  ons({
-  Questioadoader.lnLuestiozedQit Optimitions = awaQuesedoad     const l {
-  try 
-   ));
-    null }ionsError:uest true, qQuestions:, isLoading ...prevev => ({e(prat
-    setSt
-    }
-   return;   
-ode)) {.my, configtegor.caamId, config(exstionsueicQnamdDy!shouldLoa {
-    if () =>tring | null smId:nc (exalback(asyCaltions = useQuesadlo const 
- ]);
-;
-  }, [nscQuestioamiuiresDyn && reqalExamIdn hasNoRe retur   ;
-    
-=== 'review'e  modtimed' ||== 'ry || mode = = categocQuestionsiresDynamionst requ;
-    cIdryExamempora isT!examId ||mId = RealExaonst hasNo    cp_exam_');
-temtartsWith('xamId.sId && eamId = examExrary isTempo  const) => {
-  ringng, mode: stry: stri, catego| nullring ((examId: st useCallbackuestions =amicQDyn shouldLoad
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { RealAviationQuestion } from '@/data/realAviationQuestions';
+import { loadAndFilterQuestions } from '@/utils/questionLoader';
+import { OptimizedQuestionLoader } from '@/services/OptimizedQuestionLoader';
 
-  const
-  });on: false,xplanatiwE sho  
- d: false,wereisAnsl,
-    nuledAnswer:     selections: [],
-Questic   dynamll,
- : nunsError   questio
- lse,uestions: fagQ    isLoadintate>({
-amModeSExte<e] = useSta, setStatst [state;
-
-  conParams])search };
-  }, [,
-   examTitle
-      || '0'),') imeLimit.get('trchParamseInt(seaparsimit:  timeL0'),
-     ount') || '2'questionCet(Params.g(searcheIntrsionCount: pa    quest,
-   ''lty') ||difficuarams.get('chPearficulty: s
-      difFAMILY', 'A320_aft') ||cr('airhParams.getft: searc   aircra
-   dCategory,ecte: selegory,
-      catdeode: examMo   m  urn {
- ret
-      }
-    
-  romTitle;tegoryFtle] || caoryFromTi[categMap= categoryry edCatego     select
-      };
- lics',ydrauulico': 'hema-hidrá  'sist',
-      ectrical 'elo':rictema-eléct        'sisce',
-performan': 'performance
-        '',aulicsydrraulics': 'h        'hydics',
-c': 'hydraulliau      'hydr',
-  ricall': 'electlectrica  'e
-      ing } = {ing]: str stry:kegoryMap: { [t cate
-      cons '-');(/\s+/g,eplaceCase().rLower', '').to: cticae('Prá.replac= examTitleyFromTitle onst categor      c ')) {
-Práctica:tartsWith('e.s && examTitlategory(!selectedC   if '';
- | ) |.get('title'hParamstle = searct examTinsco
-    
-        }m;
-goriesParay = catedCategor  selecte) {
-    esParamif (categori 
-    
-   '';gories') || et('cateParams.g = searchamgoriesParonst cate
-    c '';egory') ||ms.get('cathParasearc = ctedCategoryelet s
-    le;
-    e': 'practicode rawMiew' ?  === 'revMode|| raw'timed' wMode ===     ra  eview' = 
-' | 'r| 'timed 'practice'  examMode:onst;
-    c'practice'de') || et('mohParams.gearcrawMode = s  const {
-  ig => onf: ExamModeCeMemo(() config = us consteters
- am URL pard validatet an
-  // Extracs();
-  earchParamuseS] = rchParamsconst [sea{
-  = () => seExamMode ort const u
+interface ExamModeConfig {
+  mode: 'practice' | 'timed' | 'review';
+  category: string;
+  aircraft: string;
+  difficulty: string;
+  questionCount: number;
+  timeLimit: number;
+  examTitle: string;
 }
 
-expboolean;lanation: 
-  showExp boolean;nswered:ll;
-  isAr | nunswer: numbeectedAel  s;
-on[]ionQuestialAviattions: ReicQuesdynam| null;
-  r Error: nsErrostio  que
-an;s: boolegQuestionadine {
-  isLoStatce ExamModerfa inte}
+interface ExamModeState {
+  isLoading: boolean;
+  questions: RealAviationQuestion[];
+  dynamicQuestions: RealAviationQuestion[] | null;
+  questionsError: Error | null;
+  selectedAnswer: number | null;
+  isAnswered: boolean;
+  showExplanation: boolean;
+}
 
-exportstring;
-xamTitle: number;
-  etimeLimit: r;
-  t: numbeuestionCoun
-  qg;ty: strinfficul  di: string;
-craft;
-  airry: string  catego 'review';
-med' |ice' | 'tide: 'practmoig {
-  odeConfExamMinterface 
+export const useExamMode = () => {
+  const [searchParams] = useSearchParams();
+  const [state, setState] = useState<ExamModeState>({
+    isLoading: false,
+    questions: [],
+    dynamicQuestions: null,
+    questionsError: null,
+    selectedAnswer: null,
+    isAnswered: false,
+    showExplanation: false,
+  });
 
-export Loader';zedQuestionices/Optimifrom '@/server } QuestionLoadzed { Optimirtimpo
-er';uestionLoadls/qtirom '@/uestions } fdFilterQurt { loadAn
-impo';stionsQuerealAviation '@/data/fromon } tinQuesRealAviatiot type { om';
-imporr-d'react-routems } from ra useSearchPa {
-import'react';back } from seCalleMemo, uect, useEff ususeState,import { 
+  // Extract and validate exam URL parameters
+  const config = useMemo((): ExamModeConfig => {
+    const rawMode = searchParams.get('mode') || 'practice';
+    const examMode: 'practice' | 'timed' | 'review' = 
+      rawMode === 'timed' || rawMode === 'review' ? rawMode : 'practice';
+    
+    const selectedCategory = searchParams.get('category') || '';
+    const categoriesParam = searchParams.get('categories') || '';
+    const examTitle = searchParams.get('title') || '';
+    
+    // Extract category from title for practice exams
+    const categoryFromTitle = examTitle.startsWith('Práctica:') && examTitle
+      ? examTitle.replace('Práctica:', '').trim().toLowerCase().replace(/\s+/g, '-')
+      : '';
+    
+    const categoryMap: { [key: string]: string } = {
+      'electrical': 'electrical',
+      'sistema-eléctrico': 'electrical', 
+      'hydraulics': 'hydraulics',
+      'sistema-hidráulico': 'hydraulics',
+      'performance': 'performance',
+    };
+
+    const selectedCategory2 = categoryMap[categoryFromTitle] || categoryFromTitle || selectedCategory;
+
+    if (!selectedCategory2 && categoriesParam) {
+      // Handle multiple categories
+    }
+
+    return {
+      mode: examMode,
+      category: selectedCategory2,
+      aircraft: searchParams.get('aircraft') || 'A320_FAMILY',
+      difficulty: searchParams.get('difficulty') || '',
+      questionCount: parseInt(searchParams.get('questionCount') || '20'),
+      timeLimit: parseInt(searchParams.get('timeLimit') || '0'),
+      examTitle,
+    };
+  }, [searchParams]);
+
+  const shouldLoadDynamicQuestions = useCallback((examId: string | null, mode: string, category: string): boolean => {
+    const hasNoRealExamId = !examId || examId.startsWith('temp_exam_');
+    const isTemporary = examId && examId.startsWith('temp_exam_');
+    const requiresDynamicQuestions = mode === 'practice' || mode === 'timed' || mode === 'review';
+    
+    return hasNoRealExamId && requiresDynamicQuestions && !!category;
+  }, []);
+
+  const loadDynamicQuestions = useCallback(async (examId: string | null, config: ExamModeConfig) => {
+    if (!shouldLoadDynamicQuestions(examId, config.mode, config.category)) {
+      return;
+    }
+
+    setState(prev => ({ ...prev, isLoading: true, questionsError: null }));
+    
+    try {
+      const loadedQuestions = await OptimizedQuestionLoader.loadAndFilterQuestions(
+        config.mode,
+        config.category || 'all',
+        config.aircraft,
+        config.difficulty,
+        config.questionCount,
+        config.examTitle
+      );
+
+      if (loadedQuestions && loadedQuestions.length > 0) {
+        setState(prev => ({ ...prev, dynamicQuestions: loadedQuestions, isLoading: false }));
+      } else {
+        // Fallback questions
+        const { allRealAviationQuestions } = await import('@/data/cleanAviationQuestions');
+        const fallbackQuestions = allRealAviationQuestions
+          .slice(0, config.questionCount)
+          .map((q, index) => ({
+            ...q,
+            _id: `fallback_${index}_${Date.now()}` as any,
+          }));
+
+        setState(prev => ({ ...prev, dynamicQuestions: fallbackQuestions, isLoading: false }));
+      }
+    } catch (fallbackError) {
+      console.error('Error loading fallback questions:', fallbackError);
+      setState(prev => ({ 
+        ...prev, 
+        questionsError: fallbackError as Error,
+        isLoading: false 
+      }));
+    } finally {
+      setState(prev => ({ ...prev, isLoading: false }));
+    }
+  }, [config.questionCount, shouldLoadDynamicQuestions]);
+
+  useEffect(() => {
+    loadDynamicQuestions(null, config);
+  }, [config, loadDynamicQuestions]);
+
+  return {
+    ...state,
+    config,
+    setState,
+  };
+};

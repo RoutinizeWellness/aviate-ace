@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { useNavigate } from "react-router-dom";
 import { 
   Plane, 
   Target, 
@@ -110,7 +113,9 @@ const testimonials = [
 ];
 
 const Index = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const { t } = useLanguage();
+  const navigate = useNavigate();
 
   const handlePlanSelect = (planName: string) => {
     if (user) {

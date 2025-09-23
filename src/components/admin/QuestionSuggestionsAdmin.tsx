@@ -38,7 +38,7 @@ export const QuestionSuggestionsAdmin = ({ className }: QuestionSuggestionsAdmin
     try {
       await updateStatus({
         adminUserId: user._id,
-        suggestionId,
+        suggestionId: suggestionId as any,
         status,
         adminNotes: notes
       });
@@ -62,7 +62,7 @@ export const QuestionSuggestionsAdmin = ({ className }: QuestionSuggestionsAdmin
     try {
       await approveAndCreate({
         adminUserId: user._id,
-        suggestionId,
+        suggestionId: suggestionId as any,
         adminNotes: notes
       });
 

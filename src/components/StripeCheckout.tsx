@@ -12,7 +12,7 @@ interface AutumnCheckoutProps {
   onCancel?: () => void;
 }
 
-export const AutumnCheckout: React.FC<AutumnCheckoutProps> = ({ 
+export const StripeCheckout: React.FC<AutumnCheckoutProps> = ({ 
   plan,
   onSuccess,
   onCancel
@@ -163,3 +163,6 @@ export const AutumnCheckout: React.FC<AutumnCheckoutProps> = ({
     </form>
   );
 };
+
+// Legacy export
+export const AutumnCheckout = StripeCheckout;

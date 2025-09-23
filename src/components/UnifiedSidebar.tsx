@@ -38,7 +38,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
                      'Usuario';
 
   const currentLevel = profile?.experience_level || '1';
-  const totalPoints = profile?.total_points || 0;
+  const totalPoints = profile?.points || 0;
 
   const renderNavigationItems = () => (
     <nav className="space-y-2">

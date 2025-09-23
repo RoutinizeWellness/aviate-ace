@@ -2,7 +2,7 @@ import { Id } from "convex/_generated/dataModel";
 import { allB737Questions } from "./b737Questions";
 
 export interface RealAviationQuestion {
-  _id: Id<"examQuestions">;
+  _id: any;
   question: string;
   options: string[];
   correctAnswer: number;
@@ -23,7 +23,7 @@ function generateQuestionId(table: string): string {
 // A320 Electrical System Questions
 export const electricalSystemQuestions: RealAviationQuestion[] = [
   {
-    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    _id: generateQuestionId("examQuestions") as any,
     question: "What is the normal AC power source priority sequence in the A320 electrical system?",
     options: [
       "Engine generators, APU generator, external power, RAT",
@@ -42,7 +42,7 @@ export const electricalSystemQuestions: RealAviationQuestion[] = [
     regulationCode: "EASA CS-25.1351"
   },
   {
-    _id: generateQuestionId("examQuestions") as Id<"examQuestions">,
+    _id: generateQuestionId("examQuestions") as any,
     question: "What happens when both engine generators fail during flight?",
     options: [
       "Total electrical failure occurs immediately",

@@ -16,6 +16,8 @@ import type {
 import type * as auth from "../auth.js";
 import type * as courses from "../courses.js";
 import type * as exams from "../exams.js";
+import type * as lessons from "../lessons.js";
+import type * as questionSuggestions from "../questionSuggestions.js";
 import type * as seedQuestions from "../seedQuestions.js";
 
 /**
@@ -30,6 +32,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   courses: typeof courses;
   exams: typeof exams;
+  lessons: typeof lessons;
+  questionSuggestions: typeof questionSuggestions;
   seedQuestions: typeof seedQuestions;
 }>;
 export declare const api: FilterApi<

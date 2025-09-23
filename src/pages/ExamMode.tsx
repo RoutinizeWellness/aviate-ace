@@ -16,7 +16,7 @@ import {
   Play,
   Trophy
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useExamSession, useExams } from "@/hooks/useExam";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -24,6 +24,13 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import type { Id } from '../../convex/_generated/dataModel';
+import { DebugQuestionLoader } from '@/components/DebugQuestionLoader';
+import { loadAndFilterQuestions } from "@/utils/questionLoader";
+
+// Import test utility in development
+if (import.meta.env.DEV) {
+  import('@/utils/testQuestionLoading');
+}
 
 const ExamMode = () => {
   const navigate = useNavigate();
@@ -123,6 +130,15 @@ const ExamMode = () => {
   const [dynamicQuestions, setDynamicQuestions] = useState<any[]>([]);
   const [isLoadingDynamicQuestions, setIsLoadingDynamicQuestions] = useState(false);
 
+  // Helper function to determine if we should load dynamic questions
+  const shouldLoadDynamicQuestions = (examId: string | null, category: string, mode: string) => {
+    const isTemporaryExamId = examId && examId.startsWith('temp_exam_');
+    const hasNoRealExamId = !examId || isTemporaryExamId;
+    const requiresDynamicQuestions = category || mode === 'timed' || mode === 'review';
+    
+    return hasNoRealExamId && requiresDynamicQuestions;
+  };
+
   // Load questions dynamically when category is selected but no examId is provided
   useEffect(() => {
     const loadQuestions = async () => {
@@ -135,34 +151,29 @@ const ExamMode = () => {
         questionCount
       });
       
-      if (!selectedExamId && (selectedCategory || examMode === 'timed' || examMode === 'review')) {
+      if (shouldLoadDynamicQuestions(selectedExamId, selectedCategory, examMode)) {
         setIsLoadingDynamicQuestions(true);
         setQuestionsError(null);
         try {
-          // Dynamically import the question loader
-          const { loadAndFilterQuestions } = await import('@/utils/questionLoader');
-          
-          // Handle special case for "Aircraft General" category
-          let effectiveCategory = selectedCategory;
-          if (selectedCategory === 'aircraft-general' || (selectedCategory && selectedCategory.includes('aircraft') && selectedCategory.includes('general'))) {
-            effectiveCategory = 'aircraft-general';
-          }
+          // Use optimized question loader
+          const { OptimizedQuestionLoader } = await import('@/services/OptimizedQuestionLoader');
           
           console.log('Loading questions with parameters:', {
             examMode,
-            effectiveCategory,
+            selectedCategory,
             selectedAircraft,
             selectedDifficulty,
             questionCount
           });
           
-          let loadedQuestions = await loadAndFilterQuestions(
-            examMode,
-            effectiveCategory,
-            selectedAircraft,
-            selectedDifficulty,
-            questionCount
-          );
+          let loadedQuestions = await OptimizedQuestionLoader.loadQuestions({
+            mode: examMode,
+            category: selectedCategory,
+            aircraft: selectedAircraft,
+            difficulty: selectedDifficulty,
+            questionCount,
+            examTitle
+          });
           
           console.log('Loaded questions count:', loadedQuestions.length);
           
@@ -184,7 +195,7 @@ const ExamMode = () => {
             console.log('Loaded', relaxedQuestions.length, 'questions with relaxed filters');
             
             // If still no questions, try with 'aircraft-general' specifically
-            if (relaxedQuestions.length === 0 && (selectedCategory && (selectedCategory.includes('aircraft') || selectedCategory.includes('general')))) {
+            if (relaxedQuestions.length === 0) {
               console.log('Trying with aircraft-general category specifically');
               const aircraftGeneralQuestions = await loadAndFilterQuestions(
                 examMode,
@@ -224,18 +235,45 @@ const ExamMode = () => {
     loadQuestions();
   }, [selectedExamId, selectedCategory, examMode, selectedAircraft, selectedDifficulty, questionCount]);
 
+  // Memoized current questions to avoid recalculation
+  const currentQuestions = useMemo(() => {
+    console.log('Computing currentQuestions:', { 
+      questions: questions?.length || 0, 
+      dynamicQuestions: dynamicQuestions.length,
+      questionsArray: questions,
+      dynamicArray: dynamicQuestions.slice(0, 3) // Only log first 3 for brevity
+    });
+    const result = (questions && questions.length > 0) ? questions : dynamicQuestions;
+    console.log('Final currentQuestions result:', result.length, 'questions');
+    return result;
+  }, [questions, dynamicQuestions]);
+
   // Initialize selected answer when question changes
   useEffect(() => {
-    const currentQuestions = questions || dynamicQuestions;
     if (examMode === 'practice' && currentQuestions && currentQuestions.length > 0) {
       const currentQuestion = currentQuestions[examState.currentQuestionIndex];
       const existingAnswer = examState.answers.find(a => a.questionId === currentQuestion?._id);
       
+      if (import.meta.env.DEV) {
+        console.log('Initializing answer state:', {
+          currentQuestionIndex: examState.currentQuestionIndex,
+          currentQuestionId: currentQuestion?._id,
+          existingAnswer,
+          totalAnswers: examState.answers.length
+        });
+      }
+      
       if (existingAnswer) {
+        if (import.meta.env.DEV) {
+          console.log('Found existing answer, setting isAnswered = true');
+        }
         setSelectedAnswer(existingAnswer.selectedAnswer);
         setIsAnswered(true);
         setShowExplanation(true);
       } else {
+        if (import.meta.env.DEV) {
+          console.log('No existing answer, setting isAnswered = false');
+        }
         setSelectedAnswer(null);
         setIsAnswered(false);
         setShowExplanation(false);
@@ -245,11 +283,12 @@ const ExamMode = () => {
 
   // Auto-start exam if we have category/difficulty or examId
   useEffect(() => {
-    const currentQuestions = questions || dynamicQuestions;
     const hasCategories = !!selectedCategory;
     
     // Don't auto-start if we're still loading dynamic questions
-    const isStillLoading = !selectedExamId && (selectedCategory || examMode === 'timed' || examMode === 'review') && isLoadingDynamicQuestions;
+    const isTemporaryExamId = selectedExamId && selectedExamId.startsWith('temp_exam_');
+    const needsDynamicQuestions = (!selectedExamId || isTemporaryExamId) && (selectedCategory || examMode === 'timed' || examMode === 'review');
+    const isStillLoading = needsDynamicQuestions && isLoadingDynamicQuestions; 
     
     console.log('Auto-start check:', {
       hasCategory: hasCategories,
@@ -326,17 +365,16 @@ const ExamMode = () => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Get current question based on current index
-  const getCurrentQuestion = () => {
-    const currentQuestions = questions || dynamicQuestions;
+  // Get current question based on current index (using memoized currentQuestions from above)
+  const getCurrentQuestion = useCallback(() => {
     return currentQuestions && currentQuestions.length > 0 ? currentQuestions[examState.currentQuestionIndex] : null;
-  };
+  }, [currentQuestions, examState.currentQuestionIndex]);
   
   // Get current answer for the current question
-  const getCurrentAnswer = () => {
+  const getCurrentAnswer = useCallback(() => {
     const currentQ = getCurrentQuestion();
     return currentQ ? examState.answers.find(a => a.questionId === currentQ._id) || null : null;
-  };
+  }, [getCurrentQuestion, examState.answers]);
 
   const handleExamSelect = (examId: string) => {
     setSelectedExamId(examId);
@@ -389,10 +427,59 @@ const ExamMode = () => {
 
   // Function to select an answer (in practice mode)
   const selectAnswer = (questionId: string, answerIndex: number) => {
-    if (examMode === 'practice' && !isAnswered) {
-      setSelectedAnswer(answerIndex);
-    } else if (examMode !== 'practice') {
+    if (import.meta.env.DEV) {
+      console.log('🎯 selectAnswer called:', { 
+        questionId, 
+        answerIndex, 
+        examMode, 
+        isAnswered, 
+        selectedAnswer,
+        currentQuestionIndex: examState.currentQuestionIndex,
+        questionIdType: typeof questionId,
+        questionIdLength: questionId?.length
+      });
+    }
+    
+    // Validate inputs
+    if (typeof answerIndex !== 'number' || answerIndex < 0 || answerIndex > 3) {
+      console.error('Invalid answer index:', answerIndex);
+      return;
+    }
+    
+    if (!questionId) {
+      console.error('No question ID provided');
+      return;
+    }
+    
+    if (examMode === 'practice') {
+      // In practice mode, always allow selection until confirmed
+      if (import.meta.env.DEV) {
+        console.log('✅ Setting selected answer in practice mode:', answerIndex);
+      }
+      
+      try {
+        setSelectedAnswer(answerIndex);
+        
+        // Reset explanation state when selecting a new answer
+        if (isAnswered) {
+          if (import.meta.env.DEV) {
+            console.log('🔄 Resetting answer state because question was already answered');
+          }
+          setIsAnswered(false);
+          setShowExplanation(false);
+        }
+        
+        if (import.meta.env.DEV) {
+          console.log('✅ Successfully set selected answer to:', answerIndex);
+        }
+      } catch (error) {
+        console.error('Error setting selected answer:', error);
+      }
+    } else {
       // For timed/review modes, answer immediately
+      if (import.meta.env.DEV) {
+        console.log('⚡ Answering immediately for non-practice mode');
+      }
       answerQuestion(questionId, answerIndex);
     }
   };
@@ -477,7 +564,6 @@ const ExamMode = () => {
     });
     
     // Track incorrect question for review mode only if we're using Convex data (valid Convex IDs)
-    const currentQuestions = questions || dynamicQuestions;
     const currentQuestion = currentQuestions?.find(q => q._id === questionId);
     if (currentQuestion && 
         selectedAnswerIndex !== currentQuestion.correctAnswer && 
@@ -498,7 +584,6 @@ const ExamMode = () => {
 
   // Function to go to next question
   const nextQuestion = () => {
-    const currentQuestions = questions || dynamicQuestions;
     if (examState.currentQuestionIndex < (currentQuestions?.length || 1) - 1) {
       setExamState(prev => ({
         ...prev,
@@ -518,7 +603,6 @@ const ExamMode = () => {
   };
 
   // Determine which questions to use
-  const currentQuestions = questions || dynamicQuestions;
   const isUsingDynamicQuestions = !questions && dynamicQuestions.length > 0;
   
   console.log('Question sources status:', {
@@ -624,10 +708,48 @@ const ExamMode = () => {
 
                 {/* Question */}
                 <div className="mb-8">
-                  <h2 className="text-xl font-semibold leading-relaxed mb-6">
+                  <h2 
+                    id={`question-${examState.currentQuestionIndex}`}
+                    className="text-xl font-semibold leading-relaxed mb-6"
+                    role="heading"
+                    aria-level={2}
+                  >
                     {currentQuestion?.question}
                   </h2>
                 </div>
+
+                {/* Debug Info */}
+                {import.meta.env.DEV && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-xs space-y-2">
+                    <p><strong>Debug:</strong> examMode={examMode}, isAnswered={isAnswered ? 'true' : 'false'}, selectedAnswer={selectedAnswer}, showExplanation={showExplanation ? 'true' : 'false'}</p>
+                    <p><strong>Question ID:</strong> {currentQuestion._id}</p>
+                    <p><strong>Options count:</strong> {currentQuestion?.options?.length || 0}</p>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          console.log('🔄 Resetting answer state');
+                          setSelectedAnswer(null);
+                          setIsAnswered(false);
+                          setShowExplanation(false);
+                        }}
+                      >
+                        Reset Answer State
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          console.log('🧪 Testing selectAnswer function');
+                          selectAnswer(currentQuestion._id, 0);
+                        }}
+                      >
+                        Test Select Option A
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Answer Options */}
                 <div className="space-y-4 mb-8">
@@ -638,9 +760,11 @@ const ExamMode = () => {
                     let isDisabled = false;
                     
                     if (examMode === 'practice') {
-                      // Practice mode - show verification after answering
-                      if (isAnswered) {
-                        isDisabled = true;
+                      // Practice mode - never disable until confirmed
+                      isDisabled = false;
+                      
+                      if (isAnswered && showExplanation) {
+                        // Show results after confirmation
                         if (index === currentQuestion.correctAnswer) {
                           borderClass = 'border-success';
                           bgClass = 'bg-success/10';
@@ -652,7 +776,7 @@ const ExamMode = () => {
                           bgClass = 'bg-surface-light';
                         }
                       } else {
-                        // Not answered yet
+                        // Selection state (before confirmation)
                         if (selectedAnswer === index) {
                           borderClass = 'border-primary';
                           bgClass = 'bg-primary/5';
@@ -675,18 +799,44 @@ const ExamMode = () => {
                     optionClass += ` ${borderClass} ${bgClass}`;
                     
                     return (
-                      <label
-                        key={index}
-                        className={optionClass}
-                      >
+                      <div key={index} className="relative">
+                        <label
+                          className={optionClass}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (import.meta.env.DEV) {
+                              console.log('🖱️ Label onClick triggered:', { index, examMode, isAnswered, isDisabled });
+                            }
+                            if (!isDisabled) {
+                              if (examMode === 'practice') {
+                                selectAnswer(currentQuestion._id, index);
+                              } else {
+                                answerQuestion(currentQuestion._id, index);
+                              }
+                            }
+                          }}
+                          style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+                        >
                         <input
                           type="radio"
                           name="answer"
                           value={index}
                           checked={examMode === 'practice' ? selectedAnswer === index : currentAnswer?.selectedAnswer === index}
-                          onChange={() => examMode === 'practice' ? selectAnswer(currentQuestion._id, index) : answerQuestion(currentQuestion._id, index)}
+                          onChange={(e) => {
+                            if (import.meta.env.DEV) {
+                              console.log('📻 Radio button onChange triggered:', { index, examMode, isAnswered, questionId: currentQuestion._id });
+                            }
+                            // Let the label handle the actual selection
+                          }}
+                          onClick={(e) => {
+                            if (import.meta.env.DEV) {
+                              console.log('Radio button onClick triggered:', { index, examMode, isAnswered });
+                            }
+                          }}
                           disabled={isDisabled}
                           className="sr-only"
+                          aria-label={`Opción ${String.fromCharCode(65 + index)}: ${option}`}
+                          aria-describedby={`question-${examState.currentQuestionIndex}`}
                         />
                         <div className={`
                           w-6 h-6 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center
@@ -729,7 +879,24 @@ const ExamMode = () => {
                         <span className="text-sm leading-relaxed font-medium">
                           {String.fromCharCode(65 + index)}. {option}
                         </span>
-                      </label>
+                        </label>
+                        
+                        {/* Debug button for testing */}
+                        {import.meta.env.DEV && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="absolute top-2 right-2 text-xs"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('🔧 Debug button clicked for option:', index);
+                              selectAnswer(currentQuestion._id, index);
+                            }}
+                          >
+                            Select {index}
+                          </Button>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
@@ -886,6 +1053,45 @@ const ExamMode = () => {
             <p>Is Loading: {isLoadingDynamicQuestions ? 'true' : 'false'}</p>
           </div>
         </Card>
+      </div>
+    );
+  }
+
+  // Debug information when no questions are found
+  if (import.meta.env.DEV && (questions.length === 0 && dynamicQuestions.length === 0)) {
+    return (
+      <div className="min-h-screen bg-background p-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-4">
+            <Button onClick={() => navigate('/exams')} variant="outline">
+              ← Volver a Exámenes
+            </Button>
+          </div>
+          
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <h2 className="text-lg font-semibold text-yellow-800 mb-2">
+              🐛 Debug: No se encontraron preguntas
+            </h2>
+            <div className="text-sm text-yellow-700 space-y-1">
+              <p><strong>Examen seleccionado:</strong> {examTitle || 'Sin título'}</p>
+              <p><strong>ID del examen:</strong> {selectedExamId}</p>
+              <p><strong>Estado de carga:</strong> {isLoadingDynamicQuestions ? 'Cargando' : 'Completado'}</p>
+              <p><strong>Preguntas encontradas:</strong> {questions.length}</p>
+              <p><strong>Selected Category:</strong> {selectedCategory || 'none'}</p>
+              <p><strong>Selected Aircraft:</strong> {selectedAircraft}</p>
+              <p><strong>Dynamic Questions:</strong> {dynamicQuestions.length}</p>
+              <p><strong>Is Loading Dynamic:</strong> {isLoadingDynamicQuestions ? 'true' : 'false'}</p>
+            </div>
+          </div>
+          
+          <DebugQuestionLoader
+            mode={examMode}
+            category={selectedCategory}
+            aircraft={selectedAircraft}
+            difficulty={selectedDifficulty}
+            questionCount={questionCount}
+          />
+        </div>
       </div>
     );
   }

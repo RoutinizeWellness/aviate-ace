@@ -284,4 +284,27 @@ export default defineSchema({
     .index("by_lesson", ["lessonId"])
     .index("by_session_type", ["sessionType"])
     .index("by_date", ["startTime"]),
+
+  // Question Suggestions table
+  questionSuggestions: defineTable({
+    userId: v.id("users"),
+    question: v.string(),
+    options: v.array(v.string()),
+    correctAnswer: v.number(),
+    explanation: v.string(),
+    aircraftType: v.string(),
+    category: v.string(),
+    difficulty: v.string(),
+    status: v.string(), // "pending", "approved", "rejected", "needs_review"
+    adminNotes: v.optional(v.string()),
+    reviewedBy: v.optional(v.id("users")),
+    reviewedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_status", ["status"])
+    .index("by_aircraft", ["aircraftType"])
+    .index("by_category", ["category"])
+    .index("by_created_at", ["createdAt"]),
 });

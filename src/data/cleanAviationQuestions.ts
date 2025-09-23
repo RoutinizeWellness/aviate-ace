@@ -17,7 +17,7 @@ export interface RealAviationQuestion {
 }
 
 function generateQuestionId(table: string): string {
-  return `${table}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `${table}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 }
 
 // A320 Electrical System Questions
@@ -265,7 +265,7 @@ export const b737Questions: RealAviationQuestion[] = [
   }
 ];
 
-// Export combined questions
+// Export combined questions (without massive database to avoid circular imports)
 export const allAviationQuestions: RealAviationQuestion[] = [
   ...electricalSystemQuestions,
   ...hydraulicSystemQuestions,

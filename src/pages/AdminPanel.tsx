@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useConvexAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { QuestionSuggestionsAdmin } from '@/components/QuestionSuggestionsAdmin';
 import { 
   Users, 
   Settings, 
@@ -31,7 +32,8 @@ import {
   BookOpen,
   List,
   Plus,
-  Save
+  Save,
+  Lightbulb
 } from 'lucide-react';
 
 const AdminPanel = () => {
@@ -557,6 +559,19 @@ const AdminPanel = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Question Suggestions Management */}
+        <Card className="surface-mid border-border/50 mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-yellow-500" />
+              Sugerencias de Preguntas
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <QuestionSuggestionsAdmin />
+          </CardContent>
+        </Card>
 
         {/* Question Management */}
         <Card className="surface-mid border-border/50 mb-8">

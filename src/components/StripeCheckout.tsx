@@ -67,7 +67,8 @@ export const AutumnCheckout: React.FC<AutumnCheckoutProps> = ({
       
       await updateUserSubscription({
         userId: user._id,
-        subscription: plan.aircraftType
+        subscription: plan.aircraftType,
+        planId: plan.id
       });
 
       // Create checkout session with Autumn

@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "name": "Code Quality Analyzer",
+  "description": "Monitors source code files for changes and analyzes modified code for potential improvements including code smells, design patterns, and best practices. Generates suggestions for improving code quality while maintaining existing functionality.",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [
+      "src/**/*.tsx",
+      "src/**/*.ts",
+      "src/**/*.js",
+      "src/**/*.jsx",
+      "convex/**/*.ts",
+      "scripts/**/*.js",
+      "scripts/**/*.ts",
+      "*.ts",
+      "*.js",
+      "*.tsx",
+      "*.jsx"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Analyze the modified code files for potential improvements. Focus on:\n\n1. **Code Smells**: Identify long methods, large classes, duplicate code, complex conditionals, and other maintainability issues\n2. **Design Patterns**: Suggest appropriate design patterns that could improve the code structure\n3. **Best Practices**: Check for TypeScript/React/JavaScript best practices including:\n   - Proper type definitions and type safety\n   - Component composition and reusability\n   - Performance optimizations (memoization, lazy loading)\n   - Error handling and validation\n   - Accessibility considerations\n4. **Readability**: Suggest improvements for variable naming, function structure, and code organization\n5. **Maintainability**: Identify areas where code could be more modular or easier to test\n6. **Performance**: Look for potential performance bottlenecks and optimization opportunities\n\nFor each suggestion, provide:\n- Clear explanation of the issue\n- Specific code example showing the improvement\n- Reasoning for why this change would be beneficial\n- Impact on functionality (ensure no breaking changes)\n\nConsider the aviation training platform context and React/TypeScript/Convex tech stack when making recommendations."
+  }
+}

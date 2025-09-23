@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useMutation as useConvexMutation, useQuery as useConvexQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useConvexAuth';
 import type { Id } from "../../convex/_generated/dataModel";
 
+// Constants
+const CONVEX_ID_LENGTH = 32;
+const RANDOM_ID_LENGTH = 8;
+const TIMESTAMP_ID_LENGTH = 8;
+
 // Helper function to generate Convex-like IDs for real exam data
 const generateExamId = (table: string): string => {
-  const randomPart = Math.random().toString(36).substring(2, 10);
-  const timestamp = Date.now().toString(36).substring(0, 8);
+  const randomPart = Math.random().toString(36).substring(2, 2 + RANDOM_ID_LENGTH);
+  const timestamp = Date.now().toString(36).substring(0, TIMESTAMP_ID_LENGTH);
   return `${table}_${randomPart}${timestamp}`;
 };
 
@@ -243,15 +247,13 @@ interface ExamSessionOptions {
 export const useExamSession = (examId: string | undefined, options: ExamSessionOptions = {}) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const {
     mode = 'practice',
     category = '',
     difficulty = '',
     timeLimit = 0,
-    questionCount = 20,
-    aircraft = 'A320_FAMILY'
+    questionCount = 20
   } = options;
   
   const [examState, setExamState] = useState<ExamState>({
@@ -262,16 +264,26 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
     startTime: new Date(),
   });
 
+  // Helper function to check if examId is a valid Convex ID
+  const isValidConvexId = (id: string): boolean => {
+    if (!id || typeof id !== 'string') return false;
+    // Convex IDs are 32-character strings with lowercase letters and digits
+    return new RegExp(`^[a-z0-9]{${CONVEX_ID_LENGTH}}$`).test(id);
+  };
+
+  // Only query Convex if we have a valid Convex ID (not temporary IDs)
+  const shouldQueryConvex = examId && isValidConvexId(examId);
+
   // Try to get exam from Convex
   const convexExam = useConvexQuery(
     api.exams.getExam,
-    examId ? { examId: examId as Id<"exams"> } : "skip"
+    shouldQueryConvex ? { examId: examId as Id<"exams"> } : "skip"
   );
 
   // Try to get questions from Convex
   const convexQuestions = useConvexQuery(
     api.exams.getExamQuestions,
-    examId ? { examId: examId as Id<"exams">, limit: 20 } : "skip"
+    shouldQueryConvex ? { examId: examId as Id<"exams">, limit: 20 } : "skip"
   );
 
   // Real exam title function
@@ -360,11 +372,7 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
     _creationTime: Date.now(),
   };
 
-  // Real questions data - filter based on mode, category, difficulty, and aircraft
-  const getFilteredQuestions = () => {
-    // Import and return real questions when needed
-    return [];
-  };
+
 
   const realQuestions: ConvexExamQuestion[] = examId 
     ? [] // Will be populated dynamically when examId is provided
@@ -430,6 +438,23 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
     }
   };
 
+  // Helper function to calculate exam results
+  const calculateExamResults = (finalAnswers: ExamAnswer[], questions: ConvexExamQuestion[]) => {
+    const correctAnswers = finalAnswers.filter(answer => {
+      const question = questions.find((q: ConvexExamQuestion) => q._id === answer.questionId);
+      return question && answer.selectedAnswer === question.correctAnswer;
+    }).length;
+
+    const score = Math.round((correctAnswers / questions.length) * 100);
+
+    const incorrectAnswers = finalAnswers.filter(answer => {
+      const question = questions.find((q: ConvexExamQuestion) => q._id === answer.questionId);
+      return question && answer.selectedAnswer !== question.correctAnswer;
+    });
+
+    return { correctAnswers, score, incorrectAnswers };
+  };
+
   const handleSubmitExam = async (finalAnswers: ExamAnswer[]) => {
     if (!user || !questions || !exam) {
       toast({
@@ -441,25 +466,13 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
     }
 
     try {
-      // Calculate results
-      const correctAnswers = finalAnswers.filter(answer => {
-        const question = questions.find(q => q._id === answer.questionId);
-        return question && answer.selectedAnswer === question.correctAnswer;
-      }).length;
-
-      const score = Math.round((correctAnswers / questions.length) * 100);
-
-      // Track incorrect questions for review mode
-      const incorrectAnswers = finalAnswers.filter(answer => {
-        const question = questions.find(q => q._id === answer.questionId);
-        return question && answer.selectedAnswer !== question.correctAnswer;
-      });
+      const { correctAnswers, score, incorrectAnswers } = calculateExamResults(finalAnswers, questions);
 
       // Record incorrect questions for future review
       if (mode !== 'review' && incorrectAnswers.length > 0) {
         try {
           for (const incorrectAnswer of incorrectAnswers) {
-            const question = questions.find(q => q._id === incorrectAnswer.questionId);
+            const question = questions.find((q: ConvexExamQuestion) => q._id === incorrectAnswer.questionId);
             // Only track incorrect questions if we're using Convex data (valid Convex IDs)
             if (question && typeof question._id === 'string' && question._id.length === 32) {
               await recordIncorrectQuestion({
@@ -482,13 +495,13 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
       // Mark questions as resolved in review mode if answered correctly
       if (mode === 'review') {
         const correctAnswersInReview = finalAnswers.filter(answer => {
-          const question = questions.find(q => q._id === answer.questionId);
+          const question = questions.find((q: ConvexExamQuestion) => q._id === answer.questionId);
           return question && answer.selectedAnswer === question.correctAnswer;
         });
 
         try {
           for (const correctAnswer of correctAnswersInReview) {
-            const question = questions.find(q => q._id === correctAnswer.questionId);
+            const question = questions.find((q: ConvexExamQuestion) => q._id === correctAnswer.questionId);
             // Only mark questions as resolved if we're using Convex data (valid Convex IDs)
             if (question && typeof question._id === 'string' && question._id.length === 32) {
               await markQuestionResolved({

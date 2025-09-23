@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,8 @@ import {
   Award,
   Gamepad2,
   Shield,
-  Menu
+  Menu,
+  Lightbulb
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -30,15 +31,12 @@ import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { GamificationDashboard } from "@/components/GamificationDashboard";
-import { ConvexStatusIndicator } from "@/components/ConvexStatusIndicator";
 import { UnifiedSidebar } from "@/components/UnifiedSidebar";
-import type { Id } from "../../convex/_generated/dataModel";
+import { QuestionSuggestionForm } from "@/components/QuestionSuggestionForm";
+import { UserQuestionSuggestions } from "@/components/UserQuestionSuggestions";
+import { isValidConvexId } from "@/utils/convexHelpers";
 
-// Helper function to validate Convex IDs
-const isValidConvexId = (id: string): boolean => {
-  // Convex IDs are 32-character strings with lowercase letters and digits
-  return /^[a-z0-9]{32}$/.test(id);
-};
+
 
 const MobileNavigation = () => {
   const navigate = useNavigate();
@@ -328,7 +326,7 @@ const Dashboard = () => {
           <div className="flex-1 overflow-auto p-4 md:p-6">
             {/* Main Dashboard Tabs */}
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className={`grid w-full ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              <TabsList className={`grid w-full ${isMobile ? 'grid-cols-3' : 'grid-cols-4'}`}>
                 <TabsTrigger value="overview" className={`${isMobile ? 'text-xs' : ''}`}>
                   <BookOpen className="w-4 h-4 mr-2" />
                   Overview
@@ -336,6 +334,10 @@ const Dashboard = () => {
                 <TabsTrigger value="gamification" className={`${isMobile ? 'text-xs' : ''}`}>
                   <Gamepad2 className="w-4 h-4 mr-2" />
                   Achievements
+                </TabsTrigger>
+                <TabsTrigger value="suggestions" className={`${isMobile ? 'text-xs' : ''}`}>
+                  <Lightbulb className="w-4 h-4 mr-2" />
+                  Sugerencias
                 </TabsTrigger>
                 {!isMobile && (
                   <TabsTrigger value="analytics">
@@ -628,6 +630,13 @@ const Dashboard = () => {
 
               <TabsContent value="gamification" className="space-y-6">
                 <GamificationDashboard isMobile={isMobile} />
+              </TabsContent>
+
+              <TabsContent value="suggestions" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <QuestionSuggestionForm />
+                  <UserQuestionSuggestions />
+                </div>
               </TabsContent>
 
               {!isMobile && (

@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 import Pricing from "./pages/Pricing";
 import ExamMode from "./pages/ExamMode";
 import Exams from "./pages/Exams";
@@ -92,6 +93,7 @@ const App = () => (
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/pricing" element={
                   <ProtectedRoute>
                     <Pricing />

@@ -11,6 +11,7 @@ export default defineSchema({
     role: v.optional(v.string()), // "user", "admin", "premium"
     accountType: v.optional(v.string()), // "free", "premium", "enterprise"
     subscription: v.optional(v.string()), // "A320", "BOEING_737", "ALL" (for admin)
+    planId: v.optional(v.string()), // "1month", "3months", "6months", "1year"
     ipAddress: v.optional(v.string()), // Track IP for one account per IP restriction
     isActive: v.optional(v.boolean()),
     permissions: v.optional(v.array(v.string())), // ["manage_users", "view_analytics", etc.]
@@ -158,7 +159,7 @@ export default defineSchema({
   // User Incorrect Questions table (for review mode)
   userIncorrectQuestions: defineTable({
     userId: v.id("users"),
-    questionId: v.id("examQuestions"),
+    questionId: v.union(v.id("examQuestions"), v.string()), // Allow both ID and string for flexibility
     incorrectAnswer: v.number(),
     correctAnswer: v.number(),
     sessionType: v.string(), // "practice", "timed", "exam"

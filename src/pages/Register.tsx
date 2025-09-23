@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useConvexAuth';
-import { Plane, UserPlus, Mail, User, AlertCircle } from 'lucide-react';
+import { Plane, UserPlus, Mail, User, Lock, AlertCircle } from 'lucide-react';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -15,6 +16,8 @@ const Register = () => {
   const [formData, setFormData] = useState({
     email: '',
     fullName: '',
+    password: '',
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
 
@@ -22,13 +25,23 @@ const Register = () => {
     e.preventDefault();
     setError('');
 
-    if (!formData.email || !formData.fullName) {
+    if (!formData.email || !formData.fullName || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
     try {
-      const user = await signUp(formData.email, formData.fullName);
+      const user = await signUp(formData.email, formData.fullName, formData.password);
       if (user) {
         // Check if there's a return URL in the state or query parameters
         const searchParams = new URLSearchParams(location.search);
@@ -49,93 +62,154 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo */}
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, hsl(var(--primary)) 0%, transparent 50%),
+                           radial-gradient(circle at 75% 75%, hsl(var(--primary)) 0%, transparent 50%)`
+        }} />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4">
-            <Plane className="w-8 h-8 text-white" />
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+              <Plane className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">PilotPrepFlightX</h1>
+              <p className="text-xs text-muted-foreground">Professional Training</p>
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">PilotPrepFlightX</h1>
-          <p className="text-gray-600 mt-2">Create your account to get started</p>
+          <h2 className="text-3xl font-bold mb-2">Crear Cuenta</h2>
+          <p className="text-muted-foreground">
+            Únete para comenzar tu preparación profesional
+          </p>
         </div>
 
-        <Card className="border-0 shadow-xl">
+        {/* Registration Form */}
+        <Card className="surface-mid border-border/50">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="flex items-center justify-center gap-2 text-xl">
-              <UserPlus className="w-5 h-5" />
-              Sign Up
-            </CardTitle>
+            <CardTitle className="text-xl">Registro</CardTitle>
           </CardHeader>
           
-          <CardContent>
+          <CardContent className="space-y-6">
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
               <div className="space-y-2">
-                <Label htmlFor="fullName" className="flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Full Name
+                <Label htmlFor="fullName" className="text-sm font-medium">
+                  Nombre Completo
                 </Label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                  className="h-11"
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    placeholder="Tu nombre completo"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    className="pl-10 surface-light border-border/50 focus:border-primary"
+                    required
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Email Address
+                <Label htmlFor="email" className="text-sm font-medium">
+                  Correo Electrónico
                 </Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="h-11"
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="tu@email.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="pl-10 surface-light border-border/50 focus:border-primary"
+                    required
+                  />
+                </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full h-11 text-base font-medium"
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Contraseña
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="pl-10 surface-light border-border/50 focus:border-primary"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  Confirmar Contraseña
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="pl-10 surface-light border-border/50 focus:border-primary"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
                 disabled={isLoading}
               >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? "Creando Cuenta..." : "Crear Cuenta"}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
-                Already have an account?{' '}
-                <Link 
-                  to="/login" 
-                  className="font-medium text-primary hover:text-primary/80 transition-colors"
-                >
-                  Sign in here
-                </Link>
-              </p>
+            <div className="text-center text-sm text-muted-foreground">
+              ¿Ya tienes cuenta?{" "}
+              <Link to="/login" className="text-primary hover:text-primary-bright font-medium">
+                Inicia sesión aquí
+              </Link>
             </div>
           </CardContent>
         </Card>
 
-        <div className="mt-8 text-center text-xs text-gray-500">
-          <p>By creating an account, you agree to our Terms of Service and Privacy Policy</p>
+        <div className="mt-6 p-4 surface-light rounded-lg border border-warning/20 bg-warning/5">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-warning mb-1">Funcionalidad Backend Requerida</p>
+              <p className="text-muted-foreground">
+                Para activar el registro y todas las funciones de la plataforma, necesitas conectar
+                este proyecto con Convex. Al crear una cuenta, aceptas nuestros Términos de Servicio y Política de Privacidad.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

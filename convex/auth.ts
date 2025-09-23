@@ -395,7 +395,7 @@ export const forceGrantAdminAccess = mutation({
 export const recordIncorrectQuestion = mutation({
   args: {
     userId: v.id("users"),
-    questionId: v.id("examQuestions"),
+    questionId: v.union(v.id("examQuestions"), v.string()), // Allow both ID and string for flexibility
     incorrectAnswer: v.number(),
     correctAnswer: v.number(),
     sessionType: v.string(),
@@ -404,11 +404,18 @@ export const recordIncorrectQuestion = mutation({
     aircraftType: v.string(),
   },
   handler: async (ctx, args) => {
+    // Convert string questionId to proper format if needed
+    let questionId = args.questionId;
+    if (typeof questionId === 'string' && !questionId.startsWith('examQuestions_')) {
+      // If it's a plain string, we'll store it as is for now
+      // In a real app, you'd want to validate this exists in examQuestions table
+    }
+
     // Check if question already exists for this user
     const existing = await ctx.db
       .query("userIncorrectQuestions")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
-      .filter((q) => q.eq(q.field("questionId"), args.questionId))
+      .filter((q) => q.eq(q.field("questionId"), questionId))
       .first();
 
     if (existing) {
@@ -423,7 +430,7 @@ export const recordIncorrectQuestion = mutation({
       // Create new incorrect question record
       await ctx.db.insert("userIncorrectQuestions", {
         userId: args.userId,
-        questionId: args.questionId,
+        questionId: questionId as any,
         incorrectAnswer: args.incorrectAnswer,
         correctAnswer: args.correctAnswer,
         sessionType: args.sessionType,
@@ -573,12 +580,14 @@ export const updateUserStats = mutation({
 export const updateUserSubscription = mutation({
   args: {
     userId: v.id("users"),
+    planId: v.string(), // "1month", "3months", "6months", "1year"
     subscription: v.string(), // "A320_FAMILY", "B737_FAMILY", "ALL"
   },
   handler: async (ctx, args) => {
     await ctx.db.patch(args.userId, {
       subscription: args.subscription,
       accountType: args.subscription === "ALL" ? "premium" : "premium",
+      planId: args.planId,
       updatedAt: Date.now(),
     });
 

@@ -14,20 +14,20 @@ import { useNavigate } from "react-router-dom";
 
 const QuizDemo = () => {
   const navigate = useNavigate();
-  const [selectedAircraft, setSelectedAircraft] = useState<'A320' | 'BOEING_737' | null>(null);
+  const [selectedAircraft, setSelectedAircraft] = useState<'A320_FAMILY' | 'B737_FAMILY' | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showQuiz, setShowQuiz] = useState(false);
 
   const aircraftTypes = [
     {
-      type: 'A320' as const,
+      type: 'A320_FAMILY' as const,
       name: 'Airbus A320',
       description: 'Prueba gratuita del sistema A320',
       color: 'bg-blue-500',
       categories: ['Engines', 'Flight Controls', 'Hydraulics', 'Electrical']
     },
     {
-      type: 'BOEING_737' as const,
+      type: 'B737_FAMILY' as const,
       name: 'Boeing 737',
       description: 'Prueba gratuita del sistema Boeing 737',
       color: 'bg-green-500',
@@ -35,7 +35,7 @@ const QuizDemo = () => {
     }
   ];
 
-  const handleStartQuiz = (aircraft: 'A320' | 'BOEING_737', category: string) => {
+  const handleStartQuiz = (aircraft: 'A320_FAMILY' | 'B737_FAMILY', category: string) => {
     setSelectedAircraft(aircraft);
     setSelectedCategory(category);
     setShowQuiz(true);
@@ -201,7 +201,7 @@ const QuizDemo = () => {
           </p>
           <Button 
             size="lg"
-            onClick={() => navigate('/subscription')}
+            onClick={() => navigate('/pricing')}
             className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
           >
             Ver Planes de Suscripción

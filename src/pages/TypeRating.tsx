@@ -2,7 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   ArrowLeft,
   Lock,
   Play,
@@ -12,7 +19,8 @@ import {
   Lightbulb,
   Target,
   BookOpen,
-  Plane
+  Plane,
+  ChevronDown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -20,7 +28,7 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
-import { UnifiedSidebar } from "@/components/UnifiedSidebar"; // Added import for UnifiedSidebar
+import { UnifiedSidebar } from "@/components/UnifiedSidebar";
 
 const TypeRating = () => {
   const navigate = useNavigate();
@@ -49,6 +57,7 @@ const TypeRating = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [moduleProgress, setModuleProgress] = useState<any[]>([]);
   const [lessonProgress, setLessonProgress] = useState<any[]>([]);
+  const [selectedAircraft, setSelectedAircraft] = useState<'A320_FAMILY' | 'B737_FAMILY'>('A320_FAMILY');
 
   // Load progress data when component mounts - using localStorage for now
   useEffect(() => {
@@ -333,6 +342,29 @@ const TypeRating = () => {
     }
   };
 
+  // Aircraft options for dropdown
+  const aircraftOptions = [
+    {
+      value: 'A320_FAMILY',
+      label: 'Airbus A320 Family',
+      description: 'A318, A319, A320, A321',
+      hasAccess: hasA320Access
+    },
+    {
+      value: 'B737_FAMILY',
+      label: 'Boeing 737 Family',
+      description: 'B737-700, B737-800, B737 MAX',
+      hasAccess: hasAccessTo('B737_FAMILY')
+    }
+  ];
+
+  const handleAircraftChange = (aircraftType: 'A320_FAMILY' | 'B737_FAMILY') => {
+    setSelectedAircraft(aircraftType);
+    if (aircraftType === 'B737_FAMILY') {
+      navigate('/b737-type-rating');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Unified Sidebar */}
@@ -360,8 +392,8 @@ const TypeRating = () => {
         {!isMobile && (
           <header className="mb-8">
             <div className="flex items-center gap-4 mb-4">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
                 onClick={() => navigate('/dashboard')}
                 className="flex items-center gap-2"
@@ -369,24 +401,61 @@ const TypeRating = () => {
                 <ArrowLeft className="w-4 h-4" />
                 Volver al Dashboard
               </Button>
-              {!hasA320Access && (
+              {!hasA320Access && selectedAircraft === 'A320_FAMILY' && (
                 <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                   <Lock className="w-3 h-3 mr-1" />
                   Contenido Restringido
                 </Badge>
               )}
             </div>
+            
+            {/* Aircraft Selection Dropdown */}
+            <div className="mb-6">
+              <label className="text-sm font-medium mb-2 block">Selecciona el Tipo de Aeronave</label>
+              <Select value={selectedAircraft} onValueChange={handleAircraftChange}>
+                <SelectTrigger className="w-full max-w-md">
+                  <SelectValue placeholder="Selecciona una aeronave" />
+                </SelectTrigger>
+                <SelectContent>
+                  {aircraftOptions.map((aircraft) => (
+                    <SelectItem
+                      key={aircraft.value}
+                      value={aircraft.value}
+                      disabled={!aircraft.hasAccess && !adminUser}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div>
+                          <div className="font-medium">{aircraft.label}</div>
+                          <div className="text-xs text-muted-foreground">{aircraft.description}</div>
+                        </div>
+                        {!aircraft.hasAccess && !adminUser && (
+                          <Lock className="w-4 h-4 text-muted-foreground ml-2" />
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold mb-2">A320 Type Rating</h1>
-                <p className="text-muted-foreground">Entrenamiento completo para habilitación de tipo en Airbus A320. Aprende la teoría y practica con exámenes.</p>
+                <h1 className="text-4xl font-bold mb-2">
+                  {selectedAircraft === 'A320_FAMILY' ? 'A320 Type Rating' : 'B737 Type Rating'}
+                </h1>
+                <p className="text-muted-foreground">
+                  Entrenamiento completo para habilitación de tipo en {selectedAircraft === 'A320_FAMILY' ? 'Airbus A320' : 'Boeing 737'}. Aprende la teoría y practica con exámenes.
+                </p>
               </div>
               <div className="text-right">
                 <Badge className="bg-primary/10 text-primary">
                   {getSubscriptionDisplayName()}
                 </Badge>
-                {!hasA320Access && (
+                {!hasA320Access && selectedAircraft === 'A320_FAMILY' && (
                   <p className="text-xs text-warning mt-2">Necesitas suscripción A320</p>
+                )}
+                {!hasAccessTo('B737_FAMILY') && selectedAircraft === 'B737_FAMILY' && (
+                  <p className="text-xs text-warning mt-2">Necesitas suscripción B737</p>
                 )}
               </div>
             </div>
@@ -697,9 +766,9 @@ const TypeRating = () => {
 
             <Card 
               className={`surface-mid border-border/50 ${
-                hasAccessTo('BOEING_737') ? 'hover-lift cursor-pointer' : 'opacity-60'
+                hasAccessTo('B737_FAMILY') ? 'hover-lift cursor-pointer' : 'opacity-60'
               }`} 
-              onClick={() => hasAccessTo('BOEING_737') && navigate('/b737-type-rating')}
+              onClick={() => hasAccessTo('B737_FAMILY') && navigate('/b737-type-rating')}
             >
               <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
                 <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} bg-blue-500/10 rounded-lg flex items-center justify-center mx-auto ${isMobile ? 'mb-3' : 'mb-4'}`}>
@@ -707,12 +776,12 @@ const TypeRating = () => {
                 </div>
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <h3 className={`font-semibold ${isMobile ? 'text-sm' : ''}`}>Boeing 737</h3>
-                  {!hasAccessTo('BOEING_737') && <Lock className="w-4 h-4 text-muted-foreground" />}
+                  {!hasAccessTo('B737_FAMILY') && <Lock className="w-4 h-4 text-muted-foreground" />}
                 </div>
                 <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
                   Entrenamiento completo para habilitación de tipo en Boeing 737
                 </p>
-                {hasAccessTo('BOEING_737') ? (
+                {hasAccessTo('B737_FAMILY') ? (
                   <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} variant="outline">Iniciar B737</Button>
                 ) : (
                   <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>

@@ -29,7 +29,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   signIn: (email: string) => Promise<User | null>;
-  signUp: (email: string, fullName?: string) => Promise<User | null>;
+  signUp: (email: string, fullName?: string, password?: string) => Promise<User | null>;
   signOut: () => Promise<void>;
   updateProfile: (data: Partial<User>) => Promise<void>;
 }
@@ -203,7 +203,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
-  const signUp = async (email: string, fullName?: string): Promise<User | null> => {
+  const signUp = async (email: string, fullName?: string, password?: string): Promise<User | null> => {
     try {
       setIsLoading(true);
       
@@ -229,10 +229,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       
       console.log("Signing up with Convex for email:", email);
       // Register the user with Convex
-      const result = await registerUser({ 
-        email, 
+      const result = await registerUser({
+        email,
         fullName,
-        password: "temporary_password" // In a real app, this would be a real password
+        password: password || "temporary_password" // Use provided password or fallback
       });
       
       if (result.userId) {

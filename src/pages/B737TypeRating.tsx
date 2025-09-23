@@ -19,7 +19,8 @@ import { useSubscription } from "@/hooks/useSubscription";
 import { UserAvatar } from "@/components/UserAvatar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useState, useEffect } from "react";
-import { UnifiedSidebar } from "@/components/UnifiedSidebar"; // Added import for UnifiedSidebar
+import { UnifiedSidebar } from "@/components/UnifiedSidebar";
+import { useB737Progress } from "@/hooks/useAircraftProgress";
 
 const B737TypeRating = () => {
   const navigate = useNavigate();
@@ -82,13 +83,27 @@ const B737TypeRating = () => {
                      user?.email?.split('@')[0] || 
                      'Usuario';
 
-  // Extract progress logic to custom hook
-  const {
-    getLessonProgressById,
-    getModuleProgressById,
-    isLessonUnlocked,
-    isLessonCompleted
-  } = useB737Progress(moduleProgress, lessonProgress);
+  // Use the B737 progress hook
+  const { progress: b737Progress, categoryProgress, isLoading: isProgressLoading } = useB737Progress();
+  
+  // Helper functions for lesson progress
+  const getLessonProgressById = (lessonId: number) => {
+    return lessonProgress.find(lp => lp.lessonId === lessonId);
+  };
+  
+  const getModuleProgressById = (moduleId: string) => {
+    return moduleProgress.find(mp => mp.moduleId === moduleId);
+  };
+  
+  const isLessonUnlocked = (lessonId: number) => {
+    // For now, all lessons are unlocked
+    return true;
+  };
+  
+  const isLessonCompleted = (lessonId: number) => {
+    const progress = getLessonProgressById(lessonId);
+    return progress?.isCompleted || false;
+  };
 
   // Module data structure with dynamic progress - BOEING 737 SPECIFIC
   const getModulesWithProgress = () => {

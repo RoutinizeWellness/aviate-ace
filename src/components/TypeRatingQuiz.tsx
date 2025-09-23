@@ -20,14 +20,14 @@ import {
 } from "lucide-react";
 
 interface TypeRatingQuizProps {
-  aircraftType?: 'A320' | 'BOEING_737' | 'ALL';
+  aircraftType?: 'A320_FAMILY' | 'B737_FAMILY' | 'ALL';
   category?: string;
   onComplete?: (score: number, totalQuestions: number) => void;
   questionCount?: number;
 }
 
 export const TypeRatingQuiz: React.FC<TypeRatingQuizProps> = ({ 
-  aircraftType = 'A320', 
+  aircraftType = 'A320_FAMILY',
   category = 'Engines',
   onComplete,
   questionCount = 10 
@@ -47,17 +47,17 @@ export const TypeRatingQuiz: React.FC<TypeRatingQuizProps> = ({
     
     if (!isUserLoggedIn) {
       // Guest users get trial questions
-      return getTrialQuestions(aircraftType, category);
+      return getTrialQuestions(aircraftType as 'A320_FAMILY' | 'B737_FAMILY', category);
     }
     
     if (isTrialUser) {
       // Logged in users without subscription get trial questions
-      return getTrialQuestions(aircraftType, category);
+      return getTrialQuestions(aircraftType as 'A320_FAMILY' | 'B737_FAMILY', category);
     }
     
     if (hasSubscription || isAdmin()) {
       // Subscribed users get all questions
-      const allQuestions = getAllQuestions(aircraftType, category);
+      const allQuestions = getAllQuestions(aircraftType as 'A320_FAMILY' | 'B737_FAMILY', category);
       const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
       return shuffled.slice(0, Math.min(questionCount, shuffled.length));
     }
@@ -146,7 +146,7 @@ export const TypeRatingQuiz: React.FC<TypeRatingQuizProps> = ({
         trialScore={correctAnswers}
         totalTrialQuestions={questions.length}
         category={category}
-        aircraftType={aircraftType === 'ALL' ? 'A320' : aircraftType}
+        aircraftType={aircraftType === 'ALL' ? 'A320_FAMILY' : aircraftType as 'A320_FAMILY' | 'B737_FAMILY'}
         onSubscribe={handleSubscribe}
         onContinueTrial={handleContinueTrial}
       />
@@ -161,7 +161,7 @@ export const TypeRatingQuiz: React.FC<TypeRatingQuizProps> = ({
           <Lock className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-xl font-semibold mb-2">Contenido Restringido</h3>
           <p className="text-muted-foreground mb-4">
-            Necesitas una suscripción {currentQuestion.aircraftType === 'A320' ? 'A320' : 'Boeing 737'} para acceder a este quiz.
+            Necesitas una suscripción {currentQuestion.aircraftType === 'A320_FAMILY' ? 'A320' : 'Boeing 737'} para acceder a este quiz.
           </p>
           <Button onClick={handleSubscribe}>
             Ver Planes de Suscripción

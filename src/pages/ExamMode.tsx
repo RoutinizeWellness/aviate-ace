@@ -180,8 +180,7 @@ const ExamMode = () => {
             category: selectedCategory,
             aircraft: selectedAircraft,
             difficulty: selectedDifficulty,
-            questionCount,
-            examTitle
+            questionCount
           });
           
           console.log('Loaded questions count:', loadedQuestions.length);
@@ -195,7 +194,7 @@ const ExamMode = () => {
             console.log('No questions found with current filters, trying with relaxed filters');
             const relaxedQuestions = await loadAndFilterQuestions(
               examMode,
-              effectiveCategory || 'all',
+              selectedCategory || 'all',
               'ALL',
               'all',
               questionCount

@@ -5,7 +5,7 @@ export interface Question {
   correctAnswer: number;
   explanation: string;
   category: string;
-  aircraftType: 'A320' | 'BOEING_737';
+  aircraftType: 'A320_FAMILY' | 'B737_FAMILY';
   difficulty: 'easy' | 'medium' | 'hard';
   isTrial?: boolean; // Mark questions as trial/sample questions
 }
@@ -20,7 +20,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: 'La presión máxima de aceite del motor CFM56-5B es de 115 PSI según las especificaciones técnicas del A320.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -31,7 +31,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La temperatura máxima de arranque del motor CFM56-5B es de 875°C.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'hard',
     isTrial: true
   },
@@ -42,7 +42,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'El A320 puede equipar motores CFM56-5B de CFMI o IAE V2500 de International Aero Engines.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -53,7 +53,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: 'El motor CFM56-5B4 produce típicamente 27,000 lbf de empuje.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -64,7 +64,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'El sistema Autothrust controla automáticamente el empuje de los motores en el A320.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -76,7 +76,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La velocidad de ralentí en vuelo del CFM56-5B es aproximadamente 1800 RPM.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium'
   },
   {
@@ -86,7 +86,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'FADEC significa Full Authority Digital Engine Control, el sistema que controla completamente los motores.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'easy'
   },
   {
@@ -96,7 +96,7 @@ export const A320_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La presión mínima de aceite del motor en vuelo es de 17 PSI.',
     category: 'Engines',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium'
   },
   // Continue with more engine questions...
@@ -113,7 +113,7 @@ export const A320_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: 'El sistema Fly-by-Wire controla automáticamente el trim en el A320.',
     category: 'Flight Controls',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -124,7 +124,7 @@ export const A320_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'El A320 tiene 3 sistemas hidráulicos independientes: Green, Blue y Yellow.',
     category: 'Flight Controls',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -135,7 +135,7 @@ export const A320_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'Alpha Protection evita que la aeronave entre en pérdida al limitar el ángulo de ataque.',
     category: 'Flight Controls',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -146,7 +146,7 @@ export const A320_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La velocidad máxima con flaps en configuración 1 es 230 kts.',
     category: 'Flight Controls',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -157,7 +157,7 @@ export const A320_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: 'Los alerones proporcionan el control primario de alabeo en el A320.',
     category: 'Flight Controls',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -169,7 +169,7 @@ export const A320_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'La presión normal del sistema hidráulico del A320 es de 3000 PSI.',
     category: 'Flight Controls',
-    aircraftType: 'A320',
+    aircraftType: 'A320_FAMILY',
     difficulty: 'medium'
   },
   // Continue with more flight controls questions...
@@ -185,7 +185,7 @@ export const B737_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'El Boeing 737-800 tiene 2 motores turbofan montados bajo las alas.',
     category: 'Engines',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -196,7 +196,7 @@ export const B737_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'El Boeing 737-800 típicamente equipa motores CFM56-7B de CFMI.',
     category: 'Engines',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -207,7 +207,7 @@ export const B737_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'El motor CFM56-7B24 produce típicamente 24,500 lbf de empuje.',
     category: 'Engines',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -218,7 +218,7 @@ export const B737_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'Los motores del Boeing 737 son controlados por el sistema FADEC (Full Authority Digital Engine Control).',
     category: 'Engines',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -229,7 +229,7 @@ export const B737_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La temperatura máxima de arranque del CFM56-7B es de 815°C.',
     category: 'Engines',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'hard',
     isTrial: true
   },
@@ -241,7 +241,7 @@ export const B737_ENGINE_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La velocidad de ralentí en tierra del CFM56-7B es aproximadamente 1400 RPM.',
     category: 'Engines',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium'
   },
   // Continue with more B737 engine questions...
@@ -257,7 +257,7 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: 'El Boeing 737 utiliza un sistema de control hidráulico asistido, no fly-by-wire como el A320.',
     category: 'Flight Controls',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -268,7 +268,7 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'El Boeing 737 tiene 2 sistemas hidráulicos independientes: Sistema A y Sistema B.',
     category: 'Flight Controls',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -279,7 +279,7 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La velocidad máxima de operación (VMO) del Boeing 737-800 es de 350 kts.',
     category: 'Flight Controls',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -290,7 +290,7 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 2,
     explanation: 'El timón de dirección se utiliza para el control de guiñada en el Boeing 737.',
     category: 'Flight Controls',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'easy',
     isTrial: true
   },
@@ -301,7 +301,7 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 0,
     explanation: 'La presión normal del sistema hidráulico del Boeing 737 es de 3000 PSI.',
     category: 'Flight Controls',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium',
     isTrial: true
   },
@@ -313,7 +313,7 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
     correctAnswer: 1,
     explanation: 'La velocidad máxima con flaps extendidos varía según la configuración, pero típicamente es alrededor de 230 kts.',
     category: 'Flight Controls',
-    aircraftType: 'BOEING_737',
+    aircraftType: 'B737_FAMILY',
     difficulty: 'medium'
   },
   // Continue with more B737 flight controls questions...
@@ -321,12 +321,12 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
 
 // Combine all questions by category
 export const QUESTION_DATABASE = {
-  A320: {
+  A320_FAMILY: {
     Engines: A320_ENGINE_QUESTIONS,
     'Flight Controls': A320_FLIGHT_CONTROLS_QUESTIONS,
     // Add more categories...
   },
-  BOEING_737: {
+  B737_FAMILY: {
     Engines: B737_ENGINE_QUESTIONS,
     'Flight Controls': B737_FLIGHT_CONTROLS_QUESTIONS,
     // Add more categories...
@@ -334,12 +334,12 @@ export const QUESTION_DATABASE = {
 };
 
 // Helper function to get trial questions for a category
-export const getTrialQuestions = (aircraftType: 'A320' | 'BOEING_737', category: string): Question[] => {
+export const getTrialQuestions = (aircraftType: 'A320_FAMILY' | 'B737_FAMILY', category: string): Question[] => {
   const categoryQuestions = QUESTION_DATABASE[aircraftType]?.[category] || [];
   return categoryQuestions.filter(q => q.isTrial).slice(0, 5);
 };
 
 // Helper function to get all questions for a category (subscription required)
-export const getAllQuestions = (aircraftType: 'A320' | 'BOEING_737', category: string): Question[] => {
+export const getAllQuestions = (aircraftType: 'A320_FAMILY' | 'B737_FAMILY', category: string): Question[] => {
   return QUESTION_DATABASE[aircraftType]?.[category] || [];
 };

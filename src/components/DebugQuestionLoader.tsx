@@ -28,7 +28,9 @@ export const DebugQuestionLoader: React.FC<DebugQuestionLoaderProps> = ({
       // Load all available questions
       const { allAviationQuestions } = await import('@/data/cleanAviationQuestions');
       const { getAllMassiveQuestions } = await import('@/data/massiveQuestionSeeding');
-      const { allB737Questions } = await import('@/data/b737Questions');
+      // Temporarily skip loading large B737 questions file to avoid import issues
+      // const { allB737Questions } = await import('@/data/b737Questions');
+      const allB737Questions = [];
       
       const allQuestions = [
         ...allAviationQuestions,

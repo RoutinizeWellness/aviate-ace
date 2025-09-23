@@ -82,229 +82,254 @@ const B737TypeRating = () => {
                      user?.email?.split('@')[0] || 
                      'Usuario';
 
-  // Helper function to get lesson progress
-  const getLessonProgressById = (lessonId: number) => {
-    return lessonProgress.find(p => p.lessonId === lessonId);
-  };
-
-  // Helper function to get module progress
-  const getModuleProgressById = (moduleId: string) => {
-    return moduleProgress.find(m => m.moduleId === moduleId);
-  };
-
-  // Helper function to check if lesson is unlocked
-  const isLessonUnlocked = (lessonId: number) => {
-    if (lessonId === 1) return true; // Fundamentos always unlocked
-    
-    // For Sistemas lessons, check if Fundamentos is completed
-    const fundamentosProgress = getLessonProgressById(1);
-    return fundamentosProgress ? 
-      (fundamentosProgress.theoryCompleted && 
-       fundamentosProgress.flashcardsCompleted && 
-       fundamentosProgress.quizCompleted) : true; // Changed to true to allow access by default
-  };
-
-  // Helper function to check if lesson is completed
-  const isLessonCompleted = (lessonId: number) => {
-    const progress = getLessonProgressById(lessonId);
-    return progress ? 
-      (progress.theoryCompleted && 
-       progress.flashcardsCompleted && 
-       progress.quizCompleted) : false;
-  };
+  // Extract progress logic to custom hook
+  const {
+    getLessonProgressById,
+    getModuleProgressById,
+    isLessonUnlocked,
+    isLessonCompleted
+  } = useB737Progress(moduleProgress, lessonProgress);
 
   // Module data structure with dynamic progress - BOEING 737 SPECIFIC
   const getModulesWithProgress = () => {
     const fundamentosProgress = getModuleProgressById('fundamentos');
     const sistemasProgress = getModuleProgressById('sistemas');
+    const proceduresProgress = getModuleProgressById('procedures');
+    const performanceProgress = getModuleProgressById('performance');
     
     return [
       {
         id: 1,
-        title: "Boeing 737 Fundamentals",
-        description: "Boeing 737 basics and foundational knowledge",
+        title: "Boeing 737 Fundamentals & Aircraft General",
+        description: "Essential Boeing 737 knowledge including aircraft variants, specifications, and general systems overview",
         progress: fundamentosProgress ? Math.round((fundamentosProgress.completedLessons / fundamentosProgress.totalLessons) * 100) : 0,
-        totalLessons: 1,
+        totalLessons: 3,
         completedLessons: fundamentosProgress?.completedLessons || 0,
         isUnlocked: fundamentosProgress?.isUnlocked || true,
         category: "foundation",
+        estimatedTime: "3.5 hours",
+        difficulty: "Basic",
         lessons: [
           {
             id: 1,
-            title: "Boeing 737 Overview",
-            description: "General overview of Boeing 737: architecture, variants, and Boeing philosophy.",
-            duration: "45m",
+            title: "Boeing 737 Aircraft General Knowledge",
+            description: "Comprehensive overview of Boeing 737 family: variants (700/800/900), dimensions, weights, and basic specifications per EASA/FAA standards.",
+            duration: "75m",
             isCompleted: isLessonCompleted(1),
             isUnlocked: true,
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Basic",
+            topics: ["Aircraft Variants", "Dimensions & Weights", "Performance Specifications", "Certification Standards"]
+          },
+          {
+            id: 2,
+            title: "Boeing 737 Cockpit Layout & Systems Overview",
+            description: "Detailed cockpit familiarization including primary flight displays, engine indications, and system panels layout.",
+            duration: "60m",
+            isCompleted: isLessonCompleted(2),
+            isUnlocked: true,
+            hasTheory: true,
+            hasFlashcards: true,
+            hasQuiz: true,
+            difficulty: "Basic",
+            topics: ["Cockpit Layout", "Primary Displays", "System Panels", "Control Interfaces"]
+          },
+          {
+            id: 3,
+            title: "Boeing 737 Limitations & Operating Envelopes",
+            description: "Critical operating limitations including speed limits, altitude restrictions, weight limitations, and environmental constraints.",
+            duration: "45m",
+            isCompleted: isLessonCompleted(3),
+            isUnlocked: true,
+            hasTheory: true,
+            hasFlashcards: true,
+            hasQuiz: true,
+            difficulty: "Intermediate",
+            topics: ["Speed Limitations", "Weight Limits", "Altitude Restrictions", "Environmental Limits"]
           }
         ]
       },
       {
         id: 2,
-        title: "Boeing 737 Systems",
-        description: "Critical Boeing 737 aircraft systems",
+        title: "Boeing 737 Aircraft Systems",
+        description: "Comprehensive study of all Boeing 737 aircraft systems including normal operations, abnormal procedures, and emergency configurations",
         progress: sistemasProgress ? Math.round((sistemasProgress.completedLessons / sistemasProgress.totalLessons) * 100) : 0,
-        totalLessons: 14,
+        totalLessons: 12,
         completedLessons: sistemasProgress?.completedLessons || 0,
-        isUnlocked: sistemasProgress?.isUnlocked || true, // Changed to true to allow access by default
+        isUnlocked: sistemasProgress?.isUnlocked || true,
         category: "systems",
+        estimatedTime: "18 hours",
+        difficulty: "Advanced",
         lessons: [
           {
-            id: 2,
-            title: "Boeing 737 Air Conditioning & Pressurization",
-            description: "Boeing 737 cabin air conditioning, pressurization, and environmental control systems.",
-            duration: "60m",
-            isCompleted: isLessonCompleted(2),
-            isUnlocked: isLessonUnlocked(2),
-            hasTheory: true,
-            hasFlashcards: true,
-            hasQuiz: true
-          },
-          {
-            id: 3,
-            title: "Boeing 737 Anti-ice and Rain Protection",
-            description: "Boeing 737 ice protection systems, engine anti-ice, and wing anti-ice systems.",
-            duration: "50m",
-            isCompleted: isLessonCompleted(3),
-            isUnlocked: isLessonUnlocked(3),
-            hasTheory: true,
-            hasFlashcards: true,
-            hasQuiz: true
-          },
-          {
             id: 4,
-            title: "Boeing 737 Autopilot & Flight Management",
-            description: "Boeing 737 autopilot systems, FMC operation, and automated flight controls.",
-            duration: "55m",
+            title: "Air Systems - Pressurization & Air Conditioning",
+            description: "Boeing 737 environmental control systems: cabin pressurization, air conditioning packs, bleed air systems, and emergency procedures per Boeing QRH.",
+            duration: "90m",
             isCompleted: isLessonCompleted(4),
             isUnlocked: isLessonUnlocked(4),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Cabin Pressure Control", "Air Conditioning Packs", "Bleed Air Systems", "Emergency Procedures"],
+            reference: "Boeing 737 FCOM 21-31"
           },
           {
             id: 5,
-            title: "Boeing 737 Communication Systems",
-            description: "Transmisión y recepción de mensajes entre la tripulación, control de tráfico aéreo y otras aeronaves, asegurando coordinación y seguridad",
-            duration: "40m",
+            title: "Anti-Ice & Rain Protection Systems",
+            description: "Comprehensive ice protection systems including engine anti-ice, wing anti-ice, pitot heat, and windshield rain repellent systems.",
+            duration: "75m",
             isCompleted: isLessonCompleted(5),
             isUnlocked: isLessonUnlocked(5),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Engine Anti-Ice", "Wing Anti-Ice", "Pitot Static Heat", "Rain Protection"],
+            reference: "Boeing 737 FCOM 30"
           },
           {
             id: 6,
-            title: "Electrical",
-            description: "Sistema eléctrico: generación, distribución y emergencia",
-            duration: "45m",
+            title: "Automatic Flight - Autopilot & Flight Management",
+            description: "Advanced autopilot systems, Flight Management Computer (FMC) operation, autothrottle, and flight director modes per Boeing standards.",
+            duration: "120m",
             isCompleted: isLessonCompleted(6),
             isUnlocked: isLessonUnlocked(6),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Autopilot Modes", "FMC Programming", "Autothrottle", "VNAV/LNAV Operations"],
+            reference: "Boeing 737 FCOM 04"
           },
           {
             id: 7,
-            title: "Engines and APU",
-            description: "Motorización y motor auxiliar que proporciona energía eléctrica y aire presurizado al avión cuando los motores principales están apagados, garantizando autonomía en tierra y soporte en vuelo",
-            duration: "70m",
+            title: "Communication & Navigation Systems",
+            description: "VHF/HF radio systems, transponder, TCAS, GPS/IRS navigation, and communication procedures per ICAO standards.",
+            duration: "60m",
             isCompleted: isLessonCompleted(7),
             isUnlocked: isLessonUnlocked(7),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Intermediate",
+            topics: ["Radio Systems", "Transponder", "TCAS", "Navigation Systems"],
+            reference: "Boeing 737 FCOM 23-34"
           },
           {
             id: 8,
-            title: "Fire Protection",
-            description: "Detecta, alerta y combate incendios en motores, cabina y otros sistemas críticos, garantizando la seguridad de la aeronave y sus ocupantes",
-            duration: "80m",
+            title: "Electrical Power Systems",
+            description: "AC/DC electrical systems, generators, batteries, external power, and emergency electrical procedures per Boeing specifications.",
+            duration: "75m",
             isCompleted: isLessonCompleted(8),
             isUnlocked: isLessonUnlocked(8),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["AC Power Generation", "DC Systems", "Battery Operations", "Emergency Electrical"],
+            reference: "Boeing 737 FCOM 24"
           },
           {
             id: 9,
-            title: "Flight Controls",
-            description: "Mandos y superficies del avión, divididos en primarios (alerones, timón y elevador) y secundarios (flaps, slats, spoilers, trim)",
-            duration: "30m",
+            title: "Engines & APU Systems",
+            description: "CFM56-7B engine systems, APU operations, engine indications, thrust management, and powerplant emergency procedures.",
+            duration: "105m",
             isCompleted: isLessonCompleted(9),
             isUnlocked: isLessonUnlocked(9),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["CFM56-7B Systems", "APU Operations", "Engine Indications", "Thrust Management"],
+            reference: "Boeing 737 FCOM 70-49"
           },
           {
             id: 10,
-            title: "Flight Instruments and Displays",
-            description: "Flight Instruments and Displays proporcionan toda la información clave de vuelo al piloto de manera clara y confiable, garantizando seguridad y control total en cada maniobra",
-            duration: "30m",
+            title: "Fire Protection Systems",
+            description: "Engine fire detection and suppression, APU fire protection, cargo compartment fire systems, and emergency procedures per Boeing QRH.",
+            duration: "60m",
             isCompleted: isLessonCompleted(10),
             isUnlocked: isLessonUnlocked(10),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Engine Fire Detection", "Fire Suppression", "Cargo Fire Systems", "Emergency Procedures"],
+            reference: "Boeing 737 FCOM 26"
           },
           {
             id: 11,
-            title: "Flight Management and Navigation",
-            description: "Permite planificar, gestionar y guiar el vuelo de manera eficiente, asegurando rutas precisas y operaciones seguras.",
-            duration: "10m",
+            title: "Flight Controls & Hydraulics",
+            description: "Primary and secondary flight controls, hydraulic systems A & B, manual reversion, and flight control emergency procedures.",
+            duration: "90m",
             isCompleted: isLessonCompleted(11),
             isUnlocked: isLessonUnlocked(11),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Primary Controls", "Secondary Controls", "Hydraulic Systems", "Manual Reversion"],
+            reference: "Boeing 737 FCOM 27-29"
           },
           {
             id: 12,
-            title: "Fuel System",
-            description: "Gestiona el almacenamiento, suministro y distribución de combustible, garantizando que el avión opere de manera segura y eficiente durante todo el vuelo",
-            duration: "30m",
+            title: "Flight Instruments & Displays",
+            description: "Primary Flight Display (PFD), Navigation Display (ND), Engine Indication and Crew Alerting System (EICAS), and display management.",
+            duration: "75m",
             isCompleted: isLessonCompleted(12),
             isUnlocked: isLessonUnlocked(12),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Intermediate",
+            topics: ["Primary Flight Display", "Navigation Display", "EICAS", "Display Management"],
+            reference: "Boeing 737 FCOM 10-11"
           },
           {
             id: 13,
-            title: "Hydraulic System",
-            description: "Suministra la fuerza necesaria para operar sistemas críticos del avión, como tren de aterrizaje, flaps y controles de vuelo",
-            duration: "45m",
+            title: "Fuel Systems",
+            description: "Fuel storage, distribution, fuel management, center tank operations, fuel jettison, and fuel system malfunctions per Boeing procedures.",
+            duration: "75m",
             isCompleted: isLessonCompleted(13),
             isUnlocked: isLessonUnlocked(13),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Fuel Storage", "Fuel Distribution", "Center Tank Operations", "Fuel Management"],
+            reference: "Boeing 737 FCOM 28"
           },
           {
             id: 14,
-            title: "Landing Gear",
-            description: "Sistema de tren de aterrizaje que permite al avión despegar, aterrizar y maniobrar en tierra",
-            duration: "30m",
+            title: "Landing Gear & Brakes",
+            description: "Landing gear systems, wheel and brake systems, anti-skid, autobrakes, and landing gear emergency procedures.",
+            duration: "60m",
             isCompleted: isLessonCompleted(14),
             isUnlocked: isLessonUnlocked(14),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Intermediate",
+            topics: ["Landing Gear Systems", "Brake Systems", "Anti-Skid", "Emergency Procedures"],
+            reference: "Boeing 737 FCOM 32"
           },
           {
             id: 15,
-            title: "Warning Systems",
-            description: "Alertan al piloto sobre fallos, condiciones críticas o situaciones de riesgo, garantizando la seguridad y la respuesta rápida durante el vuelo",
-            duration: "45m",
+            title: "Warning Systems & EICAS",
+            description: "Master warning/caution systems, EICAS messages, crew alerting philosophy, and abnormal/emergency checklists integration.",
+            duration: "60m",
             isCompleted: isLessonCompleted(15),
             isUnlocked: isLessonUnlocked(15),
             hasTheory: true,
             hasFlashcards: true,
-            hasQuiz: true
+            hasQuiz: true,
+            difficulty: "Advanced",
+            topics: ["Warning Systems", "EICAS Messages", "Crew Alerting", "Emergency Checklists"],
+            reference: "Boeing 737 FCOM 05"
           }
         ]
       }

@@ -1,29 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useConvexAuth';
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '../../convex/_generated/api';
+import { Id } from '../../convex/_generated/dataModel';
+import FlashcardContent from '@/components/lesson/FlashcardContent';
 import { 
   ArrowLeft,
   BookOpen,
-  Play,
   CheckCircle2,
   Clock,
   Star,
-  Lightbulb,
   FileText,
   BookMarked,
-  Target
+  Target,
+  Play
 } from 'lucide-react';
+import { Id } from 'node_modules/convex/dist/esm-types/values/value';
 
 const LessonDetail = () => {
   const navigate = useNavigate();
   const { lessonId } = useParams();
   const { user } = useAuth();
   
-  // Mock lesson data - in a real app this would come from an API
+  // Modal state
+  const [showTheoryContent, setShowTheoryContent] = useState(false);
+  const [showFlashcards, setShowFlashcards] = useState(false);
+
+  // Convex queries and mutations
+  const progress = useQuery(
+    api.lessons.getUserLessonProgress,
+    user && lessonId ? { 
+      userId: user._id as Id<"users">, 
+      lessonId: lessonId as Id<"lessons"> 
+    } : "skip"
+  );
+  
+  const updateProgress = useMutation(api.lessons.updateLessonProgress);
+  const resetProgressMutation = useMutation(api.lessons.resetLessonProgress);
+
+  // Mock lesson data
   const lessonData = {
     id: lessonId || '1',
     title: "Boeing 737 Air Conditioning & Pressurization Systems",
@@ -36,131 +56,115 @@ const LessonDetail = () => {
       <h2>Boeing 737 Air Conditioning & Pressurization Systems</h2>
       
       <h3>Overview</h3>
-      <p>The Boeing 737 air conditioning and pressurization system maintains a comfortable and safe environment for passengers and crew. The system provides:</p>
-      <ul>
-        <li>Temperature control</li>
-        <li>Cabin pressurization</li>
-        <li>Air quality management</li>
-        <li>Smoke detection and removal</li>
-      </ul>
+      <p>The Boeing 737 air conditioning and pressurization system maintains a comfortable and safe environment for passengers and crew.</p>
       
-      <h3>Air Conditioning System Components</h3>
-      <p>The Boeing 737 air conditioning system consists of:</p>
-      <ol>
-        <li><strong>Air Conditioning Packs (PACKs)</strong> - Two packs provide conditioned air to the cabin</li>
-        <li><strong>Mixing Manifold</strong> - Combines conditioned air with recirculated air</li>
-        <li><strong>Distribution Ducts</strong> - Distribute air throughout the cabin</li>
-        <li><strong>Recirculation System</strong> - Recirculates filtered cabin air to reduce engine bleed air demand</li>
-        <li><strong>Temperature Control System</strong> - Maintains desired cabin temperature</li>
-      </ol>
-      
-      <h3>Pressurization System</h3>
-      <p>The pressurization system maintains cabin pressure at a comfortable level:</p>
+      <h3>Key Components</h3>
       <ul>
-        <li><strong>Cabin Pressure Controller (CPC)</strong> - Automatic control of cabin pressure</li>
+        <li><strong>Air Conditioning Packs (PACKs)</strong> - Two packs provide conditioned air</li>
+        <li><strong>Cabin Pressure Controller (CPC)</strong> - Automatic pressure control</li>
         <li><strong>Outflow Valves</strong> - Control cabin pressure by regulating air outflow</li>
-        <li><strong>Safety Valves</strong> - Provide overpressure and negative pressure protection</li>
-        <li><strong>Pressure Relief Valves</strong> - Emergency pressure relief</li>
-      </ul>
-      
-      <h3>Key Operating Principles</h3>
-      <p>Understanding the system operation is crucial for pilots:</p>
-      <ul>
-        <li>Air is typically supplied from engine bleed air or APU</li>
-        <li>PACKs cool and condition the bleed air</li>
-        <li>Pressurization is maintained by controlling outflow</li>
-        <li>Automatic systems can be overridden manually if needed</li>
+        <li><strong>Mixing Manifold</strong> - Combines conditioned and recirculated air</li>
       </ul>
       
       <h3>Emergency Procedures</h3>
-      <p>In case of system failure:</p>
-      <ol>
-        <li>Identify the failed component</li>
-        <li>Follow QRH procedures for the specific failure</li>
-        <li>Consider diverting if pressurization cannot be maintained</li>
-        <li>Monitor cabin altitude and rate of change</li>
-      </ol>
+      <p>In case of system failure, follow QRH procedures and consider diverting if pressurization cannot be maintained.</p>
     `,
     objectives: [
       "Understand air conditioning system components",
-      "Explain pressurization system operation",
+      "Explain pressurization system operation", 
       "Identify key system controls and indicators",
       "Know emergency procedures for system failures"
-    ],
-    prerequisites: [
-      "Basic aircraft systems knowledge",
-      "Understanding of pneumatic systems"
     ]
   };
 
-  const [progress, setProgress] = useState({
-    theoryCompleted: false,
-    flashcardsCompleted: false,
-    quizCompleted: false,
-    overallProgress: 0
-  });
-
-  // Load progress from localStorage
-  useEffect(() => {
-    if (user?._id && lessonId) {
-      const storedProgress = localStorage.getItem(`lesson_progress_${user._id}_${lessonId}`);
-      if (storedProgress) {
-        setProgress(JSON.parse(storedProgress));
-      }
+  // Flashcards data
+  const flashcards = [
+    {
+      id: 1,
+      front: "PACK (Pneumatic Air Cycle Kit)",
+      back: "Air conditioning unit that cools and conditions bleed air from the engines or APU for cabin use.",
+      category: "Air Conditioning"
+    },
+    {
+      id: 2,
+      front: "Cabin Pressure Controller (CPC)",
+      back: "Automatic system that maintains cabin pressure by controlling outflow valves.",
+      category: "Pressurization"
+    },
+    {
+      id: 3,
+      front: "Outflow Valve",
+      back: "Valve that controls the rate of air leaving the cabin to maintain proper pressurization.",
+      category: "Pressurization"
+    },
+    {
+      id: 4,
+      front: "Bleed Air",
+      back: "Hot, high-pressure air taken from the engine compressor stages, used for cabin air conditioning and pressurization.",
+      category: "Air Source"
+    },
+    {
+      id: 5,
+      front: "Mixing Manifold",
+      back: "Component that combines conditioned air from PACKs with recirculated cabin air.",
+      category: "Air Distribution"
     }
-  }, [user?._id, lessonId]);
+  ];
 
-  // Save progress to localStorage
-  const saveProgress = (newProgress: any) => {
-    if (user?._id && lessonId) {
-      localStorage.setItem(`lesson_progress_${user._id}_${lessonId}`, JSON.stringify(newProgress));
-      setProgress(newProgress);
+  // Event handlers
+  const handleTheoryComplete = async () => {
+    if (user && lessonId) {
+      await updateProgress({
+        userId: user._id as Id<"users">,
+        lessonId: lessonId as Id<"lessons">,
+        theoryCompleted: true
+      });
+      setShowTheoryContent(false);
     }
   };
 
-  const markTheoryComplete = () => {
-    const newProgress = {
-      ...progress,
-      theoryCompleted: true,
-      overallProgress: progress.flashcardsCompleted && progress.quizCompleted ? 100 : 
-                      progress.flashcardsCompleted || progress.quizCompleted ? 66 : 33
-    };
-    saveProgress(newProgress);
+  const handleFlashcardsComplete = async () => {
+    if (user && lessonId) {
+      await updateProgress({
+        userId: user._id as Id<"users">,
+        lessonId: lessonId as Id<"lessons">,
+        flashcardsCompleted: true
+      });
+      setShowFlashcards(false);
+    }
   };
 
-  const markFlashcardsComplete = () => {
-    const newProgress = {
-      ...progress,
-      flashcardsCompleted: true,
-      overallProgress: progress.theoryCompleted && progress.quizCompleted ? 100 : 
-                      progress.theoryCompleted || progress.quizCompleted ? 66 : 33
-    };
-    saveProgress(newProgress);
+  const handleQuizComplete = async () => {
+    if (user && lessonId) {
+      await updateProgress({
+        userId: user._id as Id<"users">,
+        lessonId: lessonId as Id<"lessons">,
+        quizCompleted: true
+      });
+      alert("Quiz completed! In a real implementation, this would show quiz questions.");
+    }
   };
 
-  const markQuizComplete = () => {
-    const newProgress = {
-      ...progress,
-      quizCompleted: true,
-      overallProgress: progress.theoryCompleted && progress.flashcardsCompleted ? 100 : 
-                      progress.theoryCompleted || progress.flashcardsCompleted ? 66 : 33
-    };
-    saveProgress(newProgress);
+  const handleResetProgress = async () => {
+    if (user && lessonId) {
+      await resetProgressMutation({
+        userId: user._id as Id<"users">,
+        lessonId: lessonId as Id<"lessons">
+      });
+    }
   };
 
-  // Function to simulate theory content viewing
-  const startTheory = () => {
-    // In a real implementation, this would navigate to the theory content
-    // For now, we'll just mark it as complete to allow progression
-    markTheoryComplete();
-  };
-
-  // Function to simulate flashcards
-  const startFlashcards = () => {
-    // In a real implementation, this would navigate to the flashcards
-    // For now, we'll just mark it as complete to allow progression
-    markFlashcardsComplete();
-  };
+  // Loading state
+  if (progress === undefined) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading lesson...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -175,6 +179,14 @@ const LessonDetail = () => {
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Course
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleResetProgress}
+            className="flex items-center gap-2"
+          >
+            Reset Progress
           </Button>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -235,7 +247,7 @@ const LessonDetail = () => {
               </p>
               <Button 
                 className="w-full" 
-                onClick={startTheory}
+                onClick={() => setShowTheoryContent(true)}
               >
                 {progress.theoryCompleted ? (
                   <>
@@ -267,7 +279,7 @@ const LessonDetail = () => {
               <Button 
                 className="w-full"
                 variant={progress.theoryCompleted ? "default" : "secondary"}
-                onClick={startFlashcards}
+                onClick={() => setShowFlashcards(true)}
                 disabled={!progress.theoryCompleted}
               >
                 {progress.flashcardsCompleted ? (
@@ -300,11 +312,7 @@ const LessonDetail = () => {
               <Button 
                 className="w-full"
                 variant={progress.flashcardsCompleted ? "default" : "secondary"}
-                onClick={() => {
-                  markQuizComplete();
-                  // Navigate to a quiz page or show quiz results
-                  alert("Quiz completed! In a real implementation, this would show quiz questions.");
-                }}
+                onClick={handleQuizComplete}
                 disabled={!progress.flashcardsCompleted}
               >
                 {progress.quizCompleted ? (
@@ -323,62 +331,85 @@ const LessonDetail = () => {
           </Card>
         </div>
 
-        {/* Lesson Content */}
+        {/* Learning Objectives */}
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="w-5 h-5" />
-              Lesson Content
+              <Target className="w-5 h-5" />
+              Learning Objectives
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div 
-              className="prose prose-sm max-w-none dark:prose-invert"
-              dangerouslySetInnerHTML={{ __html: lessonData.content }} 
-            />
+            <ul className="space-y-2">
+              {lessonData.objectives.map((objective, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-sm">{objective}</span>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
 
-        {/* Learning Objectives */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Learning Objectives
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {lessonData.objectives.map((objective, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">{objective}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+        {/* Theory Content Modal */}
+        {showTheoryContent && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    Theory: {lessonData.title}
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => setShowTheoryContent(false)}>
+                    ✕
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div 
+                  className="prose prose-sm max-w-none dark:prose-invert"
+                  dangerouslySetInnerHTML={{ __html: lessonData.content }} 
+                />
+                <div className="flex justify-end gap-4 pt-4 border-t">
+                  <Button variant="outline" onClick={() => setShowTheoryContent(false)}>
+                    Close
+                  </Button>
+                  <Button onClick={handleTheoryComplete}>
+                    <CheckCircle2 className="w-4 h-4 mr-2" />
+                    Mark as Complete
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
-                Prerequisites
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {lessonData.prerequisites.map((prereq, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <BookOpen className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm">{prereq}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Flashcards Modal */}
+        {showFlashcards && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Flashcards: Key Terms
+                  </span>
+                  <Button variant="ghost" size="sm" onClick={() => setShowFlashcards(false)}>
+                    ✕
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FlashcardContent 
+                  flashcards={flashcards}
+                  onComplete={handleFlashcardsComplete}
+                  onClose={() => setShowFlashcards(false)}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

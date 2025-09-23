@@ -1,5 +1,3 @@
-import type { Id } from "../../convex/_generated/dataModel";
-
 /**
  * Utility functions for working with Convex IDs and data
  */

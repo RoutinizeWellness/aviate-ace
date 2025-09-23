@@ -16,7 +16,7 @@ import {
   Play,
   Trophy
 } from "lucide-react";
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useExamSession, useExams } from "@/hooks/useExam";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -31,6 +31,24 @@ import { loadAndFilterQuestions } from "@/utils/questionLoader";
 if (import.meta.env.DEV) {
   import('@/utils/testQuestionLoading');
 }
+
+// Constants
+const CONVEX_ID_LENGTH = 32;
+const CATEGORY_MAPPINGS = {
+  'electrical': 'electrical',
+  'hydraulic': 'hydraulics',
+  'hydraulics': 'hydraulics',
+  'performance': 'performance',
+  'sistema-eléctrico': 'electrical',
+  'sistema-hidráulico': 'hydraulics',
+  'sistema-electrico': 'electrical',
+  'sistema-hidraulico': 'hydraulics'
+} as const;
+
+// Utility functions
+const isValidConvexId = (id: string): boolean => {
+  return typeof id === 'string' && id.length === CONVEX_ID_LENGTH;
+};
 
 const ExamMode = () => {
   const navigate = useNavigate();
@@ -71,19 +89,7 @@ const ExamMode = () => {
     const categoryFromTitle = examTitle.replace('Práctica: ', '').toLowerCase().replace(/\s+/g, '-');
     console.log('Extracted category from title:', categoryFromTitle);
     
-    // Map common category names to their proper keys
-    const categoryMap: { [key: string]: string } = {
-      'electrical': 'electrical',
-      'hydraulic': 'hydraulics',
-      'hydraulics': 'hydraulics',
-      'performance': 'performance',
-      'sistema-eléctrico': 'electrical',
-      'sistema-hidráulico': 'hydraulics',
-      'sistema-electrico': 'electrical',
-      'sistema-hidraulico': 'hydraulics'
-    };
-    
-    selectedCategory = categoryMap[categoryFromTitle] || categoryFromTitle;
+    selectedCategory = CATEGORY_MAPPINGS[categoryFromTitle as keyof typeof CATEGORY_MAPPINGS] || categoryFromTitle;
     console.log('Mapped category:', selectedCategory);
   }
   
@@ -129,6 +135,9 @@ const ExamMode = () => {
   // State for dynamically loaded questions
   const [dynamicQuestions, setDynamicQuestions] = useState<any[]>([]);
   const [isLoadingDynamicQuestions, setIsLoadingDynamicQuestions] = useState(false);
+  
+  // Ref to prevent infinite re-renders
+  const isInitializedRef = useRef(false);
 
   // Helper function to determine if we should load dynamic questions
   const shouldLoadDynamicQuestions = (examId: string | null, category: string, mode: string) => {
@@ -237,49 +246,35 @@ const ExamMode = () => {
 
   // Memoized current questions to avoid recalculation
   const currentQuestions = useMemo(() => {
-    console.log('Computing currentQuestions:', { 
-      questions: questions?.length || 0, 
-      dynamicQuestions: dynamicQuestions.length,
-      questionsArray: questions,
-      dynamicArray: dynamicQuestions.slice(0, 3) // Only log first 3 for brevity
-    });
-    const result = (questions && questions.length > 0) ? questions : dynamicQuestions;
-    console.log('Final currentQuestions result:', result.length, 'questions');
-    return result;
+    return (questions && questions.length > 0) ? questions : dynamicQuestions;
   }, [questions, dynamicQuestions]);
 
   // Initialize selected answer when question changes
+  const currentQuestion = useMemo(() => {
+    return currentQuestions && currentQuestions.length > 0 
+      ? currentQuestions[examState.currentQuestionIndex] 
+      : null;
+  }, [currentQuestions, examState.currentQuestionIndex]);
+
+  const existingAnswer = useMemo(() => {
+    return currentQuestion 
+      ? examState.answers.find(a => a.questionId === currentQuestion._id)
+      : null;
+  }, [currentQuestion, examState.answers]);
+
   useEffect(() => {
-    if (examMode === 'practice' && currentQuestions && currentQuestions.length > 0) {
-      const currentQuestion = currentQuestions[examState.currentQuestionIndex];
-      const existingAnswer = examState.answers.find(a => a.questionId === currentQuestion?._id);
-      
-      if (import.meta.env.DEV) {
-        console.log('Initializing answer state:', {
-          currentQuestionIndex: examState.currentQuestionIndex,
-          currentQuestionId: currentQuestion?._id,
-          existingAnswer,
-          totalAnswers: examState.answers.length
-        });
-      }
-      
+    if (examMode === 'practice' && currentQuestion) {
       if (existingAnswer) {
-        if (import.meta.env.DEV) {
-          console.log('Found existing answer, setting isAnswered = true');
-        }
         setSelectedAnswer(existingAnswer.selectedAnswer);
         setIsAnswered(true);
         setShowExplanation(true);
       } else {
-        if (import.meta.env.DEV) {
-          console.log('No existing answer, setting isAnswered = false');
-        }
         setSelectedAnswer(null);
         setIsAnswered(false);
         setShowExplanation(false);
       }
     }
-  }, [examState.currentQuestionIndex, examState.answers, questions, dynamicQuestions, examMode]);
+  }, [examMode, currentQuestion?._id, existingAnswer?.selectedAnswer]);
 
   // Auto-start exam if we have category/difficulty or examId
   useEffect(() => {
@@ -290,17 +285,7 @@ const ExamMode = () => {
     const needsDynamicQuestions = (!selectedExamId || isTemporaryExamId) && (selectedCategory || examMode === 'timed' || examMode === 'review');
     const isStillLoading = needsDynamicQuestions && isLoadingDynamicQuestions; 
     
-    console.log('Auto-start check:', {
-      hasCategory: hasCategories,
-      hasExamId: !!selectedExamId,
-      hasQuestions: !!currentQuestions && currentQuestions.length > 0,
-      hasSessionId: !!examState.sessionId,
-      examMode,
-      isStillLoading,
-      isLoadingDynamicQuestions,
-      questionsLength: questions?.length || 0,
-      dynamicQuestionsLength: dynamicQuestions.length
-    });
+    // Auto-start check (logging removed to prevent console spam)
     
     // Auto-start if we have:
     // 1. An exam ID (real or temporary)
@@ -318,11 +303,14 @@ const ExamMode = () => {
     if (shouldAutoStart) {
       console.log('Auto-starting exam...');
       // Add a small delay to ensure state is properly updated
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         handleStartExam();
       }, 100);
+      
+      // Cleanup timeout on unmount or dependency change
+      return () => clearTimeout(timeoutId);
     }
-  }, [selectedCategory, selectedExamId, questions, dynamicQuestions.length, examState.sessionId, handleStartExam, examMode, isLoadingDynamicQuestions]);
+  }, [selectedCategory, selectedExamId, examState.sessionId, examMode, isLoadingDynamicQuestions, currentQuestions?.length]); // Stabilized dependencies
 
   // Timer countdown effect
   useEffect(() => {
@@ -426,7 +414,18 @@ const ExamMode = () => {
   };
 
   // Function to select an answer (in practice mode)
-  const selectAnswer = (questionId: string, answerIndex: number) => {
+  const selectAnswer = useCallback((questionId: string, answerIndex: number) => {
+    // Input validation with proper error handling
+    if (!questionId?.trim()) {
+      console.error('Invalid question ID provided:', questionId);
+      return;
+    }
+    
+    if (!Number.isInteger(answerIndex) || answerIndex < 0 || answerIndex > 3) {
+      console.error('Invalid answer index. Must be integer between 0-3:', answerIndex);
+      return;
+    }
+
     if (import.meta.env.DEV) {
       console.log('🎯 selectAnswer called:', { 
         questionId, 
@@ -434,21 +433,8 @@ const ExamMode = () => {
         examMode, 
         isAnswered, 
         selectedAnswer,
-        currentQuestionIndex: examState.currentQuestionIndex,
-        questionIdType: typeof questionId,
-        questionIdLength: questionId?.length
+        currentQuestionIndex: examState.currentQuestionIndex
       });
-    }
-    
-    // Validate inputs
-    if (typeof answerIndex !== 'number' || answerIndex < 0 || answerIndex > 3) {
-      console.error('Invalid answer index:', answerIndex);
-      return;
-    }
-    
-    if (!questionId) {
-      console.error('No question ID provided');
-      return;
     }
     
     if (examMode === 'practice') {
@@ -482,11 +468,11 @@ const ExamMode = () => {
       }
       answerQuestion(questionId, answerIndex);
     }
-  };
+  }, [examMode, isAnswered, selectedAnswer]);
 
   // Function to confirm answer in practice mode
-  const confirmAnswer = (questionId: string) => {
-    if (selectedAnswer === null) return;
+  const confirmAnswer = useCallback((questionId: string) => {
+    if (selectedAnswer === null || !questionId?.trim()) return;
     
     const timeSpent = Math.floor((Date.now() - examState.startTime.getTime()) / 1000);
     
@@ -518,8 +504,7 @@ const ExamMode = () => {
     const currentQuestion = getCurrentQuestion();
     if (currentQuestion && 
         selectedAnswer !== currentQuestion.correctAnswer && 
-        typeof currentQuestion._id === 'string' && 
-        currentQuestion._id.length === 32) {
+        isValidConvexId(currentQuestion._id)) {
       recordIncorrectQuestion({
         userId: user!._id as Id<"users">,
         questionId: currentQuestion._id as Id<"examQuestions">,
@@ -531,7 +516,7 @@ const ExamMode = () => {
         aircraftType: currentQuestion.aircraftType,
       }).catch(error => console.log('Could not track incorrect question:', error));
     }
-  };
+  }, [selectedAnswer, examState.startTime, setExamState, getCurrentQuestion, examMode, user, recordIncorrectQuestion]);
 
   // Function to answer a question (for non-practice modes)
   const answerQuestion = (questionId: string, selectedAnswerIndex: number) => {
@@ -567,8 +552,7 @@ const ExamMode = () => {
     const currentQuestion = currentQuestions?.find(q => q._id === questionId);
     if (currentQuestion && 
         selectedAnswerIndex !== currentQuestion.correctAnswer && 
-        typeof currentQuestion._id === 'string' && 
-        currentQuestion._id.length === 32) {
+        isValidConvexId(currentQuestion._id)) {
       recordIncorrectQuestion({
         userId: user!._id as Id<"users">,
         questionId: currentQuestion._id as Id<"examQuestions">,
@@ -605,19 +589,10 @@ const ExamMode = () => {
   // Determine which questions to use
   const isUsingDynamicQuestions = !questions && dynamicQuestions.length > 0;
   
-  console.log('Question sources status:', {
-    hasQuestions: !!questions,
-    hasDynamicQuestions: dynamicQuestions.length > 0,
-    isUsingDynamicQuestions,
-    dynamicQuestionsCount: dynamicQuestions.length,
-    questionsCount: questions?.length || 0,
-    selectedCategory,
-    selectedExamId
-  });
+  // Question sources status (logging removed to prevent console spam)
 
   // Main exam interface
   if (!examState.isCompleted && currentQuestions && currentQuestions.length > 0) {
-    console.log('Showing main exam interface with questions:', currentQuestions.length);
     // Only show the exam interface if we have a session ID (exam has started)
     // or if we're in a mode that should auto-start
     const shouldShowExamInterface = examState.sessionId || 

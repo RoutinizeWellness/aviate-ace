@@ -285,6 +285,23 @@ export default defineSchema({
     .index("by_session_type", ["sessionType"])
     .index("by_date", ["startTime"]),
 
+  // User Lesson Progress table
+  userLessonProgress: defineTable({
+    userId: v.id("users"),
+    lessonId: v.id("lessons"),
+    theoryCompleted: v.boolean(),
+    flashcardsCompleted: v.boolean(),
+    quizCompleted: v.boolean(),
+    overallProgress: v.number(), // 0-100
+    lastAccessedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_lesson", ["lessonId"])
+    .index("by_user_lesson", ["userId", "lessonId"]),
+
   // Question Suggestions table
   questionSuggestions: defineTable({
     userId: v.id("users"),

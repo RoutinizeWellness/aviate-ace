@@ -1,20 +1,17 @@
 /**
  * Utility to test question loading in development
  */
-
 export async function testQuestionLoading() {
   console.log('🧪 Testing question loading...');
-  
+
   try {
     // Test loading all questions
-    const { allAviationQuestions } = await import('@/data/cleanAviationQuestions');
-    const { getAllMassiveQuestions } = await import('@/data/massiveQuestionSeeding');
-    const { allB737Questions } = await import('@/data/b737Questions');
+    const { allAviationQuestions } = await import("@/data/cleanAviationQuestions");
+    const { getAllMassiveQuestions } = await import("@/data/massiveQuestionSeeding");
     
     console.log('📊 Question Database Stats:');
     console.log(`- Clean Aviation Questions: ${allAviationQuestions.length}`);
     console.log(`- Massive Questions: ${getAllMassiveQuestions().length}`);
-    console.log(`- B737 Questions: ${allB737Questions.length}`);
     
     // Combine all questions
     const allQuestions = [

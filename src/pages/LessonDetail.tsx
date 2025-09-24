@@ -20,7 +20,6 @@ import {
   Target,
   Play
 } from 'lucide-react';
-import { Id } from 'node_modules/convex/dist/esm-types/values/value';
 
 const LessonDetail = () => {
   const navigate = useNavigate();

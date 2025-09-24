@@ -140,13 +140,12 @@ export const TypeRatingQuiz: React.FC<TypeRatingQuizProps> = ({
     const correctAnswers = selectedAnswers.filter((answer, index) => 
       answer === questions[index]?.correctAnswer
     ).length;
-    
     return (
       <SubscriptionCTA
         trialScore={correctAnswers}
         totalTrialQuestions={questions.length}
         category={category}
-        aircraftType={aircraftType === 'ALL' ? 'A320_FAMILY' : aircraftType as 'A320_FAMILY' | 'B737_FAMILY'}
+        aircraftType={aircraftType === 'B737_FAMILY' ? 'BOEING_737' : 'A320'}
         onSubscribe={handleSubscribe}
         onContinueTrial={handleContinueTrial}
       />

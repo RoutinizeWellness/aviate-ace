@@ -82,14 +82,6 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         <User className="w-5 h-5" />
         <span>Perfil</span>
       </Button>
-      <Button 
-        variant={activePage === 'settings' ? "default" : "ghost"} 
-        className="w-full justify-start gap-3 h-12"
-        onClick={() => navigate('/settings')}
-      >
-        <Settings className="w-5 h-5" />
-        <span>Configuración</span>
-      </Button>
       
       {/* Admin Panel - Only show for admins */}
       {isAdmin(user) ? (

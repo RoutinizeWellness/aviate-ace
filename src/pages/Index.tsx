@@ -118,12 +118,16 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handlePlanSelect = (planName: string) => {
+    try {
+      // Persist chosen plan id for subscription-management
+      const match = PRICING_PLANS.find(p => planName.includes(p.name.split(' ')[0]) || planName === p.name);
+      if (match) localStorage.setItem('selectedPlan', JSON.stringify(match.id));
+    } catch {}
+
     if (user) {
-      // If user is already logged in, go directly to dashboard
-      window.location.href = '/dashboard';
+      window.location.href = '/subscription-management';
     } else {
-      // If user is not logged in, redirect to login with return URL
-      window.location.href = `/login?returnUrl=/dashboard`;
+      window.location.href = `/login?returnUrl=/subscription-management`;
     }
   };
 
@@ -169,22 +173,17 @@ const Index = () => {
           </Badge>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-            Prepárate para el{" "}
-            <span className="text-primary">Éxito</span> en tu
-            <br />
-            Habilitación{" "}
-            <span className="text-primary-bright">A320 & B737</span>
+            {t('home.title')}
           </h1>
           
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-10">
-            La única plataforma especializada que necesitas para aprobar tu examen de habilitación. 
-            Simulacros reales, estadísticas avanzadas y contenido actualizado por pilotos experimentados.
+            {t('home.subtitle')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button size="lg" className="bg-primary hover:bg-primary-dark text-lg px-8 py-6">
               <Target className="w-5 h-5 mr-2" />
-              <a href="/dashboard" className="no-underline text-inherit">Comenzar Preparación</a>
+              <a href="/dashboard" className="no-underline text-inherit">{t('home.cta')}</a>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6">
               <BookOpen className="w-5 h-5 mr-2" />
@@ -192,21 +191,7 @@ const Index = () => {
             </Button>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">95%</div>
-              <div className="text-sm text-muted-foreground">Tasa de Aprobación</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">5,000+</div>
-              <div className="text-sm text-muted-foreground">Preguntas Actualizadas</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">1,200+</div>
-              <div className="text-sm text-muted-foreground">Pilotos Certificados</div>
-            </div>
-          </div>
+          {/* Stats intentionally removed until verified data is available */}
         </div>
       </section>
 
@@ -455,8 +440,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Planes que se Adaptan a tu{" "}
-              <span className="text-primary">Preparación</span>
+              {t('pricing.title')}
             </h2>
           </div>
 
@@ -553,7 +537,7 @@ const Index = () => {
           </p>
           <Button size="lg" className="bg-primary hover:bg-primary-dark text-lg px-12 py-6">
             <TrendingUp className="w-5 h-5 mr-2" />
-            Comenzar Ahora - Gratis
+            {t('home.cta')}
           </Button>
         </div>
       </section>

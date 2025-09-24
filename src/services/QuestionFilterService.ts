@@ -260,32 +260,22 @@ export class QuestionFilterService {
   }
 
   private shuffleAndLimit(questions: RealAviationQuestion[], limit: number): RealAviationQuestion[] {
-    const shuffled = questions.sort(() => Math.random() - 0.5);
-    
-    // If we don't have enough questions, duplicate some to reach the target count
-    let finalQuestions = [...shuffled];
-    
-    if (finalQuestions.length < limit && finalQuestions.length > 0) {
-      debugLog(`Not enough unique questions (${finalQuestions.length}), duplicating to reach ${limit}`);
-      
-      while (finalQuestions.length < limit) {
-        const remainingNeeded = limit - finalQuestions.length;
-        const questionsToAdd = shuffled.slice(0, Math.min(remainingNeeded, shuffled.length));
-        
-        // Create duplicates with modified questions to avoid exact duplicates
-        const duplicatedQuestions = questionsToAdd.map((q, index) => ({
-          ...q,
-          _id: `${q._id}_dup_${Date.now()}_${index}` as any,
-          question: `${q.question} (Variante ${Math.floor(finalQuestions.length / shuffled.length) + 1})`
-        }));
-        
-        finalQuestions.push(...duplicatedQuestions);
-      }
+    // Enforce uniqueness by question text
+    const seen = new Set<string>();
+    const unique = questions.filter(q => {
+      const key = (q.question || '').trim().toLowerCase();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    const shuffled = unique.sort(() => Math.random() - 0.5);
+    const limited = shuffled.slice(0, Math.min(limit, shuffled.length));
+
+    if (limited.length < limit) {
+      debugLog(`Only ${limited.length} unique questions available for current filters (requested ${limit}).`);
     }
-    
-    const limited = finalQuestions.slice(0, limit);
-    
-    debugLog(`Final filtered questions: ${limited.length} (requested: ${limit})`);
+
     return limited;
   }
 }

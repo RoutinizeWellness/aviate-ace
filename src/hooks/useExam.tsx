@@ -344,14 +344,18 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
 
   const realExam: ConvexExam = examId ? {
     _id: examId as Id<"exams">,
-    title: "Examen de Sistemas A320 - Nivel Avanzado",
-    description: "Evaluación completa de sistemas de la aeronave Airbus A320 incluyendo protecciones de vuelo, sistemas eléctricos y procedimientos de emergencia.",
-    aircraftType: "A320_FAMILY",
-    category: "Sistemas de Aeronave",
-    difficulty: "advanced",
-    timeLimit: 90,
-    passingScore: 85,
-    questionsCount: 20,
+    title: getRealExamTitle(),
+    description: mode === 'timed' 
+      ? 'Simulación del examen oficial con tiempo límite y condiciones reales.'
+      : mode === 'review'
+      ? 'Repasa las preguntas que has respondido incorrectamente para mejorar tu comprensión.'
+      : 'Práctica sin límite de tiempo para mejorar tus conocimientos.',
+    aircraftType: (options.aircraft || "GENERAL_AVIATION") as string,
+    category: category || "Práctica General",
+    difficulty: difficulty || "intermediate",
+    timeLimit: getRealExamTimeLimit(),
+    passingScore: mode === 'timed' ? 80 : 70,
+    questionsCount: questionCount,
     isActive: true,
     _creationTime: Date.now(),
   } : {

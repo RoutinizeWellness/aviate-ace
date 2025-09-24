@@ -13,12 +13,10 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-import Pricing from "./pages/Pricing";
 import ExamMode from "./pages/ExamMode";
 import Exams from "./pages/Exams";
 import Progress from "./pages/Progress";
 import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
 import TypeRating from "./pages/TypeRating";
 import B737TypeRating from "./pages/B737TypeRating";
 import LessonDetail from "./pages/LessonDetail";
@@ -26,7 +24,6 @@ import Flashcards from "./pages/Flashcards";
 import QuizDemo from "./pages/QuizDemo";
 import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import AdminPanel from "./pages/AdminPanel";
-import AdminSetup from "./pages/AdminSetup";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import ConvexTest from "./pages/ConvexTest";
 import IntegrationTest from "./pages/IntegrationTest";
@@ -94,11 +91,6 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/pricing" element={
-                  <ProtectedRoute>
-                    <Pricing />
-                  </ProtectedRoute>
-                } />
                 <Route path="/dashboard" element={
                   <ProtectedRoute>
                     <Dashboard />
@@ -144,11 +136,6 @@ const App = () => (
                     <Profile />
                   </ProtectedRoute>
                 } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <Settings />
-                  </ProtectedRoute>
-                } />
                 <Route path="/quiz-demo" element={<QuizDemo />} />
                 <Route path="/analytics" element={
                   <ProtectedRoute>
@@ -160,15 +147,10 @@ const App = () => (
                     <AdminPanel />
                   </ProtectedRoute>
                 } />
-                <Route path="/admin-setup" element={<AdminSetup />} />
                 <Route path="/convex-test" element={<ConvexTest />} />
                 <Route path="/convex-test-page" element={<ConvexTestPage />} />
                 <Route path="/comprehensive-convex-test" element={<ComprehensiveConvexTest />} />
-                <Route path="/subscription-management" element={
-                  <ProtectedRoute>
-                    <SubscriptionManagement />
-                  </ProtectedRoute>
-                } />
+                <Route path="/subscription-management" element={<SubscriptionManagement />} />
                 <Route path="/integration-test" element={<IntegrationTest />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />

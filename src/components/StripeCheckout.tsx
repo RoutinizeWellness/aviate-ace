@@ -50,7 +50,7 @@ export const StripeCheckout: React.FC<AutumnCheckoutProps> = ({
       
       // Redirect to login with return URL
       setTimeout(() => {
-        window.location.href = '/login?returnUrl=/pricing';
+        window.location.href = '/login?returnUrl=/subscription-management';
       }, 2000);
       return;
     }

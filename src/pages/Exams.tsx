@@ -76,6 +76,7 @@ const Exams = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedAircraft, setSelectedAircraft] = useState<string>(getDefaultAircraft());
+  const [reviewSelectedAircraft, setReviewSelectedAircraft] = useState<string>(getDefaultAircraft());
   const [selectedQuestionCount, setSelectedQuestionCount] = useState<string>("20");
   const [selectedReviewQuestionCount, setSelectedReviewQuestionCount] = useState<string>("20");
 
@@ -109,7 +110,7 @@ const Exams = () => {
   const aircraftTypes = getAvailableAircraftTypes();
 
   // Available categories
-  const getAvailableCategories = () => {
+  const getAvailableCategoriesFor = (aircraft: string) => {
     const a320Categories = [
       { value: "aircraft-general", label: "General de Aeronave", description: "Conocimiento general y limitaciones de aeronave" },
       { value: "electrical", label: "Eléctrico", description: "Generación y distribución de energía eléctrica" },
@@ -124,19 +125,19 @@ const Exams = () => {
     ];
     
     const b737Categories = [
-      { value: "airplane-general", label: "GENERAL DE AVIÓN", description: "Información general y limitaciones del avión" },
-      { value: "air-systems", label: "SISTEMAS DE AIRE", description: "Sistemas neumáticos, presurización y aire acondicionado" },
-      { value: "electrical", label: "ELÉCTRICO", description: "Sistemas de energía eléctrica" },
-      { value: "engines-apu", label: "MOTORES Y APU", description: "Sistemas de motor y unidad de potencia auxiliar" },
-      { value: "flight-controls", label: "CONTROLES DE VUELO", description: "Sistemas de control de vuelo primario y secundario" },
-      { value: "fuel", label: "COMBUSTIBLE", description: "Almacenamiento, distribución e indicación de combustible" },
-      { value: "hydraulics", label: "HIDRÁULICO", description: "Sistemas de potencia hidráulica" },
-      { value: "landing-gear", label: "TREN DE ATERRIZAJE", description: "Extensión, retracción e indicación del tren de aterrizaje" }
+      { value: "airplane-general", label: "general de avión", description: "Información general y limitaciones del avión" },
+      { value: "air-systems", label: "sistemas de aire", description: "Sistemas neumáticos, presurización y aire acondicionado" },
+      { value: "electrical", label: "eléctrico", description: "Sistemas de energía eléctrica" },
+      { value: "engines-apu", label: "motores y apu", description: "Sistemas de motor y unidad de potencia auxiliar" },
+      { value: "flight-controls", label: "controles de vuelo", description: "Sistemas de control de vuelo primario y secundario" },
+      { value: "fuel", label: "combustible", description: "Almacenamiento, distribución e indicación de combustible" },
+      { value: "hydraulics", label: "hidráulico", description: "Sistemas de potencia hidráulica" },
+      { value: "landing-gear", label: "tren de aterrizaje", description: "Extensión, retracción e indicación del tren de aterrizaje" }
     ];
     
     const allCategories = [...a320Categories, ...b737Categories.filter(cat => !a320Categories.some(a320Cat => a320Cat.value === cat.value))];
     
-    switch (selectedAircraft) {
+    switch (aircraft) {
       case "A320_FAMILY":
         return a320Categories;
       case "B737_FAMILY":
@@ -148,7 +149,8 @@ const Exams = () => {
     }
   };
   
-  const categories = getAvailableCategories();
+  const categories = getAvailableCategoriesFor(selectedAircraft);
+  const reviewCategories = getAvailableCategoriesFor(reviewSelectedAircraft);
 
   const toggleCategory = (categoryValue: string) => {
     setSelectedCategories(prev => {
@@ -194,6 +196,7 @@ const Exams = () => {
     if (selectedCategories.length > 0) params.set('categories', selectedCategories.join(','));
     if (selectedDifficulty && selectedDifficulty !== 'all') params.set('difficulty', selectedDifficulty);
     params.set('questionCount', selectedReviewQuestionCount);
+    params.set('aircraft', reviewSelectedAircraft);
     navigate(`/exam?${params.toString()}`);
   };
 
@@ -374,7 +377,26 @@ const Exams = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Número de Preguntas</label>
+                    <label className="text-sm font-medium">Tipo de Aeronave</label>
+                    <Select value={reviewSelectedAircraft} onValueChange={setReviewSelectedAircraft}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona tipo de aeronave" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableAircraftTypes().map((air) => (
+                          <SelectItem key={air.value} value={air.value}>
+                            <div>
+                              <div className="font-medium">{air.label}</div>
+                              <div className="text-xs text-muted-foreground">{air.description}</div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Categorías</label>
                     <Select value={selectedQuestionCount} onValueChange={setSelectedQuestionCount}>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar cantidad" />
@@ -500,7 +522,7 @@ const Exams = () => {
                     </div>
                     
                     <div className="border rounded-md p-3 max-h-40 overflow-y-auto">
-                      {categories.map((category) => (
+                      {reviewCategories.map((category) => (
                         <div 
                           key={category.value} 
                           className="flex items-center space-x-2 py-2"
@@ -622,7 +644,7 @@ const Exams = () => {
                   </div>
                   <Button 
                     className="w-full" 
-                    onClick={() => navigate('/type-rating')}
+                    onClick={() => navigate('/exam?mode=timed&timeLimit=60&questionCount=50&aircraft=A320_FAMILY')}
                   >
                     Iniciar Examen
                   </Button>
@@ -660,7 +682,7 @@ const Exams = () => {
                   </div>
                   <Button 
                     className="w-full" 
-                    onClick={() => navigate('/b737-type-rating')}
+                    onClick={() => navigate('/exam?mode=timed&timeLimit=60&questionCount=50&aircraft=B737_FAMILY')}
                   >
                     Iniciar Examen
                   </Button>

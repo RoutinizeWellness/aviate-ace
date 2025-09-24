@@ -72,6 +72,8 @@ const B737TypeRating = () => {
         } finally {
           setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
       }
     };
     

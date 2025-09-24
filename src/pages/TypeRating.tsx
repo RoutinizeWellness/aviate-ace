@@ -81,6 +81,9 @@ const TypeRating = () => {
         } finally {
           setIsLoading(false);
         }
+      } else {
+        // No user available; show UI with default empty progress
+        setIsLoading(false);
       }
     };
     

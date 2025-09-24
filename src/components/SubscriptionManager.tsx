@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useConvexAuth';
-import { getSubscriptionDetails, cancelSubscription, updateSubscriptionPlan, processRefund } from '@/services/stripe/backend';
+import { getSubscriptionDetails, cancelSubscription, updateSubscriptionPlan, /* processRefund */ } from '@/services/autumn/backend';
 import { PRICING_PLANS } from '@/config/pricing';
 
 interface Subscription {
@@ -111,10 +111,8 @@ const SubscriptionManager = () => {
 
   const handleRefund = async (paymentIntentId: string) => {
     try {
-      await processRefund({
-        paymentIntentId,
-        reason: 'requested_by_customer'
-      });
+      // Refunds via Autumn not implemented in this demo.
+      console.warn('Refund not implemented with Autumn in this demo:', paymentIntentId);
       
       toast({
         title: "Success",

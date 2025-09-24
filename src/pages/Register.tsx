@@ -199,18 +199,6 @@ const Register = () => {
           </CardContent>
         </Card>
 
-        <div className="mt-6 p-4 surface-light rounded-lg border border-warning/20 bg-warning/5">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium text-warning mb-1">Funcionalidad Backend Requerida</p>
-              <p className="text-muted-foreground">
-                Para activar el registro y todas las funciones de la plataforma, necesitas conectar
-                este proyecto con Convex. Al crear una cuenta, aceptas nuestros Términos de Servicio y Política de Privacidad.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

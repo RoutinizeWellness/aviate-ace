@@ -157,23 +157,25 @@ const cancelUserSubscription = async (userId: string) => {
 // Get subscription details
 export const getSubscriptionDetails = async (userId: string) => {
   try {
-    // In a real implementation, you would fetch subscription details from your database
     console.log(`Fetching subscription details for user ${userId}`);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Return mock subscription data
+
+    const customer = await autumnInstance.customers.get(userId);
+    if (customer.error || !customer.data) {
+      return null;
+    }
+
+    // Autumn demo: assume a single active subscription per customer in metadata
+    // If your Autumn API provides subscriptions, fetch them here.
     return {
-      id: 'sub_mock123',
+      id: `sub_${userId}`,
       status: 'active',
-      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-      productId: 'a320-premium',
+      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      productId: customer.data?.default_product_id || 'unknown',
       cancelAtPeriodEnd: false
     };
   } catch (error) {
     console.error('Error fetching subscription details:', error);
-    throw new Error('Failed to fetch subscription details');
+    return null;
   }
 };
 

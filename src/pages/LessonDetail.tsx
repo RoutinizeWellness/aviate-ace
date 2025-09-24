@@ -30,11 +30,15 @@ const LessonDetail = () => {
   const [showTheoryContent, setShowTheoryContent] = useState(false);
   const [showFlashcards, setShowFlashcards] = useState(false);
 
-  // Convex queries and mutations
+  // Helper: validate Convex IDs (32-char lowercase/digits)
+  const isValidConvexId = (id: string): boolean => /^[a-z0-9]{32}$/.test(id);
+
+  // Convex queries and mutations (guarded)
+  const canUseConvex = !!(user && lessonId && isValidConvexId(lessonId));
   const progress = useQuery(
     api.lessons.getUserLessonProgress,
-    user && lessonId ? { 
-      userId: user._id as Id<"users">, 
+    canUseConvex ? { 
+      userId: user!._id as Id<"users">, 
       lessonId: lessonId as Id<"lessons"> 
     } : "skip"
   );
@@ -112,7 +116,7 @@ const LessonDetail = () => {
 
   // Event handlers
   const handleTheoryComplete = async () => {
-    if (user && lessonId) {
+    if (user && lessonId && canUseConvex) {
       await updateProgress({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">,
@@ -123,7 +127,7 @@ const LessonDetail = () => {
   };
 
   const handleFlashcardsComplete = async () => {
-    if (user && lessonId) {
+    if (user && lessonId && canUseConvex) {
       await updateProgress({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">,
@@ -134,7 +138,7 @@ const LessonDetail = () => {
   };
 
   const handleQuizComplete = async () => {
-    if (user && lessonId) {
+    if (user && lessonId && canUseConvex) {
       await updateProgress({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">,
@@ -145,7 +149,7 @@ const LessonDetail = () => {
   };
 
   const handleResetProgress = async () => {
-    if (user && lessonId) {
+    if (user && lessonId && canUseConvex) {
       await resetProgressMutation({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">
@@ -153,8 +157,8 @@ const LessonDetail = () => {
     }
   };
 
-  // Loading state
-  if (progress === undefined) {
+  // Loading state (only when using Convex)
+  if (canUseConvex && progress === undefined) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">

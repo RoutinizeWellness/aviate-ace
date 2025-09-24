@@ -134,11 +134,18 @@ const translations = {
 };
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<'es' | 'en'>('es');
+  const [language, setLanguage] = useState<'es' | 'en'>(() => {
+    const saved = localStorage.getItem('language') as 'es' | 'en' | null;
+    if (saved === 'es' || saved === 'en') return saved;
+    const browser = (navigator.language || navigator.languages?.[0] || 'en').toLowerCase();
+    return browser.startsWith('es') ? 'es' : 'en';
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem('language') as 'es' | 'en';
-    if (saved) setLanguage(saved);
+    const saved = localStorage.getItem('language') as 'es' | 'en' | null;
+    if (saved === 'es' || saved === 'en') {
+      setLanguage(saved);
+    }
   }, []);
 
   const handleSetLanguage = (lang: 'es' | 'en') => {

@@ -692,38 +692,6 @@ const ExamMode = () => {
                   </h2>
                 </div>
 
-                {/* Debug Info */}
-                {import.meta.env.DEV && (
-                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-xs space-y-2">
-                    <p><strong>Debug:</strong> examMode={examMode}, isAnswered={isAnswered ? 'true' : 'false'}, selectedAnswer={selectedAnswer}, showExplanation={showExplanation ? 'true' : 'false'}</p>
-                    <p><strong>Question ID:</strong> {currentQuestion._id}</p>
-                    <p><strong>Options count:</strong> {currentQuestion?.options?.length || 0}</p>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          console.log('🔄 Resetting answer state');
-                          setSelectedAnswer(null);
-                          setIsAnswered(false);
-                          setShowExplanation(false);
-                        }}
-                      >
-                        Reset Answer State
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          console.log('🧪 Testing selectAnswer function');
-                          selectAnswer(currentQuestion._id, 0);
-                        }}
-                      >
-                        Test Select Option A
-                      </Button>
-                    </div>
-                  </div>
-                )}
 
                 {/* Answer Options */}
                 <div className="space-y-4 mb-8">
@@ -855,21 +823,6 @@ const ExamMode = () => {
                         </span>
                         </label>
                         
-                        {/* Debug button for testing */}
-                        {import.meta.env.DEV && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="absolute top-2 right-2 text-xs"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              console.log('🔧 Debug button clicked for option:', index);
-                              selectAnswer(currentQuestion._id, index);
-                            }}
-                          >
-                            Select {index}
-                          </Button>
-                        )}
                       </div>
                     );
                   })}
@@ -1031,44 +984,6 @@ const ExamMode = () => {
     );
   }
 
-  // Debug information when no questions are found
-  if (import.meta.env.DEV && (questions.length === 0 && dynamicQuestions.length === 0)) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-4">
-            <Button onClick={() => navigate('/exams')} variant="outline">
-              ← Volver a Exámenes
-            </Button>
-          </div>
-          
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <h2 className="text-lg font-semibold text-yellow-800 mb-2">
-              🐛 Debug: No se encontraron preguntas
-            </h2>
-            <div className="text-sm text-yellow-700 space-y-1">
-              <p><strong>Examen seleccionado:</strong> {examTitle || 'Sin título'}</p>
-              <p><strong>ID del examen:</strong> {selectedExamId}</p>
-              <p><strong>Estado de carga:</strong> {isLoadingDynamicQuestions ? 'Cargando' : 'Completado'}</p>
-              <p><strong>Preguntas encontradas:</strong> {questions.length}</p>
-              <p><strong>Selected Category:</strong> {selectedCategory || 'none'}</p>
-              <p><strong>Selected Aircraft:</strong> {selectedAircraft}</p>
-              <p><strong>Dynamic Questions:</strong> {dynamicQuestions.length}</p>
-              <p><strong>Is Loading Dynamic:</strong> {isLoadingDynamicQuestions ? 'true' : 'false'}</p>
-            </div>
-          </div>
-          
-          <DebugQuestionLoader
-            mode={examMode}
-            category={selectedCategory}
-            aircraft={selectedAircraft}
-            difficulty={selectedDifficulty}
-            questionCount={questionCount}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">

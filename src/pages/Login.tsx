@@ -154,19 +154,6 @@ const Login = () => {
           </CardContent>
         </Card>
 
-        {/* Backend Notice */}
-        <div className="mt-6 p-4 surface-light rounded-lg border border-warning/20 bg-warning/5">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-medium text-warning mb-1">Funcionalidad Backend Requerida</p>
-              <p className="text-muted-foreground">
-                Para activar el login y todas las funciones de la plataforma, necesitas conectar 
-                este proyecto con Supabase. Haz clic en el botón verde de Supabase en la parte superior.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

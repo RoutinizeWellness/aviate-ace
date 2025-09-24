@@ -3,7 +3,7 @@ export const EXAM_CONSTANTS = {
   // Time limits (in minutes)
   DEFAULT_TIME_LIMIT: 60,
   PRACTICE_TIME_LIMIT: 0, // No time limit
-  TIMED_EXAM_TIME_LIMIT: 90,
+  TIMED_EXAM_TIME_LIMIT: 60,
   QUICK_EXAM_TIME_LIMIT: 30,
 
   // Question counts

@@ -580,7 +580,7 @@ export const updateUserStats = mutation({
 export const updateUserSubscription = mutation({
   args: {
     userId: v.id("users"),
-    planId: v.string(), // "1month", "3months", "6months", "1year"
+    planId: v.optional(v.string()), // "1month", "3months", "6months", "1year"
     subscription: v.string(), // "A320_FAMILY", "B737_FAMILY", "ALL"
   },
   handler: async (ctx, args) => {

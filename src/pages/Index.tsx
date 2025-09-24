@@ -108,7 +108,7 @@ const testimonials = [
   {
     quote: "After failing with other methods, this platform gave me the confidence and knowledge I needed.",
     name: "Miguel Torres",
-    role: "Piloto B737 - Vueling"
+    role: "Piloto B737"
   }
 ];
 
@@ -119,11 +119,11 @@ const Index = () => {
 
   const handlePlanSelect = (planName: string) => {
     if (user) {
-      // If user is already logged in, go directly to pricing page
-      window.location.href = '/pricing';
+      // If user is already logged in, go directly to dashboard
+      window.location.href = '/dashboard';
     } else {
       // If user is not logged in, redirect to login with return URL
-      window.location.href = `/login?returnUrl=/pricing`;
+      window.location.href = `/login?returnUrl=/dashboard`;
     }
   };
 
@@ -143,6 +143,7 @@ const Index = () => {
           </div>
           
           <div className="flex items-center gap-3">
+            <LanguageToggle />
             <Button variant="outline" size="sm">
               <a href="/login" className="no-underline">Iniciar Sesión</a>
             </Button>

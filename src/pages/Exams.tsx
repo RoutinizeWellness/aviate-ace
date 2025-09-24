@@ -55,51 +55,50 @@ const Exams = () => {
   
   // Check access permissions
   const canAccessA320 = hasAccessTo('A320_FAMILY');
-  const canAccessBoeing = hasAccessTo('B737_FAMILY'); // Updated to match the actual aircraft type
+  const canAccessBoeing = hasAccessTo('B737_FAMILY');
   const userSubscription = getCurrentSubscription();
   const adminUser = isAdmin();
   
-  // State for category selection - Set default aircraft based on subscription
+  // State for category selection
   const getDefaultAircraft = () => {
     if (adminUser || (canAccessA320 && canAccessBoeing)) {
-      return "A320_FAMILY"; // Default to A320 if access to both
+      return "A320_FAMILY";
     } else if (canAccessA320) {
       return "A320_FAMILY";
     } else if (canAccessBoeing) {
       return "B737_FAMILY";
     }
-    return "A320_FAMILY"; // Fallback
+    return "A320_FAMILY";
   };
   
   const [showPracticeDialog, setShowPracticeDialog] = useState(false);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]); // Changed to array for multiple selections
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedAircraft, setSelectedAircraft] = useState<string>(getDefaultAircraft());
   const [selectedQuestionCount, setSelectedQuestionCount] = useState<string>("20");
   const [selectedReviewQuestionCount, setSelectedReviewQuestionCount] = useState<string>("20");
 
-  // Available aircraft types - Filter based on subscription
+  // Available aircraft types
   const getAvailableAircraftTypes = () => {
     const allTypes = [
       { value: "A320_FAMILY", label: "Airbus A320 Family", description: "A318, A319, A320, A321" },
       { value: "B737_FAMILY", label: "Boeing 737", description: "B737-700, B737-800, B737 MAX" },
-      { value: "ALL", label: "All Aircraft Types", description: "Mixed questions from all aircraft" }
+      { value: "ALL", label: "Todos los Tipos", description: "Preguntas mixtas de todas las aeronaves" }
     ];
     
     if (adminUser) {
-      return allTypes; // Admins see everything
+      return allTypes;
     }
     
     const availableTypes = [];
     if (canAccessA320) {
-      availableTypes.push(allTypes[0]); // A320
+      availableTypes.push(allTypes[0]);
     }
     if (canAccessBoeing) {
-      availableTypes.push(allTypes[1]); // Boeing 737
+      availableTypes.push(allTypes[1]);
     }
     
-    // Add "All" option only if user has access to multiple aircraft types
     if (availableTypes.length > 1) {
       availableTypes.push(allTypes[2]);
     }
@@ -109,67 +108,33 @@ const Exams = () => {
   
   const aircraftTypes = getAvailableAircraftTypes();
 
-  // Available categories - Dynamically based on selected aircraft type
+  // Available categories
   const getAvailableCategories = () => {
-    // Categories for A320 Family
     const a320Categories = [
-      { value: "aircraft-general", label: "Aircraft General", description: "General aircraft knowledge and limitations" },
-      { value: "load-acceleration-limits", label: "Load Acceleration Limits", description: "Aircraft structural and acceleration limitations" },
-      { value: "environment-limits", label: "Environment Limits", description: "Environmental operational limitations" },
-      { value: "weight-limits", label: "Weight Limits", description: "Maximum weights and balance limitations" },
-      { value: "speed-limits", label: "Speed Limits", description: "Aircraft speed limitations and restrictions" },
-      { value: "air-bleed-cond-press-vent", label: "Air Bleed/Cond/Press/Vent", description: "Air conditioning, pressurization, and ventilation" },
-      { value: "autoflight", label: "Autoflight", description: "Autopilot and flight management systems" },
-      { value: "apu", label: "APU", description: "Auxiliary Power Unit operations and limitations" },
-      { value: "engines", label: "Engines", description: "Engine operations, limitations, and procedures" },
-      { value: "flight-controls", label: "Flight Controls", description: "Primary and secondary flight control systems" },
-      { value: "fuel", label: "Fuel", description: "Fuel systems, distribution, and monitoring" },
-      { value: "ice-rain-protection", label: "Ice and Rain Protection", description: "Anti-ice and rain protection systems" },
-      { value: "landing-gear", label: "Landing Gear", description: "Landing gear operation, brakes, and steering" },
-      { value: "oxygen", label: "Oxygen", description: "Oxygen systems and emergency procedures" },
-      { value: "gpws", label: "GPWS", description: "Ground Proximity Warning System" },
-      { value: "navigation", label: "Navigation", description: "Navigation systems and procedures" },
-      // Additional A320-specific categories to match the generated questions
-      { value: "approach-procedures", label: "Approach Procedures", description: "Instrument approach procedures and landing" },
-      { value: "electrical", label: "Electrical", description: "Electrical power generation and distribution" },
-      { value: "emergency-procedures", label: "Emergency Procedures", description: "Emergency and abnormal procedures" },
-      { value: "fire-protection", label: "Fire Protection", description: "Fire detection and suppression systems" },
-      { value: "flight-protection", label: "Flight Protection", description: "Flight envelope protection systems" },
-      { value: "hydraulics", label: "Hydraulics", description: "Hydraulic power systems and components" },
-      { value: "meteorologia", label: "Meteorología", description: "Weather conditions and meteorological information" },
-      { value: "motor-y-apu", label: "Motor y APU", description: "Engine and auxiliary power unit systems" },
-      { value: "navegacion", label: "Navegación", description: "Navigation procedures and systems" },
-      { value: "performance", label: "Performance", description: "Aircraft performance calculations and limitations" },
-      { value: "procedimientos-de-despegue", label: "Procedimientos de Despegue", description: "Takeoff procedures and limitations" },
-      { value: "reglamentacion", label: "Reglamentación", description: "Aviation regulations and requirements" },
-      { value: "sistema-electrico", label: "Sistema Eléctrico", description: "Electrical systems in Spanish" },
-      { value: "sistema-hidraulico", label: "Sistema Hidráulico", description: "Hydraulic systems in Spanish" }
+      { value: "aircraft-general", label: "General de Aeronave", description: "Conocimiento general y limitaciones de aeronave" },
+      { value: "electrical", label: "Eléctrico", description: "Generación y distribución de energía eléctrica" },
+      { value: "hydraulics", label: "Hidráulico", description: "Sistemas de potencia hidráulica" },
+      { value: "performance", label: "Rendimiento", description: "Cálculos y limitaciones de rendimiento" },
+      { value: "air-bleed-cond-press-vent", label: "Aire/Cond/Presur/Vent", description: "Aire acondicionado, presurización y ventilación" },
+      { value: "autoflight", label: "Vuelo Automático", description: "Piloto automático y sistemas de gestión de vuelo" },
+      { value: "engines", label: "Motores", description: "Operaciones, limitaciones y procedimientos de motores" },
+      { value: "flight-controls", label: "Controles de Vuelo", description: "Sistemas de control de vuelo primario y secundario" },
+      { value: "fuel", label: "Combustible", description: "Sistemas de combustible, distribución y monitoreo" },
+      { value: "landing-gear", label: "Tren de Aterrizaje", description: "Operación del tren de aterrizaje, frenos y dirección" }
     ];
     
-    // Categories for B737 Family
     const b737Categories = [
-      { value: "airplane-general", label: "AIRPLANE GENERAL", description: "General aircraft information and limitations" },
-      { value: "air-systems", label: "AIR SYSTEMS", description: "Pneumatic, pressurization, and air conditioning systems" },
-      { value: "anti-ice-rain", label: "ANTI-ICE AND RAIN", description: "Ice and rain protection systems" },
-      { value: "automatic-flight", label: "AUTOMATIC FLIGHT", description: "Autopilot and flight management systems" },
-      { value: "communication", label: "COMMUNICATION", description: "Radio and communication systems" },
-      { value: "electrical", label: "ELECTRICAL", description: "Electrical power systems" },
-      { value: "engines-apu", label: "ENGINES AND APU", description: "Engine and auxiliary power unit systems" },
-      { value: "fire-protection", label: "FIRE PROTECTION", description: "Fire detection and suppression systems" },
-      { value: "flight-controls", label: "FLIGHT CONTROLS", description: "Primary and secondary flight control systems" },
-      { value: "flight-instruments", label: "FLIGHT INSTRUMENTS AND DISPLAYS", description: "Flight instruments and display systems" },
-      { value: "flight-management", label: "FLIGHT MANAGEMENT AND NAVIGATION", description: "Flight management and navigation systems" },
-      { value: "fuel", label: "FUEL", description: "Fuel storage, distribution, and indication systems" },
-      { value: "hydraulics", label: "HYDRAULICS", description: "Hydraulic power systems" },
-      { value: "landing-gear", label: "LANDING GEAR", description: "Landing gear extension, retraction, and indication" },
-      { value: "warning-systems", label: "WARNING SYSTEMS", description: "Master warning, master caution, and alerting systems" }
+      { value: "airplane-general", label: "GENERAL DE AVIÓN", description: "Información general y limitaciones del avión" },
+      { value: "air-systems", label: "SISTEMAS DE AIRE", description: "Sistemas neumáticos, presurización y aire acondicionado" },
+      { value: "electrical", label: "ELÉCTRICO", description: "Sistemas de energía eléctrica" },
+      { value: "engines-apu", label: "MOTORES Y APU", description: "Sistemas de motor y unidad de potencia auxiliar" },
+      { value: "flight-controls", label: "CONTROLES DE VUELO", description: "Sistemas de control de vuelo primario y secundario" },
+      { value: "fuel", label: "COMBUSTIBLE", description: "Almacenamiento, distribución e indicación de combustible" },
+      { value: "hydraulics", label: "HIDRÁULICO", description: "Sistemas de potencia hidráulica" },
+      { value: "landing-gear", label: "TREN DE ATERRIZAJE", description: "Extensión, retracción e indicación del tren de aterrizaje" }
     ];
     
-    // All categories for mixed selection
-    const allCategories = [
-      ...a320Categories,
-      ...b737Categories.filter(cat => !a320Categories.some(a320Cat => a320Cat.value === cat.value))
-    ];
+    const allCategories = [...a320Categories, ...b737Categories.filter(cat => !a320Categories.some(a320Cat => a320Cat.value === cat.value))];
     
     switch (selectedAircraft) {
       case "A320_FAMILY":
@@ -185,7 +150,6 @@ const Exams = () => {
   
   const categories = getAvailableCategories();
 
-  // Toggle category selection
   const toggleCategory = (categoryValue: string) => {
     setSelectedCategories(prev => {
       if (prev.includes(categoryValue)) {
@@ -196,7 +160,6 @@ const Exams = () => {
     });
   };
 
-  // Clear all selected categories
   const clearAllCategories = () => {
     setSelectedCategories([]);
   };
@@ -254,10 +217,8 @@ const Exams = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Unified Sidebar */}
       <UnifiedSidebar activePage="exams" />
 
-      {/* Main Content */}
       <main className="ml-64 p-8">
         {/* Header */}
         <header className="mb-8">
@@ -271,6 +232,7 @@ const Exams = () => {
               <ArrowLeft className="w-4 h-4" />
               Volver al Dashboard
             </Button>
+            <LanguageToggle />
           </div>
           <h1 className="text-4xl font-bold mb-2">Exámenes</h1>
           <p className="text-muted-foreground">Practica y toma exámenes para tu certificación de piloto.</p>
@@ -295,15 +257,15 @@ const Exams = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Practice with real exam questions without time limit.
+                      Practica con preguntas reales de examen sin límite de tiempo.
                     </p>
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span>Real questions available:</span>
+                        <span>Preguntas reales disponibles:</span>
                         <span className="font-medium">3,000+</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>Official exam simulation</span>
+                        <span>Simulación de examen oficial</span>
                         <CheckCircle2 className="w-4 h-4 text-success" />
                       </div>
                     </div>
@@ -323,10 +285,10 @@ const Exams = () => {
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Aircraft Type</label>
+                    <label className="text-sm font-medium">Tipo de Aeronave</label>
                     <Select value={selectedAircraft} onValueChange={setSelectedAircraft}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select aircraft type" />
+                        <SelectValue placeholder="Selecciona tipo de aeronave" />
                       </SelectTrigger>
                       <SelectContent>
                         {aircraftTypes.map((aircraft) => (
@@ -370,7 +332,7 @@ const Exams = () => {
                           />
                           <label
                             htmlFor={category.value}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                            className="flex-1 text-sm cursor-pointer"
                           >
                             <div className="font-medium">{category.label}</div>
                             <div className="text-xs text-muted-foreground">{category.description}</div>
@@ -390,10 +352,15 @@ const Exams = () => {
                     <label className="text-sm font-medium">Dificultad</label>
                     <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Todas las dificultades" />
+                        <SelectValue placeholder="Seleccionar dificultad" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todas las dificultades</SelectItem>
+                        <SelectItem value="all">
+                          <div>
+                            <div className="font-medium">Todas las dificultades</div>
+                            <div className="text-xs text-muted-foreground">Preguntas de todos los niveles</div>
+                          </div>
+                        </SelectItem>
                         {difficulties.map((difficulty) => (
                           <SelectItem key={difficulty.value} value={difficulty.value}>
                             <div>
@@ -405,6 +372,7 @@ const Exams = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Número de Preguntas</label>
                     <Select value={selectedQuestionCount} onValueChange={setSelectedQuestionCount}>
@@ -423,49 +391,50 @@ const Exams = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  
                   <div className="flex gap-2 pt-4">
                     <Button variant="outline" onClick={() => setShowPracticeDialog(false)} className="flex-1">
                       Cancelar
                     </Button>
                     <Button onClick={handleStartPractice} className="flex-1" disabled={selectedCategories.length === 0}>
                       <Play className="w-4 h-4 mr-2" />
-                      Comenzar
+                      Comenzar Práctica
                     </Button>
                   </div>
                 </div>
               </DialogContent>
             </Dialog>
 
-            {/* Timed Exam */}
-            <Card className="surface-mid border-border/50 hover-lift cursor-pointer group">
+            {/* Timed Mode */}
+            <Card className="surface-mid border-border/50 hover-lift cursor-pointer group" onClick={handleStartTimedExam}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
                     <Clock className="w-6 h-6 text-warning" />
                   </div>
-                  <Badge variant="outline">Desafío</Badge>
+                  <Badge className="bg-warning/10 text-warning">Cronometrado</Badge>
                 </div>
-                <CardTitle className="text-lg">Examen Cronometrado</CardTitle>
+                <CardTitle className="text-lg">Modo Examen Cronometrado</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Simulates real official exam conditions.
+                  Simulacro de examen real con tiempo limitado y condiciones oficiales.
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span>Duración:</span>
+                    <span>Tiempo límite:</span>
                     <span className="font-medium">60 minutos</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Preguntas:</span>
                     <span className="font-medium">75</span>
                   </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Puntuación mínima:</span>
+                    <span className="font-medium">75%</span>
+                  </div>
                 </div>
-                <Button 
-                  variant="outline" 
-                  className="w-full"
-                  onClick={handleStartTimedExam}
-                >
+                <Button className="w-full bg-warning text-warning-foreground hover:bg-warning/90">
                   <Clock className="w-4 h-4 mr-2" />
                   Iniciar Examen
                 </Button>
@@ -481,30 +450,27 @@ const Exams = () => {
                       <div className="w-12 h-12 bg-info/10 rounded-lg flex items-center justify-center">
                         <BookOpen className="w-6 h-6 text-info" />
                       </div>
-                      <Badge variant="outline">Repaso</Badge>
+                      <Badge className="bg-info/10 text-info">Repaso</Badge>
                     </div>
                     <CardTitle className="text-lg">Modo Repaso</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Repasa preguntas que has respondido incorrectamente.
+                      Repasa preguntas que has respondido incorrectamente para mejorar tu conocimiento.
                     </p>
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span>Preguntas pendientes:</span>
-                        <span className="font-medium">0</span>
+                        <span>Preguntas incorrectas guardadas:</span>
+                        <span className="font-medium">143</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>Explicaciones detalladas</span>
-                        <CheckCircle2 className="w-4 h-4 text-success" />
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-2">
-                        <span>Responde preguntas incorrectamente en el modo práctica para comenzar a repasar.</span>
+                        <span>Progreso de mejora:</span>
+                        <span className="font-medium">68%</span>
                       </div>
                     </div>
-                    <Button variant="outline" className="w-full">
+                    <Button className="w-full bg-info text-info-foreground hover:bg-info/90">
                       <BookOpen className="w-4 h-4 mr-2" />
-                      Repasar
+                      Comenzar Repaso
                     </Button>
                   </CardContent>
                 </Card>
@@ -513,13 +479,13 @@ const Exams = () => {
                 <DialogHeader>
                   <DialogTitle>Configurar Repaso</DialogTitle>
                   <DialogDescription>
-                    Selecciona las categorías para repasar preguntas específicas que necesitas mejorar.
+                    Selecciona las categorías que quieres repasar. Solo verás preguntas que has respondido incorrectamente.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium">Categorías a Repasar</label>
+                      <label className="text-sm font-medium">Categorías</label>
                       {selectedCategories.length > 0 && (
                         <Button 
                           variant="ghost" 
@@ -546,7 +512,7 @@ const Exams = () => {
                           />
                           <label
                             htmlFor={`review-${category.value}`}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                            className="flex-1 text-sm cursor-pointer"
                           >
                             <div className="font-medium">{category.label}</div>
                             <div className="text-xs text-muted-foreground">{category.description}</div>
@@ -605,134 +571,103 @@ const Exams = () => {
         </section>
 
         {/* Available Exams */}
-        <section className="mb-10">
+        <section>
           <h2 className="text-2xl font-bold mb-6">Exámenes Disponibles</h2>
-          {isLoadingExams ? (
-            <div className="text-center py-8">
-              <div className="text-muted-foreground">Cargando exámenes...</div>
-            </div>
-          ) : exams && exams.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {exams.map((exam) => (
-                <Card key={exam._id} className="surface-mid border-border/50 hover-lift cursor-pointer group">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <Plane className="w-6 h-6 text-primary" />
-                      </div>
-                      <Badge className="bg-primary/10 text-primary">
-                        {exam.aircraftType?.replace('_', ' ').toUpperCase() || 'GENERAL'}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg">{exam.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {exam.description || "Examen de preparación para certificación"}
-                    </p>
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between text-sm">
-                        <span>Preguntas:</span>
-                        <span className="font-medium">{exam.questionsCount}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Duración:</span>
-                        <span className="font-medium">{exam.timeLimit} min</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Puntuación mínima:</span>
-                        <span className="font-medium">{exam.passingScore}%</span>
-                      </div>
-                    </div>
-                    <Button 
-                      className="w-full"
-                      onClick={() => navigate(`/exam?examId=${exam._id}`)}
-                    >
-                      <Play className="w-4 h-4 mr-2" />
-                      Iniciar Examen
+          
+          {!canAccessA320 && !canAccessBoeing && (
+            <div className="mb-6 p-4 border border-warning/20 bg-warning/5 rounded-lg">
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-warning" />
+                <div>
+                  <p className="font-medium text-warning">Acceso Limitado</p>
+                  <p className="text-sm text-muted-foreground">
+                    Necesitas una suscripción activa para acceder a los exámenes completos. 
+                    <Button variant="link" className="h-auto p-0 ml-1" onClick={() => navigate('/dashboard')}>
+                      Ver planes disponibles
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card className="surface-mid border-border/50">
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-muted/50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Target className="w-8 h-8 text-muted-foreground" />
+                  </p>
                 </div>
-                <h3 className="font-medium mb-2">No hay exámenes disponibles</h3>
-                <p className="text-sm text-muted-foreground">Los exámenes estarán disponibles próximamente.</p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
-        </section>
-
-        {/* Recent Exam Sessions */}
-        <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-6">Historial de Exámenes</h2>
-          {userExamSessions && userExamSessions.length > 0 ? (
-            <div className="space-y-4">
-              {userExamSessions.slice(0, 5).map((session) => (
-                <Card key={session._id} className="surface-mid border-border/50">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                          session.score >= 75 ? 'bg-success/10' : session.score && session.score >= 60 ? 'bg-warning/10' : 'bg-destructive/10'
-                        }`}>
-                          {session.score >= 75 ? (
-                            <CheckCircle2 className="w-6 h-6 text-success" />
-                          ) : session.score && session.score >= 60 ? (
-                            <Clock className="w-6 h-6 text-warning" />
-                          ) : (
-                            <AlertCircle className="w-6 h-6 text-destructive" />
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold">
-                            {"Examen"}
-                          </h3>
-                          <p className="text-sm text-muted-foreground">
-                            {session.completedAt ? 
-                              `Completado ${new Date(session.completedAt).toLocaleDateString('es-ES', {
-                                day: 'numeric',
-                                month: 'short',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}` :
-                              "En progreso"
-                            }
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`text-2xl font-bold ${
-                          session.score >= 75 ? 'text-success' : session.score && session.score >= 60 ? 'text-warning' : 'text-destructive'
-                        }`}>
-                          {session.score !== null ? `${session.score}%` : "-"}
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {session.timeSpent ? `${Math.floor(session.timeSpent / 60)} min` : ""}
-                        </p>
-                      </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Airbus A320 Exam */}
+            {(canAccessA320 || adminUser) && (
+              <Card className="surface-mid border-border/50 hover-lift cursor-pointer group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Plane className="w-6 h-6 text-primary" />
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card className="surface-mid border-border/50">
-              <CardContent className="p-6 text-center">
-                <div className="w-16 h-16 bg-muted/50 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Clock className="w-8 h-8 text-muted-foreground" />
-                </div>
-                <h3 className="font-medium mb-2">Sin historial de exámenes</h3>
-                <p className="text-sm text-muted-foreground mb-4">Realiza tu primer examen para comenzar tu historial.</p>
-                <Button onClick={() => navigate('/exam')}>Comenzar Práctica</Button>
-              </CardContent>
-            </Card>
-          )}
+                    <Badge className="bg-primary/10 text-primary">AIRBUS A320</Badge>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Examen de Habilitación A320</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Examen completo de habilitación de tipo para aeronave Airbus A320 cubriendo todos los sistemas y procedimientos
+                  </p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span>Preguntas:</span>
+                      <span className="font-medium">50</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Duración:</span>
+                      <span className="font-medium">60 min</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Puntuación mínima:</span>
+                      <span className="font-medium">75%</span>
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => navigate('/type-rating')}
+                  >
+                    Iniciar Examen
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+            
+            {/* Boeing 737 Exam */}
+            {(canAccessBoeing || adminUser) && (
+              <Card className="surface-mid border-border/50 hover-lift cursor-pointer group">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                      <Plane className="w-6 h-6 text-blue-500" />
+                    </div>
+                    <Badge className="bg-blue-500/10 text-blue-500">BOEING 737</Badge>
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">Examen de Habilitación B737</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Examen completo de habilitación de tipo para aeronave Boeing 737 cubriendo todos los sistemas y procedimientos
+                  </p>
+                  <div className="space-y-2 mb-6">
+                    <div className="flex justify-between text-sm">
+                      <span>Preguntas:</span>
+                      <span className="font-medium">50</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Duración:</span>
+                      <span className="font-medium">60 min</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Puntuación mínima:</span>
+                      <span className="font-medium">75%</span>
+                    </div>
+                  </div>
+                  <Button 
+                    className="w-full" 
+                    onClick={() => navigate('/b737-type-rating')}
+                  >
+                    Iniciar Examen
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </section>
       </main>
     </div>

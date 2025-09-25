@@ -5,12 +5,12 @@ import {
   Target, 
   BarChart3, 
   User, 
-  Settings, 
   LogOut,
-  Plane,
   Shield,
   Menu
 } from "lucide-react";
+import logo from '@/assets/logo.svg';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigate } from "react-router-dom";
 import { useAuth, isAdmin } from "@/hooks/useConvexAuth";
 import { useSupabaseProfile } from "@/hooks/useSupabaseProfile";
@@ -22,6 +22,7 @@ interface UnifiedSidebarProps {
 }
 
 export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { profile } = useSupabaseProfile();
@@ -48,7 +49,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         onClick={() => navigate('/dashboard')}
       >
         <BookOpen className="w-5 h-5" />
-        <span>Inicio</span>
+        <span>{t('nav.dashboard')}</span>
       </Button>
       <Button 
         variant={activePage === 'exams' ? "default" : "ghost"} 
@@ -56,14 +57,14 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         onClick={() => navigate('/exams')}
       >
         <Target className="w-5 h-5" />
-        <span>Exámenes</span>
+        <span>{t('nav.exams')}</span>
       </Button>
       <Button 
         variant={activePage === 'type-rating' ? "default" : "ghost"} 
         className="w-full justify-start gap-3 h-12"
         onClick={() => navigate('/type-rating')}
       >
-        <Plane className="w-5 h-5" />
+        <img src={logo} alt="Logo" className="w-5 h-5" />
         <span>Type Rating</span>
       </Button>
       <Button 
@@ -72,7 +73,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         onClick={() => navigate('/progress')}
       >
         <BarChart3 className="w-5 h-5" />
-        <span>Progreso</span>
+        <span>{t('nav.progress')}</span>
       </Button>
       <Button 
         variant={activePage === 'profile' ? "default" : "ghost"} 
@@ -80,7 +81,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         onClick={() => navigate('/profile')}
       >
         <User className="w-5 h-5" />
-        <span>Perfil</span>
+        <span>{t('nav.profile')}</span>
       </Button>
       
       {/* Admin Panel - Only show for admins */}
@@ -91,7 +92,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
           onClick={() => navigate('/admin')}
         >
           <Shield className="w-5 h-5" />
-          <span>Panel Admin</span>
+          <span>{t('nav.admin')}</span>
         </Button>
       ) : null}
     </nav>
@@ -102,9 +103,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
       <div className="p-6">
         {/* Logo */}
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-            <Plane className="w-6 h-6 text-primary" />
-          </div>
+          <img src={logo} alt="PilotPrepFlightX" className="w-12 h-12" />
           <div>
             <h1 className="font-bold text-lg">PilotPrepFlightX</h1>
             <p className="text-xs text-muted-foreground">Aprendizaje</p>
@@ -135,7 +134,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
             onClick={handleSignOut}
           >
             <LogOut className="w-5 h-5" />
-            <span>Cerrar Sesión</span>
+            <span>{t('nav.logout')}</span>
           </Button>
         </div>
       </div>
@@ -153,9 +152,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         <div className="flex flex-col h-full bg-background">
           <div className="p-6 border-b">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                <Plane className="w-5 h-5 text-primary" />
-              </div>
+              <img src={logo} alt="PilotPrepFlightX" className="w-10 h-10" />
               <div>
                 <h2 className="font-bold">PilotPrepFlightX</h2>
                 <p className="text-xs text-muted-foreground">Aprendizaje</p>

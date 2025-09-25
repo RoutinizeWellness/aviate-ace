@@ -1,0 +1,22 @@
+{
+  "nav.dashboard": "Dashboard",
+  "nav.exams": "Exámenes",
+  "nav.lessons": "Lecciones",
+  "nav.flashcards": "Tarjetas",
+  "nav.progress": "Progreso",
+  "nav.pricing": "Precios",
+  "nav.profile": "Perfil",
+  "nav.admin": "Admin",
+  "nav.logout": "Cerrar Sesión",
+
+  "home.title": "Domina la Aviación Comercial",
+  "home.subtitle": "Plataforma integral de preparación para pilotos de A320 y B737",
+  "home.cta": "Comenzar Ahora",
+
+  "pricing.title": "Planes de Precios",
+
+  "footer.terms": "Términos de Servicio",
+  "footer.privacy": "Política de Privacidad",
+  "footer.contact": "Contacto",
+  "footer.rights": "Todos los derechos reservados."
+}

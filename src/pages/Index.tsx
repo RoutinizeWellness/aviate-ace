@@ -5,7 +5,6 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 import { 
-  Plane, 
   Target, 
   BarChart3, 
   Clock, 
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import { PRICING_PLANS } from "@/config/pricing";
 import heroCockpit from "@/assets/hero-cockpit.jpg";
+import logo from "@/assets/logo.svg";
 import { useAuth } from "@/hooks/useConvexAuth";
 
 interface PricingPlan {
@@ -136,15 +136,13 @@ const Index = () => {
       {/* Simplified Header without navigation links */}
       <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground">
-              <Plane className="w-6 h-6" />
+            <div className="flex items-center gap-3">
+              <img src={logo} alt="PilotPrepFlightX" className="w-10 h-10" />
+              <div>
+                <h1 className="text-xl font-bold">PilotPrepFlightX</h1>
+                <p className="text-xs text-muted-foreground">Professional Training</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold">PilotPrepFlightX</h1>
-              <p className="text-xs text-muted-foreground">Professional Training</p>
-            </div>
-          </div>
           
           <div className="flex items-center gap-3">
             <LanguageToggle />
@@ -559,7 +557,7 @@ const Index = () => {
             <div className="flex gap-8 text-sm text-muted-foreground">
               <a href="/terms" className="hover:text-primary transition-colors">Términos</a>
               <a href="/privacy" className="hover:text-primary transition-colors">Privacidad</a>
-              <a href="/contact" className="hover:text-primary transition-colors">Contacto</a>
+              <a href="mailto:pilotprepflightx@outlook.es" className="hover:text-primary transition-colors">Contacto</a>
             </div>
           </div>
           

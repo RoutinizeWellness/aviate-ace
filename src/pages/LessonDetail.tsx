@@ -169,6 +169,14 @@ const LessonDetail = () => {
     );
   }
 
+  // Provide a safe progress object when Convex is skipped
+  const safeProgress = (progress as any) || {
+    theoryCompleted: false,
+    flashcardsCompleted: false,
+    quizCompleted: false,
+    overallProgress: 0,
+  };
+
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
@@ -227,9 +235,9 @@ const LessonDetail = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Lesson Progress</span>
-                <span className="text-sm font-medium">{progress.overallProgress}%</span>
+                <span className="text-sm font-medium">{safeProgress.overallProgress}%</span>
               </div>
-              <Progress value={progress.overallProgress} className="h-2" />
+              <Progress value={safeProgress.overallProgress} className="h-2" />
             </div>
           </CardContent>
         </Card>
@@ -237,7 +245,7 @@ const LessonDetail = () => {
         {/* Learning Activities */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Theory */}
-          <Card className={`border-2 ${progress.theoryCompleted ? 'border-green-500' : 'border-border'}`}>
+          <Card className={`border-2 ${safeProgress.theoryCompleted ? 'border-green-500' : 'border-border'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <FileText className="w-5 h-5" />
@@ -252,7 +260,7 @@ const LessonDetail = () => {
                 className="w-full" 
                 onClick={() => setShowTheoryContent(true)}
               >
-                {progress.theoryCompleted ? (
+                {safeProgress.theoryCompleted ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
                     Completed
@@ -268,7 +276,7 @@ const LessonDetail = () => {
           </Card>
 
           {/* Flashcards */}
-          <Card className={`border-2 ${progress.flashcardsCompleted ? 'border-green-500' : 'border-border'}`}>
+          <Card className={`border-2 ${safeProgress.flashcardsCompleted ? 'border-green-500' : 'border-border'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <BookMarked className="w-5 h-5" />
@@ -281,11 +289,11 @@ const LessonDetail = () => {
               </p>
               <Button 
                 className="w-full"
-                variant={progress.theoryCompleted ? "default" : "secondary"}
+                variant={safeProgress.theoryCompleted ? "default" : "secondary"}
                 onClick={() => setShowFlashcards(true)}
-                disabled={!progress.theoryCompleted}
+                disabled={!safeProgress.theoryCompleted}
               >
-                {progress.flashcardsCompleted ? (
+                {safeProgress.flashcardsCompleted ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
                     Completed
@@ -293,7 +301,7 @@ const LessonDetail = () => {
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    {progress.theoryCompleted ? 'Start Flashcards' : 'Complete Theory First'}
+                    {safeProgress.theoryCompleted ? 'Start Flashcards' : 'Complete Theory First'}
                   </>
                 )}
               </Button>
@@ -301,7 +309,7 @@ const LessonDetail = () => {
           </Card>
 
           {/* Quiz */}
-          <Card className={`border-2 ${progress.quizCompleted ? 'border-green-500' : 'border-border'}`}>
+          <Card className={`border-2 ${safeProgress.quizCompleted ? 'border-green-500' : 'border-border'}`}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Star className="w-5 h-5" />
@@ -314,11 +322,11 @@ const LessonDetail = () => {
               </p>
               <Button 
                 className="w-full"
-                variant={progress.flashcardsCompleted ? "default" : "secondary"}
+                variant={safeProgress.flashcardsCompleted ? "default" : "secondary"}
                 onClick={handleQuizComplete}
-                disabled={!progress.flashcardsCompleted}
+                disabled={!safeProgress.flashcardsCompleted}
               >
-                {progress.quizCompleted ? (
+                {safeProgress.quizCompleted ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
                     Completed

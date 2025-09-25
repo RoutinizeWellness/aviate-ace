@@ -13,29 +13,42 @@ export interface PricingPlan {
 }
 
 export const PRICING_PLANS: PricingPlan[] = [
-  // A320 Plans
+  // Launch offer plans (global access)
   {
-    id: 'a320-1month',
-    name: 'A320 Type Rating - 1 Month',
-    description: 'Complete preparation package for Airbus A320 type rating',
+    id: 'pilotprep-1m',
+    name: '1 mes',
+    description: 'Oferta de lanzamiento: acceso completo por 1 mes',
     price: 19.99,
     currency: 'EUR',
     duration: '1 Month',
     durationMonths: 1,
-    aircraftType: 'A320_FAMILY',
+    aircraftType: 'ALL',
     features: [
-      'Access to A320 theory lessons',
-      'Unlimited practice exams',
-      'Advanced analytics and progress tracking',
-      'Personalized study recommendations',
-      'Priority email support',
-      'Offline access to materials',
-      'Exam simulation mode'
+      'Acceso completo a A320 y B737',
+      'Simulacros ilimitados',
+      'Analíticas avanzadas',
+      'Recomendaciones de estudio personalizadas'
     ],
-    productId: 'a320-1month'
+    productId: 'pilotprepflightx_-_1_mes'
   },
   {
-    id: 'a320-3months',
+    id: 'pilotprep-3m',
+    name: '3 meses',
+    description: 'Oferta de lanzamiento: 10% de descuento por 3 meses',
+    price: 19.99 * 3 * 0.9,
+    currency: 'EUR',
+    duration: '3 Months',
+    durationMonths: 3,
+    aircraftType: 'ALL',
+    popular: true,
+    features: [
+      'Acceso completo a A320 y B737',
+      'Simulacros ilimitados',
+      'Analíticas avanzadas',
+      'Recomendaciones de estudio personalizadas'
+    ],
+    productId: 'pilotprepflightx_-_3_meses'
+  },
     name: 'A320 Type Rating - 3 Months',
     description: 'Extended preparation package for Airbus A320 type rating',
     price: 39.99,
@@ -57,7 +70,22 @@ export const PRICING_PLANS: PricingPlan[] = [
     productId: 'a320-3months'
   },
   {
-    id: 'a320-6months',
+    id: 'pilotprep-6m',
+    name: '6 meses',
+    description: 'Oferta de lanzamiento: 20% de descuento por 6 meses',
+    price: 19.99 * 6 * 0.8,
+    currency: 'EUR',
+    duration: '6 Months',
+    durationMonths: 6,
+    aircraftType: 'ALL',
+    features: [
+      'Acceso completo a A320 y B737',
+      'Simulacros ilimitados',
+      'Analíticas avanzadas',
+      'Recomendaciones de estudio personalizadas'
+    ],
+    productId: 'pilotprepflightx_-_6_meses'
+  },
     name: 'A320 Type Rating - 6 Months',
     description: 'Comprehensive preparation package for Airbus A320 type rating',
     price: 59.99,
@@ -79,7 +107,22 @@ export const PRICING_PLANS: PricingPlan[] = [
     productId: 'a320-6months'
   },
   {
-    id: 'a320-1year',
+    id: 'pilotprep-12m',
+    name: '1 año',
+    description: 'Oferta de lanzamiento: 30% de descuento por 12 meses',
+    price: 19.99 * 12 * 0.7,
+    currency: 'EUR',
+    duration: '1 Year',
+    durationMonths: 12,
+    aircraftType: 'ALL',
+    features: [
+      'Acceso completo a A320 y B737',
+      'Simulacros ilimitados',
+      'Analíticas avanzadas',
+      'Recomendaciones de estudio personalizadas'
+    ],
+    productId: 'pilotprepflightx_-_1_ao'
+  },
     name: 'A320 Type Rating - 1 Year',
     description: 'Complete annual access to Airbus A320 type rating preparation',
     price: 89.99,
@@ -100,9 +143,9 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Regular content updates'
     ],
     productId: 'a320-1year'
-  },
-  // B737 Plans
-  {
+}
+];
+  // End plans
     id: 'b737-1month',
     name: 'B737 Type Rating - 1 Month',
     description: 'Complete preparation package for Boeing 737 type rating',

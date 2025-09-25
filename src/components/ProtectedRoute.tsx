@@ -20,6 +20,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to={`/login?returnUrl=${encodeURIComponent(returnUrl)}`} replace />;
   }
 
+  // Trial expiration enforcement (simple client-side gate)
+  const trialExpired = localStorage.getItem('trial_expired') === 'true';
+  if (trialExpired && location.pathname !== '/subscription-management') {
+    return <Navigate to={'/subscription-management?notice=trialExpired'} replace />;
+  }
+
   return <>{children}</>;
 };
 

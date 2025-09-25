@@ -1,0 +1,22 @@
+{
+  "nav.dashboard": "Dashboard",
+  "nav.exams": "Exams",
+  "nav.lessons": "Lessons",
+  "nav.flashcards": "Flashcards",
+  "nav.progress": "Progress",
+  "nav.pricing": "Pricing",
+  "nav.profile": "Profile",
+  "nav.admin": "Admin",
+  "nav.logout": "Logout",
+
+  "home.title": "Master Commercial Aviation",
+  "home.subtitle": "Comprehensive training platform for A320 and B737 pilots",
+  "home.cta": "Get Started",
+
+  "pricing.title": "Pricing Plans",
+
+  "footer.terms": "Terms of Service",
+  "footer.privacy": "Privacy Policy",
+  "footer.contact": "Contact",
+  "footer.rights": "All rights reserved."
+}

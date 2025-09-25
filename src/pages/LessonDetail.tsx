@@ -20,11 +20,16 @@ import {
   Target,
   Play
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { useTypeRatingProgress } from '@/hooks/useTypeRatingProgress';
 
 const LessonDetail = () => {
   const navigate = useNavigate();
   const { lessonId } = useParams();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const aircraftParam = (searchParams.get('aircraft') as 'A320_FAMILY' | 'B737_FAMILY' | null) || 'A320_FAMILY';
+  const { mark } = useTypeRatingProgress(aircraftParam);
   
   // Modal state
   const [showTheoryContent, setShowTheoryContent] = useState(false);
@@ -122,6 +127,11 @@ const LessonDetail = () => {
         lessonId: lessonId as Id<"lessons">,
         theoryCompleted: true
       });
+      // Also mark Type Rating step in Convex (if lessonId is numeric)
+      const numericId = Number(lessonId);
+      if (!Number.isNaN(numericId)) {
+        try { await mark(numericId, 'theory'); } catch {}
+      }
       setShowTheoryContent(false);
     }
   };
@@ -133,6 +143,10 @@ const LessonDetail = () => {
         lessonId: lessonId as Id<"lessons">,
         flashcardsCompleted: true
       });
+      const numericId = Number(lessonId);
+      if (!Number.isNaN(numericId)) {
+        try { await mark(numericId, 'flashcards'); } catch {}
+      }
       setShowFlashcards(false);
     }
   };
@@ -144,6 +158,10 @@ const LessonDetail = () => {
         lessonId: lessonId as Id<"lessons">,
         quizCompleted: true
       });
+      const numericId = Number(lessonId);
+      if (!Number.isNaN(numericId)) {
+        try { await mark(numericId, 'quiz'); } catch {}
+      }
       alert("Quiz completed! In a real implementation, this would show quiz questions.");
     }
   };
@@ -185,7 +203,7 @@ const LessonDetail = () => {
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={() => navigate('/b737-type-rating')}
+            onClick={() => navigate(aircraftParam === 'B737_FAMILY' ? '/b737-type-rating' : '/type-rating')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -334,7 +352,7 @@ const LessonDetail = () => {
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    {progress.flashcardsCompleted ? 'Start Quiz' : 'Complete Flashcards First'}
+                    {safeProgress.flashcardsCompleted ? 'Start Quiz' : 'Complete Flashcards First'}
                   </>
                 )}
               </Button>

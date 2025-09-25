@@ -15,6 +15,16 @@ export interface RealAviationQuestion {
   regulationCode?: string;
 }
 
+// Placeholder arrays for different system questions
+const electricalSystemQuestions: RealAviationQuestion[] = [];
+const hydraulicSystemQuestions: RealAviationQuestion[] = [];
+const fuelSystemQuestions: RealAviationQuestion[] = [];
+const pressurizationSystemQuestions: RealAviationQuestion[] = [];
+const brakeSystemQuestions: RealAviationQuestion[] = [];
+const flightControlsQuestions: RealAviationQuestion[] = [];
+const landingGearQuestions: RealAviationQuestion[] = [];
+const oxygenSystemQuestions: RealAviationQuestion[] = [];
+
 // Export combined questions
 export const allAviationQuestions: RealAviationQuestion[] = [
   ...electricalSystemQuestions,

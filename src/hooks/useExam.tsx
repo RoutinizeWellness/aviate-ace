@@ -338,7 +338,7 @@ export const useExamSession = (examId: string | undefined, options: ExamSessionO
   };
 
   const getRealExamTimeLimit = () => {
-    if (mode === 'timed') return timeLimit || 60;
+    if (mode === 'timed') return timeLimit > 0 ? timeLimit : 60; // Default to 60 minutes for timed exams
     return 0; // No time limit for practice and review
   };
 

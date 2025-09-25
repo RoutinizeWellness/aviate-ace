@@ -14,7 +14,46 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const esExtended = {
   ...esJson,
   // Navigation
-  'nav.dashboard': 'Dashboard',
+'nav.dashboard': 'Dashboard',
+  'nav.exams': 'Exámenes',
+  'nav.typeRating': 'Type Rating',
+  'nav.progress': 'Progreso',
+  'nav.profile': 'Perfil',
+  'nav.admin': 'Administración',
+'nav.logout': 'Cerrar sesión',
+  // Exams
+  'exams.title': 'Exámenes',
+  'exams.categories': 'Categorías de Examen',
+  'exams.practiceMode': 'Modo Práctica',
+  'exams.configurePractice': 'Configurar Práctica',
+  'exams.recommended': 'Recomendado',
+  'exams.selectAircraftType': 'Tipo de Aeronave',
+  'exams.categoriesLabel': 'Categorías',
+  'exams.clearAll': 'Limpiar todo',
+  'exams.difficulty': 'Dificultad',
+  'exams.allDifficulties': 'Todas las dificultades',
+  'exams.mixedAllTypes': 'Todos los Tipos',
+  'exams.startPractice': 'Comenzar Práctica',
+  'exams.timedMode': 'Modo Examen Cronometrado',
+  'exams.startTimed': 'Iniciar Examen',
+  'exams.reviewMode': 'Modo Repaso',
+  'exams.startReview': 'Comenzar Repaso',
+  // Subscription
+  'subscription.title': 'Gestión de Suscripciones',
+  'subscription.subtitle': 'Administra tu plan y facturación',
+  'subscription.availablePlans': 'Planes Disponibles',
+  'subscription.selectPlan': 'Selecciona un plan para suscribirte con Autumn',
+  'subscription.email': 'Correo electrónico',
+  'subscription.useEmailNote': 'Usaremos este correo para crear tu cliente en el checkout.',
+  'subscription.subscribe': 'Suscribirme',
+  'subscription.currentPlan': 'Plan Actual',
+  'subscription.planFeatures': 'Características del Plan',
+  'subscription.quickActions': 'Acciones Rápidas',
+  'subscription.updatePaymentMethod': 'Actualizar Método de Pago',
+  'subscription.viewBillingHistory': 'Ver Historial de Facturación',
+  'subscription.requestRefund': 'Solicitar Reembolso',
+  'subscription.needHelp': '¿Necesitas Ayuda?',
+  'subscription.contactSupport': 'Contactar Soporte',
   'nav.flashcards': 'Tarjetas',
   
   // Home page extended
@@ -54,13 +93,63 @@ const esExtended = {
   'common.cancel': 'Cancelar',
   'common.delete': 'Eliminar',
   'common.edit': 'Editar',
-  'common.back': 'Volver'
+'common.back': 'Volver',
+  // Type Rating
+  'typerating.quickActions': 'Acciones Rápidas',
+  'typerating.practiceExam': 'Examen de Práctica',
+  'typerating.startPractice': 'Iniciar Práctica',
+  'typerating.flashcards': 'Tarjetas (Flashcards)',
+  'typerating.startFlashcards': 'Empezar Flashcards',
+  'typerating.examSimulator': 'Simulador de Examen',
+  'typerating.startExam': 'Iniciar Examen',
+  'typerating.selectAircraft': 'Selecciona tu Aeronave',
+  'typerating.a320': 'Airbus A320',
+  'typerating.b737': 'Boeing 737'
 };
 
 const enExtended = {
   ...enJson,
   // Navigation
-  'nav.dashboard': 'Dashboard',
+'nav.dashboard': 'Dashboard',
+  'nav.exams': 'Exams',
+  'nav.typeRating': 'Type Rating',
+  'nav.progress': 'Progress',
+  'nav.profile': 'Profile',
+  'nav.admin': 'Admin',
+'nav.logout': 'Log out',
+  // Exams
+  'exams.title': 'Exams',
+  'exams.categories': 'Exam Categories',
+  'exams.practiceMode': 'Practice Mode',
+  'exams.configurePractice': 'Configure Practice',
+  'exams.recommended': 'Recommended',
+  'exams.selectAircraftType': 'Aircraft Type',
+  'exams.categoriesLabel': 'Categories',
+  'exams.clearAll': 'Clear all',
+  'exams.difficulty': 'Difficulty',
+  'exams.allDifficulties': 'All difficulties',
+  'exams.mixedAllTypes': 'All Types',
+  'exams.startPractice': 'Start Practice',
+  'exams.timedMode': 'Timed Exam Mode',
+  'exams.startTimed': 'Start Exam',
+  'exams.reviewMode': 'Review Mode',
+  'exams.startReview': 'Start Review',
+  // Subscription
+  'subscription.title': 'Subscription Management',
+  'subscription.subtitle': 'Manage your plan and billing',
+  'subscription.availablePlans': 'Available Plans',
+  'subscription.selectPlan': 'Select a plan to subscribe via Autumn',
+  'subscription.email': 'Email',
+  'subscription.useEmailNote': 'We will use this email to create your customer for checkout.',
+  'subscription.subscribe': 'Subscribe',
+  'subscription.currentPlan': 'Current Plan',
+  'subscription.planFeatures': 'Plan Features',
+  'subscription.quickActions': 'Quick Actions',
+  'subscription.updatePaymentMethod': 'Update Payment Method',
+  'subscription.viewBillingHistory': 'View Billing History',
+  'subscription.requestRefund': 'Request Refund',
+  'subscription.needHelp': 'Need Help?',
+  'subscription.contactSupport': 'Contact Support',
   'nav.flashcards': 'Flashcards',
   
   // Home page extended
@@ -100,7 +189,18 @@ const enExtended = {
   'common.cancel': 'Cancel',
   'common.delete': 'Delete',
   'common.edit': 'Edit',
-  'common.back': 'Back'
+'common.back': 'Back',
+  // Type Rating
+  'typerating.quickActions': 'Quick Actions',
+  'typerating.practiceExam': 'Practice Exam',
+  'typerating.startPractice': 'Start Practice',
+  'typerating.flashcards': 'Flashcards',
+  'typerating.startFlashcards': 'Start Flashcards',
+  'typerating.examSimulator': 'Exam Simulator',
+  'typerating.startExam': 'Start Exam',
+  'typerating.selectAircraft': 'Select your Aircraft',
+  'typerating.a320': 'Airbus A320',
+  'typerating.b737': 'Boeing 737'
 };
 
 const translations: Record<'es' | 'en', Record<string, string>> = {
@@ -131,6 +231,14 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
+
+  // Reflect language in the <html> tag and force minimal visual updates without reload
+  useEffect(() => {
+    try {
+      document.documentElement.lang = language;
+      document.documentElement.setAttribute('data-lang', language);
+    } catch {}
+  }, [language]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>

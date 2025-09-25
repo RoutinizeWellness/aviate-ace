@@ -65,7 +65,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
         onClick={() => navigate('/type-rating')}
       >
         <img src={logo} alt="Logo" className="w-5 h-5" />
-        <span>Type Rating</span>
+        <span>{t('nav.typeRating')}</span>
       </Button>
       <Button 
         variant={activePage === 'progress' ? "default" : "ghost"} 
@@ -182,7 +182,7 @@ export const UnifiedSidebar = ({ activePage }: UnifiedSidebarProps) => {
               onClick={handleSignOut}
             >
               <LogOut className="w-5 h-5" />
-              <span>Cerrar Sesión</span>
+              <span>{t('nav.logout')}</span>
             </Button>
           </div>
         </div>

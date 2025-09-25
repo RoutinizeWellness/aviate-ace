@@ -29,7 +29,8 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Analíticas avanzadas',
       'Recomendaciones de estudio personalizadas'
     ],
-    productId: 'pilotprepflightx_-_1_mes'
+    // Map to Autumn "complete-package" (monthly/annual handled on Autumn side)
+    productId: 'complete-package'
   },
   {
     id: 'pilotprep-3m',
@@ -47,8 +48,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Analíticas avanzadas',
       'Recomendaciones de estudio personalizadas'
     ],
-    productId: 'pilotprepflightx_-_3_meses'
+    productId: 'complete-package'
   },
+  {
+    id: 'a320-3months',
     name: 'A320 Type Rating - 3 Months',
     description: 'Extended preparation package for Airbus A320 type rating',
     price: 39.99,
@@ -67,7 +70,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Exam simulation mode',
       'Extended study time'
     ],
-    productId: 'a320-3months'
+    productId: 'a320-premium'
   },
   {
     id: 'pilotprep-6m',
@@ -84,8 +87,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Analíticas avanzadas',
       'Recomendaciones de estudio personalizadas'
     ],
-    productId: 'pilotprepflightx_-_6_meses'
+    productId: 'complete-package'
   },
+  {
+    id: 'a320-6months',
     name: 'A320 Type Rating - 6 Months',
     description: 'Comprehensive preparation package for Airbus A320 type rating',
     price: 59.99,
@@ -104,7 +109,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Extended study time',
       'Progress tracking over time'
     ],
-    productId: 'a320-6months'
+    productId: 'a320-premium'
   },
   {
     id: 'pilotprep-12m',
@@ -121,8 +126,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Analíticas avanzadas',
       'Recomendaciones de estudio personalizadas'
     ],
-    productId: 'pilotprepflightx_-_1_ao'
+    productId: 'complete-package'
   },
+  {
+    id: 'a320-1year',
     name: 'A320 Type Rating - 1 Year',
     description: 'Complete annual access to Airbus A320 type rating preparation',
     price: 89.99,
@@ -142,10 +149,10 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Progress tracking over time',
       'Regular content updates'
     ],
-    productId: 'a320-1year'
-}
-];
-  // End plans
+    productId: 'a320-premium'
+  },
+  // B737 Type Rating Plans
+  {
     id: 'b737-1month',
     name: 'B737 Type Rating - 1 Month',
     description: 'Complete preparation package for Boeing 737 type rating',
@@ -163,7 +170,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Offline access to materials',
       'Exam simulation mode'
     ],
-    productId: 'b737-1month'
+    productId: 'b737-premium'
   },
   {
     id: 'b737-3months',
@@ -185,7 +192,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Exam simulation mode',
       'Extended study time'
     ],
-    productId: 'b737-3months'
+    productId: 'b737-premium'
   },
   {
     id: 'b737-6months',
@@ -207,7 +214,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Extended study time',
       'Progress tracking over time'
     ],
-    productId: 'b737-6months'
+    productId: 'b737-premium'
   },
   {
     id: 'b737-1year',
@@ -230,7 +237,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'Progress tracking over time',
       'Regular content updates'
     ],
-    productId: 'b737-1year'
+    productId: 'b737-premium'
   },
   // Complete Package Plans
   {

@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { UnifiedSidebar } from "@/components/UnifiedSidebar";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Exams = () => {
   const navigate = useNavigate();
@@ -52,6 +53,7 @@ const Exams = () => {
   const { hasAccessTo, getCurrentSubscription, isAdmin, getSubscriptionDisplayName } = useSubscription();
   const { exams, isLoadingExams, userExamSessions } = useExams();
   const { profile } = useSupabaseProfile();
+  const { t } = useLanguage();
   
   // Check access permissions
   const canAccessA320 = hasAccessTo('A320_FAMILY');
@@ -233,17 +235,17 @@ const Exams = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              Volver al Dashboard
+              {t('common.back')}
             </Button>
             <LanguageToggle />
           </div>
-          <h1 className="text-4xl font-bold mb-2">Exámenes</h1>
+          <h1 className="text-4xl font-bold mb-2">{t('exams.title')}</h1>
           <p className="text-muted-foreground">Practica y toma exámenes para tu certificación de piloto.</p>
         </header>
 
         {/* Exam Categories */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-6">Categorías de Examen</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('exams.categories')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Practice Mode */}
             <Dialog open={showPracticeDialog} onOpenChange={setShowPracticeDialog}>
@@ -254,9 +256,9 @@ const Exams = () => {
                       <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
                         <Target className="w-6 h-6 text-primary" />
                       </div>
-                      <Badge className="bg-primary/10 text-primary">Recomendado</Badge>
+<Badge className="bg-primary/10 text-primary">{t('exams.recommended')}</Badge>
                     </div>
-                    <CardTitle className="text-lg">Modo Práctica</CardTitle>
+<CardTitle className="text-lg">{t('exams.practiceMode')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
@@ -281,14 +283,14 @@ const Exams = () => {
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Configurar Práctica</DialogTitle>
+<DialogTitle>{t('exams.configurePractice')}</DialogTitle>
                   <DialogDescription>
                     Selecciona las categorías y dificultad para personalizar tu sesión de práctica.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Tipo de Aeronave</label>
+<label className="text-sm font-medium">{t('exams.selectAircraftType')}</label>
                     <Select value={selectedAircraft} onValueChange={setSelectedAircraft}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecciona tipo de aeronave" />
@@ -308,7 +310,7 @@ const Exams = () => {
                   
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium">Categorías</label>
+<label className="text-sm font-medium">{t('exams.categoriesLabel')}</label>
                       {selectedCategories.length > 0 && (
                         <Button 
                           variant="ghost" 
@@ -317,7 +319,7 @@ const Exams = () => {
                           className="text-xs h-6 px-2"
                         >
                           <X className="w-3 h-3 mr-1" />
-                          Limpiar todo
+{t('exams.clearAll')}
                         </Button>
                       )}
                     </div>
@@ -352,7 +354,7 @@ const Exams = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Dificultad</label>
+<label className="text-sm font-medium">{t('exams.difficulty')}</label>
                     <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar dificultad" />
@@ -360,7 +362,7 @@ const Exams = () => {
                       <SelectContent>
                         <SelectItem value="all">
                           <div>
-                            <div className="font-medium">Todas las dificultades</div>
+<div className="font-medium">{t('exams.allDifficulties')}</div>
                             <div className="text-xs text-muted-foreground">Preguntas de todos los niveles</div>
                           </div>
                         </SelectItem>
@@ -420,7 +422,7 @@ const Exams = () => {
                     </Button>
                     <Button onClick={handleStartPractice} className="flex-1" disabled={selectedCategories.length === 0}>
                       <Play className="w-4 h-4 mr-2" />
-                      Comenzar Práctica
+{t('exams.startPractice')}
                     </Button>
                   </div>
                 </div>
@@ -436,7 +438,7 @@ const Exams = () => {
                   </div>
                   <Badge className="bg-warning/10 text-warning">Cronometrado</Badge>
                 </div>
-                <CardTitle className="text-lg">Modo Examen Cronometrado</CardTitle>
+<CardTitle className="text-lg">{t('exams.timedMode')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
@@ -458,7 +460,7 @@ const Exams = () => {
                 </div>
                 <Button className="w-full bg-warning text-warning-foreground hover:bg-warning/90">
                   <Clock className="w-4 h-4 mr-2" />
-                  Iniciar Examen
+{t('exams.startTimed')}
                 </Button>
               </CardContent>
             </Card>
@@ -474,7 +476,7 @@ const Exams = () => {
                       </div>
                       <Badge className="bg-info/10 text-info">Repaso</Badge>
                     </div>
-                    <CardTitle className="text-lg">Modo Repaso</CardTitle>
+<CardTitle className="text-lg">{t('exams.reviewMode')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
@@ -492,7 +494,7 @@ const Exams = () => {
                     </div>
                     <Button className="w-full bg-info text-info-foreground hover:bg-info/90">
                       <BookOpen className="w-4 h-4 mr-2" />
-                      Comenzar Repaso
+{t('exams.startReview')}
                     </Button>
                   </CardContent>
                 </Card>

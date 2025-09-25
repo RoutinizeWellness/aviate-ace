@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import type { Id } from '../../convex/_generated/dataModel';
-import { DebugQuestionLoader } from '@/components/DebugQuestionLoader';
+// Debug components removed for production
 import { loadAndFilterQuestions } from "@/utils/questionLoader";
 
 // Import test utility in development
@@ -77,20 +77,15 @@ const ExamMode = () => {
   
   const selectedDifficulty = searchParams.get('difficulty') || '';
   const selectedAircraft = searchParams.get('aircraft') || 'A320_FAMILY';
-  const timeLimit = parseInt(searchParams.get('timeLimit') || '0');
+  const timeLimit = parseInt(searchParams.get('timeLimit') || (examMode === 'timed' ? '60' : '0'));
   const questionCount = parseInt(searchParams.get('questionCount') || '20');
   
   // If no category is provided but we have an exam title pattern, extract category from title
   const examTitle = searchParams.get('title') || '';
-  console.log('Exam title from URL params:', examTitle);
-  console.log('Initial selectedCategory:', selectedCategory);
   
   if (!selectedCategory && examTitle.startsWith('Práctica: ')) {
     const categoryFromTitle = examTitle.replace('Práctica: ', '').toLowerCase().replace(/\s+/g, '-');
-    console.log('Extracted category from title:', categoryFromTitle);
-    
     selectedCategory = CATEGORY_MAPPINGS[categoryFromTitle as keyof typeof CATEGORY_MAPPINGS] || categoryFromTitle;
-    console.log('Mapped category:', selectedCategory);
   }
   
   // Generate a temporary exam ID for practice sessions without a real exam
@@ -151,29 +146,12 @@ const ExamMode = () => {
   // Load questions dynamically when category is selected but no examId is provided
   useEffect(() => {
     const loadQuestions = async () => {
-      console.log('Dynamic question loading triggered with:', {
-        selectedExamId,
-        selectedCategory,
-        examMode,
-        selectedAircraft,
-        selectedDifficulty,
-        questionCount
-      });
-      
       if (shouldLoadDynamicQuestions(selectedExamId, selectedCategory, examMode)) {
         setIsLoadingDynamicQuestions(true);
         setQuestionsError(null);
         try {
           // Use optimized question loader
           const { OptimizedQuestionLoader } = await import('@/services/OptimizedQuestionLoader');
-          
-          console.log('Loading questions with parameters:', {
-            examMode,
-            selectedCategory,
-            selectedAircraft,
-            selectedDifficulty,
-            questionCount
-          });
           
           let loadedQuestions = await OptimizedQuestionLoader.loadQuestions({
             mode: examMode,
@@ -183,15 +161,11 @@ const ExamMode = () => {
             questionCount
           });
           
-          console.log('Loaded questions count:', loadedQuestions.length);
-          
           // Validate that we have questions
           if (loadedQuestions && loadedQuestions.length > 0) {
             setDynamicQuestions(loadedQuestions);
-            console.log('Successfully loaded', loadedQuestions.length, 'questions');
           } else {
             // Try with relaxed filters
-            console.log('No questions found with current filters, trying with relaxed filters');
             const relaxedQuestions = await loadAndFilterQuestions(
               examMode,
               selectedCategory || 'all',
@@ -200,11 +174,9 @@ const ExamMode = () => {
               questionCount
             );
             setDynamicQuestions(relaxedQuestions);
-            console.log('Loaded', relaxedQuestions.length, 'questions with relaxed filters');
             
             // If still no questions, try with 'aircraft-general' specifically
             if (relaxedQuestions.length === 0) {
-              console.log('Trying with aircraft-general category specifically');
               const aircraftGeneralQuestions = await loadAndFilterQuestions(
                 examMode,
                 'aircraft-general',
@@ -213,11 +185,9 @@ const ExamMode = () => {
                 questionCount
               );
               setDynamicQuestions(aircraftGeneralQuestions);
-              console.log('Loaded', aircraftGeneralQuestions.length, 'aircraft-general questions');
             }
           }
         } catch (error) {
-          console.error('Error loading questions:', error);
           setQuestionsError(error as Error);
           
           // Provide fallback questions
@@ -230,9 +200,8 @@ const ExamMode = () => {
                 _id: `fallback_${index}_${Date.now()}`
               }));
             setDynamicQuestions(fallbackQuestions);
-            console.log('Provided', fallbackQuestions.length, 'fallback questions');
           } catch (fallbackError) {
-            console.error('Error loading fallback questions:', fallbackError);
+            // Fallback failed - will show error state
           }
         } finally {
           setIsLoadingDynamicQuestions(false);
@@ -513,7 +482,9 @@ const ExamMode = () => {
         category: currentQuestion.category,
         difficulty: currentQuestion.difficulty,
         aircraftType: currentQuestion.aircraftType,
-      }).catch(error => console.log('Could not track incorrect question:', error));
+      }).catch(() => {
+        // Question tracking failed - continue silently
+      });
     }
   }, [selectedAnswer, examState.startTime, setExamState, getCurrentQuestion, examMode, user, recordIncorrectQuestion]);
 
@@ -561,7 +532,9 @@ const ExamMode = () => {
         category: currentQuestion.category,
         difficulty: currentQuestion.difficulty,
         aircraftType: currentQuestion.aircraftType,
-      }).catch(error => console.log('Could not track incorrect question:', error));
+      }).catch(() => {
+        // Question tracking failed - continue silently
+      });
     }
   };
 
@@ -599,7 +572,7 @@ const ExamMode = () => {
       
     if (!shouldShowExamInterface) {
       // If we don't have a session ID yet, show loading state
-      console.log('Not showing exam interface yet - waiting for session start');
+      return null;
     } else {
       const currentQuestion = getCurrentQuestion();
       const currentAnswer = getCurrentAnswer();
@@ -746,9 +719,6 @@ const ExamMode = () => {
                           className={optionClass}
                           onClick={(e) => {
                             e.preventDefault();
-                            if (import.meta.env.DEV) {
-                              console.log('🖱️ Label onClick triggered:', { index, examMode, isAnswered, isDisabled });
-                            }
                             if (!isDisabled) {
                               if (examMode === 'practice') {
                                 selectAnswer(currentQuestion._id, index);
@@ -764,16 +734,11 @@ const ExamMode = () => {
                           name="answer"
                           value={index}
                           checked={examMode === 'practice' ? selectedAnswer === index : currentAnswer?.selectedAnswer === index}
-                          onChange={(e) => {
-                            if (import.meta.env.DEV) {
-                              console.log('📻 Radio button onChange triggered:', { index, examMode, isAnswered, questionId: currentQuestion._id });
-                            }
+                          onChange={() => {
                             // Let the label handle the actual selection
                           }}
-                          onClick={(e) => {
-                            if (import.meta.env.DEV) {
-                              console.log('Radio button onClick triggered:', { index, examMode, isAnswered });
-                            }
+                          onClick={() => {
+                            // Handled by parent label
                           }}
                           disabled={isDisabled}
                           className="sr-only"
@@ -948,18 +913,6 @@ const ExamMode = () => {
               </Card>
             </div>
 
-            {/* Success Notice */}
-            <div className="mt-8 p-4 surface-light rounded-lg border border-success/20 bg-success/5">
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-success flex-shrink-0 mt-0.5" />
-                <div className="text-sm">
-                  <p className="font-medium text-success mb-1">¡Funcionalidad Completa Activada!</p>
-                  <p className="text-muted-foreground">
-                    Cronómetro real activo, guardado automático funcionando, banco completo de preguntas cargado.
-                  </p>
-                </div>
-              </div>
-            </div>
           </main>
         </div>
       );
@@ -974,11 +927,6 @@ const ExamMode = () => {
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
           <h2 className="text-lg font-semibold mb-2">Cargando Preguntas</h2>
           <p className="text-muted-foreground">Preparando tu examen...</p>
-          <div className="mt-4 text-xs text-muted-foreground">
-            <p>Selected Category: {selectedCategory || 'none'}</p>
-            <p>Dynamic Questions: {dynamicQuestions.length}</p>
-            <p>Is Loading: {isLoadingDynamicQuestions ? 'true' : 'false'}</p>
-          </div>
         </Card>
       </div>
     );
@@ -1004,19 +952,6 @@ const ExamMode = () => {
                 'No hay preguntas disponibles para este examen o hay un problema de conexión.'
               }
             </p>
-            <div className="bg-info/10 border border-info/20 rounded-lg p-3 mb-6">
-              <p className="text-sm text-info">
-                <strong>Información de depuración:</strong><br/>
-                - Examen seleccionado: {exam?.title || 'No encontrado'}<br/>
-                - ID del examen: {selectedExamId}<br/>
-                - Estado de carga: {isLoadingQuestions ? 'Cargando...' : 'Completado'}<br/>
-                - Preguntas encontradas: {currentQuestions?.length || 0}<br/>
-                - Selected Category: {selectedCategory || 'none'}<br/>
-                - Dynamic Questions: {dynamicQuestions.length}<br/>
-                - Is Loading Dynamic: {isLoadingDynamicQuestions ? 'true' : 'false'}<br/>
-                {questionsError && `- Error: ${questionsError.message}`}
-              </p>
-            </div>
             <div className="flex gap-4 justify-center">
               <Button variant="outline" onClick={() => navigate('/exams')}>
                 <ArrowLeft className="w-4 h-4 mr-2" />

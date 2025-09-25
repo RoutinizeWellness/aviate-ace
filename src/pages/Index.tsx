@@ -15,7 +15,8 @@ import {
   Zap,
   Shield,
   BookOpen,
-  TrendingUp
+  TrendingUp,
+  Plane
 } from "lucide-react";
 import { PRICING_PLANS } from "@/config/pricing";
 import heroCockpit from "@/assets/hero-cockpit.jpg";
@@ -134,10 +135,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Simplified Header without navigation links */}
-      <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <header role="banner" className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50 safe-top">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src={logo} alt="PilotPrepFlightX" className="w-10 h-10" />
+              <img src={logo} alt="PilotPrepFlightX" className="w-10 h-10" width={40} height={40} decoding="async" />
               <div>
                 <h1 className="text-xl font-bold">PilotPrepFlightX</h1>
                 <p className="text-xs text-muted-foreground">Professional Training</p>

@@ -11,18 +11,25 @@ import {
   Clock,
   TrendingUp,
   Award,
-  DollarSign
+  DollarSign,
+  ExternalLink,
+  Mail
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useConvexAuth';
 import SubscriptionManager from '@/components/SubscriptionManager';
 import { useNavigate } from 'react-router-dom';
 import { PRICING_PLANS } from '@/config/pricing';
-import { createCheckoutSession } from '@/services/autumn/backend';
+import { useAction } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { Input } from '@/components/ui/input';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
 const SubscriptionManagement = () => {
   const { user } = useAuth();
+  const createCheckout = useAction(api.autumn.createCheckoutSession);
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [publicEmail, setPublicEmail] = useState("");
 
   // Pre-select a plan if user came from landing selection
@@ -63,13 +70,13 @@ const SubscriptionManagement = () => {
                 <Plane className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">Subscription Management</h1>
-                <p className="text-xs text-muted-foreground">Manage your account and billing</p>
+<h1 className="text-xl font-bold">{t('subscription.title')}</h1>
+<p className="text-xs text-muted-foreground">{t('subscription.subtitle')}</p>
               </div>
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" onClick={() => navigate(user ? '/dashboard' : '/')}>Volver</Button>
+<Button variant="outline" size="sm" onClick={() => navigate(user ? '/dashboard' : '/')}>{t('common.back')}</Button>
             </div>
           </div>
         </div>
@@ -77,32 +84,32 @@ const SubscriptionManagement = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Subscription Management</h1>
-          <p className="text-muted-foreground">Manage your subscription plan and billing information</p>
+<h1 className="text-3xl font-bold mb-2">{t('subscription.title')}</h1>
+<p className="text-muted-foreground">{t('subscription.subtitle')}</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
-            <SubscriptionManager />
+            <SubscriptionManager publicEmail={publicEmail} />
           </div>
           
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Available Plans</CardTitle>
-                <CardDescription>Select a plan to subscribe via Autumn Payments</CardDescription>
+<CardTitle>{t('subscription.availablePlans')}</CardTitle>
+<CardDescription>{t('subscription.selectPlan')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {!user && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Correo electrónico</label>
+<label className="text-sm font-medium">{t('subscription.email')}</label>
                     <Input
                       type="email"
                       placeholder="tu@email.com"
                       value={publicEmail}
                       onChange={(e) => setPublicEmail(e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">Usaremos este correo para crear tu cliente en el checkout.</p>
+<p className="text-xs text-muted-foreground">{t('subscription.useEmailNote')}</p>
                   </div>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -123,23 +130,32 @@ const SubscriptionManagement = () => {
                               alert('Introduce tu correo para continuar.');
                               return;
                             }
-                            const checkout = await createCheckoutSession({
+                            console.log('[UI] Creating checkout', { productId: plan.productId || plan.id, userId, email });
+const result = await createCheckout({
                               productId: plan.productId || plan.id,
                               userId: userId!,
                               email: email!
                             });
-                            if (checkout.checkoutUrl) {
-                              // Clear preselected once we start checkout
-                              localStorage.removeItem('selectedPlan');
-                              window.location.href = checkout.checkoutUrl;
+                            console.log('[UI] Checkout result', result);
+                            if ((result as any)?.error) {
+                              alert((result as any).error);
+                              return;
                             }
-                          } catch (err) {
+                            const url = (result as any)?.checkoutUrl;
+                            if (url) {
+                              localStorage.removeItem('selectedPlan');
+                              window.location.assign(url);
+                            } else {
+                              alert('No se recibió URL de checkout.');
+                            }
+                          } catch (err: any) {
                             console.error('Checkout error:', err);
-                            alert('No se pudo iniciar el checkout.');
+                            const msg = err?.message || 'No se pudo iniciar el checkout.';
+                            alert(msg);
                           }
                         }}
                       >
-                        Suscribirme
+{t('subscription.subscribe')}
                       </Button>
                     </div>
                   ))}
@@ -148,7 +164,7 @@ const SubscriptionManagement = () => {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Current Plan</CardTitle>
+<CardTitle>{t('subscription.currentPlan')}</CardTitle>
                 <CardDescription>Your active subscription details</CardDescription>
               </CardHeader>
               <CardContent>
@@ -171,7 +187,7 @@ const SubscriptionManagement = () => {
                   </div>
                   
                   <div className="pt-4 border-t">
-                    <h4 className="font-medium mb-3">Plan Features</h4>
+<h4 className="font-medium mb-3">{t('subscription.planFeatures')}</h4>
                     <ul className="space-y-2">
                       {userSubscription.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
@@ -187,29 +203,29 @@ const SubscriptionManagement = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Quick Actions</CardTitle>
+<CardTitle>{t('subscription.quickActions')}</CardTitle>
                 <CardDescription>Common subscription tasks</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="outline" className="w-full justify-start">
                   <CreditCard className="w-4 h-4 mr-2" />
-                  Update Payment Method
+{t('subscription.updatePaymentMethod')}
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <Calendar className="w-4 h-4 mr-2" />
-                  View Billing History
+{t('subscription.viewBillingHistory')}
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <DollarSign className="w-4 h-4 mr-2" />
-                  Request Refund
+{t('subscription.requestRefund')}
                 </Button>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader>
-                <CardTitle>Need Help?</CardTitle>
-                <CardDescription>Contact our support team</CardDescription>
+<CardTitle>{t('subscription.needHelp')}</CardTitle>
+<CardDescription>{t('subscription.contactSupport')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">

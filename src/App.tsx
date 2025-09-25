@@ -33,6 +33,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import { useLanguage } from "./contexts/LanguageContext";
 
 // Initialize Convex client with better error handling
 let convex: ConvexReactClient;
@@ -74,7 +75,9 @@ const queryClient = new QueryClient({
 // Initialize Stripe
 const stripePromise = getStripe();
 
-const App = () => (
+const App = () => {
+  const { language } = useLanguage();
+  return (
   <QueryClientProvider client={queryClient}>
     <ConvexProvider client={convex}>
       <AuthProvider>
@@ -82,10 +85,12 @@ const App = () => (
           <TooltipProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter future={{
+            <a href="#main" className="skip-link">Saltar al contenido</a>
+            <BrowserRouter key={language} future={{
               v7_startTransition: true,
               v7_relativeSplatPath: true
             }}>
+              <main id="main" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/login" element={<Login />} />
@@ -157,6 +162,7 @@ const App = () => (
                 <Route path="/contact" element={<Contact />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </main>
             </BrowserRouter>
           </TooltipProvider>
         </Elements>
@@ -164,5 +170,6 @@ const App = () => (
     </ConvexProvider>
   </QueryClientProvider>
 );
+};
 
 export default App;

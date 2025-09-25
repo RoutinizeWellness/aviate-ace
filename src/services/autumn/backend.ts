@@ -58,6 +58,15 @@ export const createCheckoutSession = async (params: {
     
     // Create a checkout session
     console.log('Creating checkout session with product:', params.productId);
+
+    // Optional: verify product exists to produce clearer error messages
+    try {
+      const product = await (autumnInstance as any).products?.get?.(params.productId);
+      console.log('Product lookup:', product);
+    } catch (e) {
+      console.warn('Product lookup failed (continuing to checkout):', e);
+    }
+
     const checkoutSession = await autumnInstance.checkout({
       customer_id: params.userId,
       product_id: params.productId,
@@ -78,9 +87,10 @@ export const createCheckoutSession = async (params: {
       checkoutUrl: checkoutSession.data.url,
       sessionId: 'session_' + params.userId + '_' + params.productId
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating checkout session:', error);
-    throw new Error('Failed to create checkout session: ' + (error as Error).message);
+    const message = (error?.response?.data?.error?.message) || error?.message || 'Unknown error';
+    throw new Error('Failed to create checkout session: ' + message);
   }
 };
 

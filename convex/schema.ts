@@ -303,6 +303,22 @@ export default defineSchema({
     .index("by_lesson", ["lessonId"])
     .index("by_user_lesson", ["userId", "lessonId"]),
 
+  // User Type Rating Progress (module/lesson steps by aircraft)
+  userTypeRatingProgress: defineTable({
+    userId: v.id("users"),
+    aircraftType: v.string(), // 'A320_FAMILY' | 'B737_FAMILY'
+    lessonNumericId: v.number(),
+    theoryCompleted: v.boolean(),
+    flashcardsCompleted: v.boolean(),
+    quizCompleted: v.boolean(),
+    overallProgress: v.number(), // 0-100
+    updatedAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"]) 
+    .index("by_user_aircraft", ["userId", "aircraftType"]) 
+    .index("by_user_lesson", ["userId", "lessonNumericId"]),
+
   // Question Suggestions table
   questionSuggestions: defineTable({
     userId: v.id("users"),

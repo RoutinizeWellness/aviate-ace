@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useConvexAuth';
-import { getSubscriptionDetails, cancelSubscription, updateSubscriptionPlan, /* processRefund */ } from '@/services/autumn/backend';
+import { useAction } from 'convex/react';
+import { api } from '../../convex/_generated/api';
 import { PRICING_PLANS } from '@/config/pricing';
 
 interface Subscription {
@@ -14,7 +15,11 @@ interface Subscription {
   cancelAtPeriodEnd: boolean;
 }
 
-const SubscriptionManager = () => {
+interface Props {
+  publicEmail?: string;
+}
+
+const SubscriptionManager = ({ publicEmail }: Props) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [subscription, setSubscription] = useState<Subscription | null>(null);
@@ -22,14 +27,24 @@ const SubscriptionManager = () => {
   const [cancelling, setCancelling] = useState(false);
   const [updating, setUpdating] = useState(false);
 
+  const getSubscriptionAction = useAction(api.autumn.getSubscriptionDetails);
+  const cancelSubscriptionAction = useAction(api.autumn.cancelSubscription);
+  const updatePlanAction = useAction(api.autumn.updateSubscriptionPlan);
+
   useEffect(() => {
     const fetchSubscription = async () => {
-      if (!user) return;
-      
       try {
         setLoading(true);
-        const sub = await getSubscriptionDetails(user._id);
-        setSubscription(sub);
+        if (user) {
+          const sub = await getSubscriptionAction({ userId: user._id as unknown as string });
+          setSubscription(sub as any);
+        } else if (publicEmail && publicEmail.includes('@')) {
+          const guestId = `guest_${btoa(publicEmail).replace(/=+/g, '')}`;
+          const sub = await getSubscriptionAction({ userId: guestId });
+          setSubscription(sub as any);
+        } else {
+          setSubscription(null);
+        }
       } catch (error) {
         console.error('Error fetching subscription:', error);
         toast({
@@ -43,14 +58,14 @@ const SubscriptionManager = () => {
     };
 
     fetchSubscription();
-  }, [user, toast]);
+  }, [user, publicEmail, toast, getSubscriptionAction]);
 
   const handleCancelSubscription = async () => {
     if (!subscription) return;
     
     try {
       setCancelling(true);
-      await cancelSubscription(subscription.id);
+      await cancelSubscriptionAction({ subscriptionId: subscription.id });
       
       // Update local state
       setSubscription({
@@ -79,9 +94,9 @@ const SubscriptionManager = () => {
     
     try {
       setUpdating(true);
-      await updateSubscriptionPlan({
+      await updatePlanAction({
         subscriptionId: subscription.id,
-        newPlanId
+        newProductId: newPlanId
       });
       
       // Update local state
@@ -133,7 +148,14 @@ const SubscriptionManager = () => {
   }
 
   if (!subscription) {
-    return <div>No active subscription found</div>;
+    return (
+      <div className="space-y-2">
+        <div>No active subscription found</div>
+        {!user && (
+          <p className="text-sm text-muted-foreground">Inicia sesión o introduce tu correo en "Available Plans" para iniciar un checkout y vincular tu suscripción.</p>
+        )}
+      </div>
+    );
   }
 
   return (

@@ -14,11 +14,13 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as auth from "../auth.js";
+import type * as autumn from "../autumn.js";
 import type * as courses from "../courses.js";
 import type * as exams from "../exams.js";
 import type * as lessons from "../lessons.js";
 import type * as questionSuggestions from "../questionSuggestions.js";
 import type * as seedQuestions from "../seedQuestions.js";
+import type * as typeRating from "../typeRating.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -30,11 +32,13 @@ import type * as seedQuestions from "../seedQuestions.js";
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  autumn: typeof autumn;
   courses: typeof courses;
   exams: typeof exams;
   lessons: typeof lessons;
   questionSuggestions: typeof questionSuggestions;
   seedQuestions: typeof seedQuestions;
+  typeRating: typeof typeRating;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

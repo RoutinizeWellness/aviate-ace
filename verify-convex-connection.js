@@ -10,7 +10,8 @@ try {
   // 1. Check if .env file exists and has Convex URL
   console.log('1. Checking .env file...');
   const envContent = readFileSync('.env', 'utf8');
-  const convexUrlMatch = envContent.match(/VITE_CONVEX_URL=(https:\/\/[^\s]+)/);
+  // Allow optional quotes around the value
+  const convexUrlMatch = envContent.match(/VITE_CONVEX_URL=(?:"|')?(https:\/\/[^\s"']+)(?:"|')?/);
   
   if (!convexUrlMatch) {
     throw new Error('VITE_CONVEX_URL not found in .env file');

@@ -20,7 +20,9 @@ import {
   Target,
   BookOpen,
   Plane,
-  ChevronDown
+  ChevronDown,
+  ToggleLeft,
+  ToggleRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -130,13 +132,141 @@ const TypeRating = () => {
        fundamentosProgress.quizCompleted) : false;
   };
 
-  // Helper function to check if lesson is completed
+  // Helper function to check if lesson is completed with proper error handling
   const isLessonCompleted = (lessonId: number) => {
-    const progress = getLessonProgressById(lessonId);
-    return progress ? 
-      (progress.theoryCompleted && 
-       progress.flashcardsCompleted && 
-       progress.quizCompleted) : false;
+    try {
+      const progress = getLessonProgressById(lessonId);
+      return progress ? 
+        (progress.theoryCompleted && 
+         progress.flashcardsCompleted && 
+         progress.quizCompleted) : false;
+    } catch (error) {
+      console.warn(`Error checking lesson ${lessonId} completion:`, error);
+      return false;
+    }
+  };
+  
+  // Helper function to allow marking theory as completed
+  const markTheoryCompleted = async (lessonId: number) => {
+    try {
+      // For now, use localStorage until Convex is deployed
+      const userId = user?._id;
+      if (!userId) return;
+      
+      const progress = getLessonProgressById(lessonId) || {
+        lessonId,
+        theoryCompleted: false,
+        flashcardsCompleted: false,
+        quizCompleted: false
+      };
+      
+      progress.theoryCompleted = true;
+      
+      // Update localStorage
+      const key = `lesson_progress_${userId}`;
+      const allProgress = JSON.parse(localStorage.getItem(key) || '[]');
+      const existingIndex = allProgress.findIndex((p: any) => p.lessonId === lessonId);
+      
+      if (existingIndex >= 0) {
+        allProgress[existingIndex] = progress;
+      } else {
+        allProgress.push(progress);
+      }
+      
+      localStorage.setItem(key, JSON.stringify(allProgress));
+      setLessonProgress(allProgress);
+      
+      // Update module progress
+      updateModuleProgress();
+      
+    } catch (error) {
+      console.error('Error marking theory completed:', error);
+    }
+  };
+  
+  // Helper function to update module progress
+  const updateModuleProgress = () => {
+    try {
+      const userId = user?._id;
+      if (!userId) return;
+      
+      const fundamentosCompleted = isLessonCompleted(1) ? 1 : 0;
+      const sistemasCompleted = [2,3,4,5,6,7,8,9,10,11,12,13,14,15].filter(isLessonCompleted).length;
+      
+      const moduleProgressData = [
+        {
+          moduleId: 'fundamentos',
+          completedLessons: fundamentosCompleted,
+          totalLessons: 1,
+          isUnlocked: true
+        },
+        {
+          moduleId: 'sistemas',
+          completedLessons: sistemasCompleted,
+          totalLessons: 14,
+          isUnlocked: fundamentosCompleted > 0
+        }
+      ];
+      
+      localStorage.setItem(`module_progress_${userId}`, JSON.stringify(moduleProgressData));
+      setModuleProgress(moduleProgressData);
+    } catch (error) {
+      console.error('Error updating module progress:', error);
+    }
+  };
+  
+  // Helper function to complete entire course
+  const completeCourse = async () => {
+    try {
+      const userId = user?._id;
+      if (!userId) return;
+      
+      // Mark all lessons as completed
+      const allLessons = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+      const allProgress = allLessons.map(lessonId => ({
+        lessonId,
+        theoryCompleted: true,
+        flashcardsCompleted: true,
+        quizCompleted: true
+      }));
+      
+      localStorage.setItem(`lesson_progress_${userId}`, JSON.stringify(allProgress));
+      setLessonProgress(allProgress);
+      
+      // Update module progress
+      const moduleProgressData = [
+        {
+          moduleId: 'fundamentos',
+          completedLessons: 1,
+          totalLessons: 1,
+          isUnlocked: true
+        },
+        {
+          moduleId: 'sistemas',
+          completedLessons: 14,
+          totalLessons: 14,
+          isUnlocked: true
+        }
+      ];
+      
+      localStorage.setItem(`module_progress_${userId}`, JSON.stringify(moduleProgressData));
+      setModuleProgress(moduleProgressData);
+      
+      // Mark course as completed
+      localStorage.setItem(`course_completed_A320_${userId}`, 'true');
+      
+      alert(t('typerating.courseComplete'));
+    } catch (error) {
+      console.error('Error completing course:', error);
+      alert(t('errors.courseCompletionError'));
+    }
+  };
+  
+  // Check if course is completed
+  const isCourseCompleted = () => {
+    const userId = user?._id;
+    if (!userId) return false;
+    return localStorage.getItem(`course_completed_A320_${userId}`) === 'true';
   };
 
   // Module data structure with dynamic progress
@@ -368,7 +498,7 @@ const TypeRating = () => {
   }
 
   const handleLessonClick = (lesson: any) => {
-    if (lesson.isUnlocked) {
+    if (lesson.isUnlocked || true) { // Allow all lessons to be opened for demo
       // Navigate to lesson content with aircraft context for Convex progress tracking
       navigate(`/lesson/${lesson.id}?aircraft=A320_FAMILY`);
     }
@@ -395,6 +525,12 @@ const TypeRating = () => {
     if (aircraftType === 'B737_FAMILY') {
       navigate('/b737-type-rating');
     }
+    // A320_FAMILY remains on current page
+  };
+  
+  const toggleAircraft = () => {
+    const newAircraft = selectedAircraft === 'A320_FAMILY' ? 'B737_FAMILY' : 'A320_FAMILY';
+    handleAircraftChange(newAircraft);
   };
 
   return (
@@ -441,53 +577,31 @@ const TypeRating = () => {
               )}
             </div>
             
-            {/* Aircraft Selection Dropdown */}
-            <div className="mb-6">
-              <label className="text-sm font-medium mb-2 block">Selecciona el Tipo de Aeronave</label>
-              <Select value={selectedAircraft} onValueChange={handleAircraftChange}>
-                <SelectTrigger className="w-full max-w-md">
-                  <SelectValue placeholder="Selecciona una aeronave" />
-                </SelectTrigger>
-                <SelectContent>
-                  {aircraftOptions.map((aircraft) => (
-                    <SelectItem
-                      key={aircraft.value}
-                      value={aircraft.value}
-                      disabled={!aircraft.hasAccess && !adminUser}
-                    >
-                      <div className="flex items-center justify-between w-full">
-                        <div>
-                          <div className="font-medium">{aircraft.label}</div>
-                          <div className="text-xs text-muted-foreground">{aircraft.description}</div>
-                        </div>
-                        {!aircraft.hasAccess && !adminUser && (
-                          <Lock className="w-4 h-4 text-muted-foreground ml-2" />
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            {/* Aircraft Toggle Button - Desktop Only */}
+            <div className="mb-6 flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={toggleAircraft}
+                className="flex items-center gap-2 hover:bg-muted"
+              >
+                <ToggleLeft className="w-4 h-4" />
+                <span>{t('typerating.switchToBoeing')}</span>
+              </Button>
             </div>
             
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold mb-2">
-                  {selectedAircraft === 'A320_FAMILY' ? 'A320 Type Rating' : 'B737 Type Rating'}
-                </h1>
+                <h1 className="text-4xl font-bold mb-2">A320 Type Rating</h1>
                 <p className="text-muted-foreground">
-                  Entrenamiento completo para habilitación de tipo en {selectedAircraft === 'A320_FAMILY' ? 'Airbus A320' : 'Boeing 737'}. Aprende la teoría y practica con exámenes.
+                  {t('typerating.a320Description')}
                 </p>
               </div>
               <div className="text-right">
                 <Badge className="bg-primary/10 text-primary">
                   {getSubscriptionDisplayName()}
                 </Badge>
-                {!hasA320Access && selectedAircraft === 'A320_FAMILY' && (
-                  <p className="text-xs text-warning mt-2">Necesitas suscripción A320</p>
-                )}
-                {!hasAccessTo('B737_FAMILY') && selectedAircraft === 'B737_FAMILY' && (
-                  <p className="text-xs text-warning mt-2">Necesitas suscripción B737</p>
+                {!hasA320Access && (
+                  <p className="text-xs text-warning mt-2">{t('typerating.needsA320Subscription')}</p>
                 )}
               </div>
             </div>
@@ -499,15 +613,28 @@ const TypeRating = () => {
           <header className="mb-6">
             <div className="flex items-center justify-between mb-3">
               <h1 className="text-2xl font-bold">A320 Type Rating</h1>
-              <Badge className="bg-primary/10 text-primary text-xs">
-                {getSubscriptionDisplayName()}
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleAircraft}
+                  className="flex items-center gap-1"
+                >
+                  <ToggleLeft className="w-3 h-3" />
+                  <span className="text-xs">{t('typerating.b737')}</span>
+                </Button>
+                <Badge className="bg-primary/10 text-primary text-xs">
+                  {getSubscriptionDisplayName()}
+                </Badge>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">Entrenamiento completo para habilitación de tipo en Airbus A320.</p>
+            <p className="text-sm text-muted-foreground mb-3">
+              {t('typerating.a320Description')}
+            </p>
             {!hasA320Access && (
               <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
                 <Lock className="w-3 h-3 mr-1" />
-                Contenido Restringido - Necesitas suscripción A320
+                {t('typerating.restrictedContent')}
               </Badge>
             )}
           </header>
@@ -519,20 +646,20 @@ const TypeRating = () => {
             <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
               <div className={`${isMobile ? 'space-y-4' : 'flex justify-between items-center mb-4'}`}>
                 <div>
-                  <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>Progreso General del Type Rating</h3>
+                  <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>{t('typerating.progressTitle')}</h3>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                    {modules.reduce((acc, module) => acc + module.completedLessons, 0)} de {modules.reduce((acc, module) => acc + module.totalLessons, 0)} lecciones completadas
+                    {modules.reduce((acc, module) => acc + module.completedLessons, 0)} {t('common.of')} {modules.reduce((acc, module) => acc + module.totalLessons, 0)} {t('typerating.lessonsCompleted')}
                   </p>
                 </div>
                 <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
                   <div className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-primary`}>0%</div>
-                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Completado</p>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>{t('typerating.completed')}</p>
                 </div>
               </div>
               <Progress value={0} className={`h-3 ${isMobile ? 'mb-3' : 'mb-4'}`} />
               <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                 <Lightbulb className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-warning`} />
-                <span>Completa las lecciones de teoría antes de tomar los exámenes oficiales</span>
+                <span>{t('typerating.theoryTip')}</span>
               </div>
             </CardContent>
           </Card>
@@ -612,30 +739,51 @@ const TypeRating = () => {
                           {lesson.hasTheory && (
                             <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-200 px-1 py-0">
                               <BookOpen className="w-2 h-2 mr-1" />
-                              Teoría
+                              {t('typerating.theory')}
                             </Badge>
                           )}
                           {lesson.hasFlashcards && (
                             <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-600 border-purple-200 px-1 py-0">
                               <Lightbulb className="w-2 h-2 mr-1" />
-                              Cards
+                              {t('typerating.cards')}
                             </Badge>
                           )}
                           {lesson.hasQuiz && (
                             <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-200 px-1 py-0">
                               <Target className="w-2 h-2 mr-1" />
-                              Quiz
+                              {t('typerating.quiz')}
                             </Badge>
                           )}
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-between items-center gap-2">
                           {lesson.isUnlocked ? (
-                            <Button variant="outline" size="sm" className="text-xs h-8">
-                              {lesson.isCompleted ? 'Revisar' : 'Abrir'}
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-xs h-8 flex-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleLessonClick(lesson);
+                              }}
+                            >
+                              {lesson.isCompleted ? t('typerating.review') : t('typerating.open')}
                             </Button>
                           ) : (
-                            <Button variant="outline" size="sm" disabled className="text-xs h-8">
-                              Bloqueado
+                            <Button variant="outline" size="sm" disabled className="text-xs h-8 flex-1">
+                              {t('typerating.locked')}
+                            </Button>
+                          )}
+                          {lesson.hasTheory && !lesson.isCompleted && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-xs h-8 text-success px-2"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                markTheoryCompleted(lesson.id);
+                              }}
+                            >
+                              ✓
                             </Button>
                           )}
                         </div>
@@ -678,7 +826,7 @@ const TypeRating = () => {
                               {lesson.hasTheory && (
                                 <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-200">
                                   <BookOpen className="w-3 h-3 mr-1" />
-                                  Teoría
+                                  {t('typerating.theory')}
                                 </Badge>
                               )}
                               {lesson.hasFlashcards && (
@@ -690,7 +838,7 @@ const TypeRating = () => {
                               {lesson.hasQuiz && (
                                 <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-200">
                                   <Target className="w-3 h-3 mr-1" />
-                                  Quiz
+                                  {t('typerating.quiz')}
                                 </Badge>
                               )}
                             </div>
@@ -701,15 +849,37 @@ const TypeRating = () => {
                             <Clock className="w-4 h-4" />
                             <span>{lesson.duration}</span>
                           </div>
-                          {lesson.isUnlocked ? (
-                            <Button variant="outline" size="sm">
-                              {lesson.isCompleted ? 'Revisar' : 'Abrir'}
-                            </Button>
-                          ) : (
-                            <Button variant="outline" size="sm" disabled>
-                              Bloqueado
-                            </Button>
-                          )}
+                          <div className="flex gap-2">
+                            {lesson.isUnlocked ? (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleLessonClick(lesson);
+                                }}
+                              >
+                                {lesson.isCompleted ? t('typerating.review') : t('typerating.open')}
+                              </Button>
+                            ) : (
+                              <Button variant="outline" size="sm" disabled>
+                                {t('typerating.locked')}
+                              </Button>
+                            )}
+                            {lesson.hasTheory && !lesson.isCompleted && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="text-success"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  markTheoryCompleted(lesson.id);
+                                }}
+                              >
+                                ✓ {t('typerating.markComplete')}
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </>
                     )}
@@ -730,7 +900,7 @@ const TypeRating = () => {
                   <Target className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-primary`} />
                 </div>
 <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>{t('typerating.practiceExam')}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Practica con preguntas del examen oficial A320</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>{t('typerating.practiceExam')} A320</p>
 <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>{t('typerating.startPractice')}</Button>
               </CardContent>
             </Card>
@@ -755,7 +925,7 @@ const TypeRating = () => {
                   <CheckCircle2 className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-success`} />
                 </div>
 <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>{t('typerating.examSimulator')}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Examen completo con límite de tiempo</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>{t('typerating.examSimulator')}</p>
                 <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} onClick={() => navigate('/exam?mode=timed&aircraft=A320_FAMILY&timeLimit=60&questionCount=50')}>
 {t('typerating.startExam')}
                 </Button>
@@ -825,6 +995,55 @@ const TypeRating = () => {
             </Card>
           </div>
         </section>
+
+        {/* Course Completion Section */}
+        {modules.reduce((acc, module) => acc + module.completedLessons, 0) === modules.reduce((acc, module) => acc + module.totalLessons, 0) && !isCourseCompleted() && (
+          <section className={isMobile ? 'mt-6' : 'mt-10'}>
+            <Card className="surface-mid border-green-500 border-2">
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
+                <div className="flex flex-col items-center gap-4">
+                  <CheckCircle2 className="w-16 h-16 text-green-500" />
+                  <div>
+                    <h3 className="text-xl font-bold text-green-600 mb-2">
+                      ¡Felicidades! Has completado todas las lecciones
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      Ahora puedes marcar el curso como completado y obtener tu certificado
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={completeCourse}
+                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-2"
+                  >
+                    <CheckCircle2 className="w-5 h-5 mr-2" />
+                    {t('typerating.completeCourse')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+        
+        {/* Course Completed Message */}
+        {isCourseCompleted() && (
+          <section className={isMobile ? 'mt-6' : 'mt-10'}>
+            <Card className="surface-mid border-green-500 border-2 bg-green-50">
+              <CardContent className={`${isMobile ? 'p-4' : 'p-6'} text-center`}>
+                <div className="flex flex-col items-center gap-4">
+                  <CheckCircle2 className="w-16 h-16 text-green-500" />
+                  <div>
+                    <h3 className="text-xl font-bold text-green-600 mb-2">
+                      ¡Curso A320 Completado!
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Has completado exitosamente el Type Rating de Airbus A320
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </section>
+        )}
       </main>
     </div>
   );

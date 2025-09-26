@@ -11,7 +11,9 @@ import {
   Star,
   Lightbulb,
   Target, // Added missing import
-  BookOpen // Added missing import
+  BookOpen, // Added missing import
+  ToggleLeft,
+  ToggleRight
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -58,6 +60,11 @@ const B737TypeRating = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [moduleProgress, setModuleProgress] = useState<any[]>([]);
   const [lessonProgress, setLessonProgress] = useState<any[]>([]);
+  
+  // Aircraft toggle functionality
+  const toggleAircraft = () => {
+    navigate('/type-rating'); // Navigate back to A320
+  };
 
   // Load progress data when component mounts - using localStorage for now
   useEffect(() => {
@@ -126,8 +133,85 @@ const B737TypeRating = () => {
   };
   
   const isLessonCompleted = (lessonId: number) => {
-    const progress = getLessonProgressById(lessonId);
-    return progress?.isCompleted || false;
+    try {
+      const progress = getLessonProgressById(lessonId);
+      return progress?.isCompleted || false;
+    } catch (error) {
+      console.warn(`Error checking lesson ${lessonId} completion:`, error);
+      return false;
+    }
+  };
+  
+  // Helper function to allow marking theory as completed
+  const markTheoryCompleted = async (lessonId: number) => {
+    try {
+      // For now, use localStorage until Convex is deployed
+      const userId = user?._id;
+      if (!userId) return;
+      
+      const progress = getLessonProgressById(lessonId) || {
+        lessonId,
+        isCompleted: false,
+        theoryCompleted: false,
+        flashcardsCompleted: false,
+        quizCompleted: false
+      };
+      
+      progress.theoryCompleted = true;
+      
+      // Update localStorage
+      const key = `lesson_progress_${userId}`;
+      const allProgress = JSON.parse(localStorage.getItem(key) || '[]');
+      const existingIndex = allProgress.findIndex((p: any) => p.lessonId === lessonId);
+      
+      if (existingIndex >= 0) {
+        allProgress[existingIndex] = progress;
+      } else {
+        allProgress.push(progress);
+      }
+      
+      localStorage.setItem(key, JSON.stringify(allProgress));
+      setLessonProgress(allProgress);
+      
+    } catch (error) {
+      console.error('Error marking theory completed:', error);
+    }
+  };
+  
+  // Helper function to complete entire course
+  const completeCourse = async () => {
+    try {
+      const userId = user?._id;
+      if (!userId) return;
+      
+      // Mark all B737 lessons as completed
+      const allLessons = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+      const allProgress = allLessons.map(lessonId => ({
+        lessonId,
+        isCompleted: true,
+        theoryCompleted: true,
+        flashcardsCompleted: true,
+        quizCompleted: true
+      }));
+      
+      localStorage.setItem(`lesson_progress_${userId}`, JSON.stringify(allProgress));
+      setLessonProgress(allProgress);
+      
+      // Mark course as completed
+      localStorage.setItem(`course_completed_B737_${userId}`, 'true');
+      
+      alert(t('typerating.courseComplete'));
+    } catch (error) {
+      console.error('Error completing course:', error);
+      alert(t('errors.courseCompletionError'));
+    }
+  };
+  
+  // Check if course is completed
+  const isCourseCompleted = () => {
+    const userId = user?._id;
+    if (!userId) return false;
+    return localStorage.getItem(`course_completed_B737_${userId}`) === 'true';
   };
 
   // Module data structure with dynamic progress - BOEING 737 SPECIFIC
@@ -453,6 +537,19 @@ const B737TypeRating = () => {
                 </Badge>
               )}
             </div>
+            
+            {/* Aircraft Toggle Button */}
+            <div className="mb-6 flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={toggleAircraft}
+                className="flex items-center gap-2 hover:bg-muted"
+              >
+                <ToggleRight className="w-4 h-4" />
+                <span>Cambiar a Airbus A320</span>
+              </Button>
+            </div>
+            
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-4xl font-bold mb-2">B737 Type Rating</h1>
@@ -479,6 +576,15 @@ const B737TypeRating = () => {
             <div className="flex items-center justify-between mb-3">
               <h1 className="text-2xl font-bold">B737 Type Rating</h1>
               <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={toggleAircraft}
+                  className="flex items-center gap-1"
+                >
+                  <ToggleRight className="w-3 h-3" />
+                  <span className="text-xs">A320</span>
+                </Button>
                 <LanguageToggle />
                 <Badge className="bg-primary/10 text-primary text-xs">
                   {getSubscriptionDisplayName()}
@@ -623,7 +729,17 @@ const B737TypeRating = () => {
                           )}
                         </div>
                         <div className="flex justify-end">
-                          <Button variant="outline" size="sm" className="text-xs h-8">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="text-xs h-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!lesson.isCompleted && lesson.hasTheory) {
+                                markTheoryCompleted(lesson.id);
+                              }
+                            }}
+                          >
                             {lesson.isCompleted ? 'Revisar' : 'Abrir'}
                           </Button>
                         </div>
@@ -689,7 +805,16 @@ const B737TypeRating = () => {
                             <Clock className="w-4 h-4" />
                             <span>{lesson.duration}</span>
                           </div>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (!lesson.isCompleted && lesson.hasTheory) {
+                                markTheoryCompleted(lesson.id);
+                              }
+                            }}
+                          >
                             {lesson.isCompleted ? 'Revisar' : 'Abrir'}
                           </Button>
                         </div>

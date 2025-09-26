@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useTypeRatingProgress } from '@/hooks/useTypeRatingProgress';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const LessonDetail = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const LessonDetail = () => {
   const [searchParams] = useSearchParams();
   const aircraftParam = (searchParams.get('aircraft') as 'A320_FAMILY' | 'B737_FAMILY' | null) || 'A320_FAMILY';
   const { mark } = useTypeRatingProgress(aircraftParam);
+  const { t } = useLanguage();
   
   // Modal state
   const [showTheoryContent, setShowTheoryContent] = useState(false);
@@ -51,73 +53,231 @@ const LessonDetail = () => {
   const updateProgress = useMutation(api.lessons.updateLessonProgress);
   const resetProgressMutation = useMutation(api.lessons.resetLessonProgress);
 
-  // Mock lesson data
-  const lessonData = {
-    id: lessonId || '1',
-    title: "Boeing 737 Air Conditioning & Pressurization Systems",
-    description: "Learn about the Boeing 737 cabin air conditioning, pressurization, and environmental control systems.",
-    category: "Systems",
-    aircraft: "Boeing 737",
-    duration: "60 minutes",
-    difficulty: "Advanced",
-    content: `
-      <h2>Boeing 737 Air Conditioning & Pressurization Systems</h2>
-      
-      <h3>Overview</h3>
-      <p>The Boeing 737 air conditioning and pressurization system maintains a comfortable and safe environment for passengers and crew.</p>
-      
-      <h3>Key Components</h3>
-      <ul>
-        <li><strong>Air Conditioning Packs (PACKs)</strong> - Two packs provide conditioned air</li>
-        <li><strong>Cabin Pressure Controller (CPC)</strong> - Automatic pressure control</li>
-        <li><strong>Outflow Valves</strong> - Control cabin pressure by regulating air outflow</li>
-        <li><strong>Mixing Manifold</strong> - Combines conditioned and recirculated air</li>
-      </ul>
-      
-      <h3>Emergency Procedures</h3>
-      <p>In case of system failure, follow QRH procedures and consider diverting if pressurization cannot be maintained.</p>
-    `,
-    objectives: [
-      "Understand air conditioning system components",
-      "Explain pressurization system operation", 
-      "Identify key system controls and indicators",
-      "Know emergency procedures for system failures"
-    ]
-  };
-
-  // Flashcards data
-  const flashcards = [
-    {
-      id: 1,
-      front: "PACK (Pneumatic Air Cycle Kit)",
-      back: "Air conditioning unit that cools and conditions bleed air from the engines or APU for cabin use.",
-      category: "Air Conditioning"
-    },
-    {
-      id: 2,
-      front: "Cabin Pressure Controller (CPC)",
-      back: "Automatic system that maintains cabin pressure by controlling outflow valves.",
-      category: "Pressurization"
-    },
-    {
-      id: 3,
-      front: "Outflow Valve",
-      back: "Valve that controls the rate of air leaving the cabin to maintain proper pressurization.",
-      category: "Pressurization"
-    },
-    {
-      id: 4,
-      front: "Bleed Air",
-      back: "Hot, high-pressure air taken from the engine compressor stages, used for cabin air conditioning and pressurization.",
-      category: "Air Source"
-    },
-    {
-      id: 5,
-      front: "Mixing Manifold",
-      back: "Component that combines conditioned air from PACKs with recirculated cabin air.",
-      category: "Air Distribution"
+  // Aircraft-specific lesson data based on the aircraft parameter
+  const getLessonData = () => {
+    const lessonNumber = parseInt(lessonId || '1');
+    
+    if (aircraftParam === 'B737_FAMILY') {
+      // Boeing 737 specific content
+      const b737Lessons: Record<number, any> = {
+        1: {
+          id: lessonId || '1',
+          title: "Boeing 737 Aircraft General Knowledge",
+          description: "Comprehensive overview of Boeing 737 family: variants (700/800/900), dimensions, weights, and basic specifications per EASA/FAA standards.",
+          category: "Fundamentals",
+          aircraft: "Boeing 737",
+          duration: "75 minutes",
+          difficulty: "Basic",
+          content: `
+            <h2>Boeing 737 Aircraft General Knowledge</h2>
+            
+            <h3>Overview</h3>
+            <p>The Boeing 737 is a narrow-body commercial airliner family. Learn about its variants, specifications, and operational characteristics.</p>
+            
+            <h3>Aircraft Variants</h3>
+            <ul>
+              <li><strong>Boeing 737-700</strong> - Shorter variant with reduced capacity</li>
+              <li><strong>Boeing 737-800</strong> - Most common variant in current operation</li>
+              <li><strong>Boeing 737-900</strong> - Extended variant with increased passenger capacity</li>
+              <li><strong>Boeing 737 MAX</strong> - Latest generation with new engines</li>
+            </ul>
+            
+            <h3>Key Specifications</h3>
+            <p>Maximum takeoff weight varies by variant. The 737-800 has an MTOW of approximately 79,000 kg.</p>
+            
+            <h3>Certification Standards</h3>
+            <p>Boeing 737 is certified under FAA Part 25 and EASA CS-25 regulations for commercial transport aircraft.</p>
+          `,
+          objectives: [
+            "Identify Boeing 737 aircraft variants and their differences",
+            "Understand basic aircraft dimensions and weight limitations", 
+            "Know certification standards applicable to Boeing 737",
+            "Recognize key operational characteristics"
+          ]
+        },
+        4: {
+          id: lessonId || '4',
+          title: "Boeing 737 Air Conditioning & Pressurization Systems",
+          description: "Boeing 737 environmental control systems: cabin pressurization, air conditioning packs, bleed air systems, and emergency procedures per Boeing QRH.",
+          category: "Systems",
+          aircraft: "Boeing 737",
+          duration: "90 minutes",
+          difficulty: "Advanced",
+          content: `
+            <h2>Boeing 737 Air Conditioning & Pressurization Systems</h2>
+            
+            <h3>Overview</h3>
+            <p>The Boeing 737 air conditioning and pressurization system maintains a comfortable and safe environment for passengers and crew.</p>
+            
+            <h3>Key Components</h3>
+            <ul>
+              <li><strong>Air Conditioning Packs (PACKs)</strong> - Two packs provide conditioned air</li>
+              <li><strong>Cabin Pressure Controller (CPC)</strong> - Automatic pressure control</li>
+              <li><strong>Outflow Valves</strong> - Control cabin pressure by regulating air outflow</li>
+              <li><strong>Mixing Manifold</strong> - Combines conditioned and recirculated air</li>
+            </ul>
+            
+            <h3>Emergency Procedures</h3>
+            <p>In case of system failure, follow Boeing QRH procedures and consider diverting if pressurization cannot be maintained.</p>
+          `,
+          objectives: [
+            "Understand Boeing 737 air conditioning system components",
+            "Explain Boeing 737 pressurization system operation", 
+            "Identify key system controls and indicators on Boeing 737",
+            "Know emergency procedures for Boeing 737 system failures"
+          ]
+        }
+      };
+      return b737Lessons[lessonNumber] || b737Lessons[1];
+    } else {
+      // Airbus A320 specific content
+      const a320Lessons: Record<number, any> = {
+        1: {
+          id: lessonId || '1',
+          title: "Airbus A320 Airplane General",
+          description: "Visión general A320: arquitectura, variantes y filosofía Airbus.",
+          category: "Fundamentos",
+          aircraft: "Airbus A320",
+          duration: "45 minutes",
+          difficulty: "Basic",
+          content: `
+            <h2>Airbus A320 Airplane General</h2>
+            
+            <h3>Overview</h3>
+            <p>The Airbus A320 family is a series of narrow-body airliners. Learn about Airbus design philosophy and aircraft characteristics.</p>
+            
+            <h3>Aircraft Variants</h3>
+            <ul>
+              <li><strong>Airbus A318</strong> - Shortest variant of the A320 family</li>
+              <li><strong>Airbus A319</strong> - Shortened fuselage variant</li>
+              <li><strong>Airbus A320</strong> - Original and most common variant</li>
+              <li><strong>Airbus A321</strong> - Stretched variant with increased capacity</li>
+            </ul>
+            
+            <h3>Airbus Philosophy</h3>
+            <p>Airbus emphasizes fly-by-wire technology and flight envelope protection systems.</p>
+            
+            <h3>Key Features</h3>
+            <p>The A320 features side-stick controls, ECAM system, and comprehensive automation.</p>
+          `,
+          objectives: [
+            "Understand Airbus A320 family variants and differences",
+            "Learn about Airbus design philosophy and approach", 
+            "Identify key A320 systems and controls",
+            "Recognize A320 operational characteristics"
+          ]
+        },
+        2: {
+          id: lessonId || '2',
+          title: "Airbus A320 Air Conditioning & Pressurization",
+          description: "Control de la temperatura, la presión y la calidad del aire en cabina, garantizando confort y seguridad para tripulación y pasajeros",
+          category: "Sistemas",
+          aircraft: "Airbus A320",
+          duration: "60 minutes",
+          difficulty: "Advanced",
+          content: `
+            <h2>Airbus A320 Air Conditioning & Pressurization</h2>
+            
+            <h3>Overview</h3>
+            <p>The Airbus A320 environmental control system manages cabin temperature, pressure, and air quality.</p>
+            
+            <h3>Key Components</h3>
+            <ul>
+              <li><strong>Air Conditioning Units</strong> - Two independent units for redundancy</li>
+              <li><strong>Cabin Pressure Controller</strong> - Automatic pressure management</li>
+              <li><strong>Outflow Valves</strong> - Regulate cabin pressure automatically</li>
+              <li><strong>Pack Flow Control</strong> - Manages air distribution</li>
+            </ul>
+            
+            <h3>ECAM Integration</h3>
+            <p>The A320 ECAM system provides comprehensive monitoring and alerts for environmental systems.</p>
+          `,
+          objectives: [
+            "Understand Airbus A320 air conditioning components",
+            "Explain A320 pressurization system operation", 
+            "Learn ECAM indications for environmental systems",
+            "Know A320-specific emergency procedures"
+          ]
+        }
+      };
+      return a320Lessons[lessonNumber] || a320Lessons[1];
     }
-  ];
+  };
+  
+  const lessonData = getLessonData();
+
+  // Aircraft-specific flashcards data
+  const getFlashcardsData = () => {
+    if (aircraftParam === 'B737_FAMILY') {
+      return [
+        {
+          id: 1,
+          front: "Boeing 737 PACK (Pneumatic Air Cycle Kit)",
+          back: "Air conditioning unit that cools and conditions bleed air from the engines or APU for cabin use in Boeing 737.",
+          category: "Air Conditioning"
+        },
+        {
+          id: 2,
+          front: "Boeing 737 Cabin Pressure Controller (CPC)",
+          back: "Automatic system in Boeing 737 that maintains cabin pressure by controlling outflow valves.",
+          category: "Pressurization"
+        },
+        {
+          id: 3,
+          front: "Boeing 737 Outflow Valve",
+          back: "Valve in Boeing 737 that controls the rate of air leaving the cabin to maintain proper pressurization.",
+          category: "Pressurization"
+        },
+        {
+          id: 4,
+          front: "Boeing 737 Bleed Air",
+          back: "Hot, high-pressure air taken from the Boeing 737 engine compressor stages, used for cabin air conditioning and pressurization.",
+          category: "Air Source"
+        },
+        {
+          id: 5,
+          front: "Boeing 737 Mixing Manifold",
+          back: "Component in Boeing 737 that combines conditioned air from PACKs with recirculated cabin air.",
+          category: "Air Distribution"
+        }
+      ];
+    } else {
+      return [
+        {
+          id: 1,
+          front: "Airbus A320 Air Conditioning Unit",
+          back: "Independent air conditioning system in A320 that provides conditioned air for cabin comfort.",
+          category: "Air Conditioning"
+        },
+        {
+          id: 2,
+          front: "Airbus A320 Cabin Pressure Controller",
+          back: "Automatic system in A320 that maintains cabin pressure with ECAM integration.",
+          category: "Pressurization"
+        },
+        {
+          id: 3,
+          front: "Airbus A320 ECAM",
+          back: "Electronic Centralized Aircraft Monitoring system that provides comprehensive aircraft systems monitoring in A320.",
+          category: "Systems Monitoring"
+        },
+        {
+          id: 4,
+          front: "Airbus A320 Pack Flow Control",
+          back: "System in A320 that manages air distribution and flow control throughout the cabin.",
+          category: "Air Distribution"
+        },
+        {
+          id: 5,
+          front: "Airbus A320 Side-stick",
+          back: "Primary flight control input device in A320, replacing conventional control yoke.",
+          category: "Flight Controls"
+        }
+      ];
+    }
+  };
+  
+  const flashcards = getFlashcardsData();
 
   // Event handlers
   const handleTheoryComplete = async () => {
@@ -181,7 +341,7 @@ const LessonDetail = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading lesson...</p>
+          <p className="text-muted-foreground">{t('lesson.loadingLesson')}</p>
         </div>
       </div>
     );
@@ -207,7 +367,7 @@ const LessonDetail = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Course
+            {t('lesson.backToCourse')}
           </Button>
           <Button 
             variant="outline" 
@@ -215,15 +375,15 @@ const LessonDetail = () => {
             onClick={handleResetProgress}
             className="flex items-center gap-2"
           >
-            Reset Progress
+            {t('lesson.resetProgress')}
           </Button>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">Lesson Details</h1>
-              <p className="text-sm text-muted-foreground">Complete all activities to finish this lesson</p>
+              <h1 className="text-2xl font-bold">{t('lesson.details')}</h1>
+              <p className="text-sm text-muted-foreground">{t('lesson.completeAllActivities')}</p>
             </div>
           </div>
         </div>
@@ -252,7 +412,7 @@ const LessonDetail = () => {
           <CardContent>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Lesson Progress</span>
+                <span className="text-sm font-medium">{t('lesson.progress')}</span>
                 <span className="text-sm font-medium">{safeProgress.overallProgress}%</span>
               </div>
               <Progress value={safeProgress.overallProgress} className="h-2" />
@@ -267,12 +427,12 @@ const LessonDetail = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <FileText className="w-5 h-5" />
-                Theory
+                {t('lesson.theory')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Study the theoretical concepts and principles of this lesson.
+                {t('lesson.startTheory')}
               </p>
               <Button 
                 className="w-full" 
@@ -281,12 +441,12 @@ const LessonDetail = () => {
                 {safeProgress.theoryCompleted ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Completed
+                    {t('common.completed')}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    Start Theory
+                    {t('lesson.startTheory')}
                   </>
                 )}
               </Button>
@@ -298,7 +458,7 @@ const LessonDetail = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <BookMarked className="w-5 h-5" />
-                Flashcards
+                {t('lesson.flashcards')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -314,12 +474,12 @@ const LessonDetail = () => {
                 {safeProgress.flashcardsCompleted ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Completed
+                    {t('common.completed')}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    {safeProgress.theoryCompleted ? 'Start Flashcards' : 'Complete Theory First'}
+                    {safeProgress.theoryCompleted ? t('lesson.startFlashcards') : t('lesson.completeTheoryFirst')}
                   </>
                 )}
               </Button>
@@ -331,7 +491,7 @@ const LessonDetail = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Star className="w-5 h-5" />
-                Quiz
+                {t('lesson.quiz')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -347,12 +507,12 @@ const LessonDetail = () => {
                 {safeProgress.quizCompleted ? (
                   <>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Completed
+                    {t('common.completed')}
                   </>
                 ) : (
                   <>
                     <Play className="w-4 h-4 mr-2" />
-                    {safeProgress.flashcardsCompleted ? 'Start Quiz' : 'Complete Flashcards First'}
+                    {safeProgress.flashcardsCompleted ? t('lesson.startQuiz') : t('lesson.completeFlashcardsFirst')}
                   </>
                 )}
               </Button>
@@ -365,7 +525,7 @@ const LessonDetail = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="w-5 h-5" />
-              Learning Objectives
+              {t('lesson.objectives')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -402,11 +562,11 @@ const LessonDetail = () => {
                 />
                 <div className="flex justify-end gap-4 pt-4 border-t">
                   <Button variant="outline" onClick={() => setShowTheoryContent(false)}>
-                    Close
+                    {t('lesson.close')}
                   </Button>
                   <Button onClick={handleTheoryComplete}>
                     <CheckCircle2 className="w-4 h-4 mr-2" />
-                    Mark as Complete
+                    {t('lesson.markAsComplete')}
                   </Button>
                 </div>
               </CardContent>
@@ -422,7 +582,7 @@ const LessonDetail = () => {
                 <CardTitle className="flex items-center justify-between">
                   <span className="flex items-center gap-2">
                     <FileText className="w-5 h-5" />
-                    Flashcards: Key Terms
+                    {t('lesson.keyTerms')}
                   </span>
                   <Button variant="ghost" size="sm" onClick={() => setShowFlashcards(false)}>
                     ✕

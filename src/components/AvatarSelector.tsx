@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -51,12 +52,27 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
   const [selectedColor, setSelectedColor] = useState('blue');
 
   const handleSave = () => {
-    // Create a simple avatar URL based on selection
-    const avatarUrl = `${selectedAvatar}-${selectedColor}`;
-    if (onAvatarSelect) {
-      onAvatarSelect(avatarUrl);
+    try {
+      // Create a simple avatar URL based on selection
+      const avatarUrl = `${selectedAvatar}-${selectedColor}`;
+      
+      // Save to localStorage for persistence
+      localStorage.setItem('userAvatarSelection', JSON.stringify({
+        avatar: selectedAvatar,
+        color: selectedColor,
+        url: avatarUrl
+      }));
+      
+      if (onAvatarSelect) {
+        onAvatarSelect(avatarUrl);
+      }
+      setIsOpen(false);
+      
+      // Show success feedback
+      console.log('Avatar saved successfully:', avatarUrl);
+    } catch (error) {
+      console.error('Error saving avatar:', error);
     }
-    setIsOpen(false);
   };
 
   const SelectedIcon = avatarOptions.find(opt => opt.id === selectedAvatar)?.icon || User;
@@ -72,6 +88,9 @@ export const AvatarSelector: React.FC<AvatarSelectorProps> = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Select Avatar</DialogTitle>
+          <DialogDescription>
+            Choose an avatar style and color to personalize your profile.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6">

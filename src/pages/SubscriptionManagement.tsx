@@ -18,7 +18,7 @@ import {
 import { useAuth } from '@/hooks/useConvexAuth';
 import SubscriptionManager from '@/components/SubscriptionManager';
 import { useNavigate } from 'react-router-dom';
-import { PRICING_PLANS } from '@/config/pricing';
+import { PRICING_PLANS, getTranslatedPlans } from '@/config/pricing';
 import { useAction } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Input } from '@/components/ui/input';
@@ -44,6 +44,9 @@ const SubscriptionManagement = () => {
     }
   }, []);
 
+  // Get translated pricing plans
+  const translatedPlans = getTranslatedPlans(PRICING_PLANS, t);
+  
   const highlightPlan = (planId: string) => preselectedPlanId && preselectedPlanId === planId;
   
   // Mock user subscription data
@@ -113,13 +116,23 @@ const SubscriptionManagement = () => {
                   </div>
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {PRICING_PLANS.map((plan) => (
+                  {translatedPlans.map((plan) => (
                     <div key={plan.id} className={`p-4 border rounded-lg ${highlightPlan(plan.id) ? 'ring-2 ring-primary' : ''}`}>
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold">{plan.name}</h3>
                         <Badge>€{plan.price.toFixed(2)}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">{plan.description}</p>
+                      {plan.popular && (
+                        <Badge className="mb-2 bg-primary text-primary-foreground">
+                          {t('pricing.popular')}
+                        </Badge>
+                      )}
+                      {plan.bestValue && (
+                        <Badge className="mb-2 bg-success text-success-foreground">
+                          {t('pricing.bestValue')}
+                        </Badge>
+                      )}
                       <Button
                         className="w-full"
                         onClick={async () => {
@@ -131,7 +144,7 @@ const SubscriptionManagement = () => {
                               return;
                             }
                             console.log('[UI] Creating checkout', { productId: plan.productId || plan.id, userId, email });
-const result = await createCheckout({
+                            const result = await createCheckout({
                               productId: plan.productId || plan.id,
                               userId: userId!,
                               email: email!
@@ -155,7 +168,7 @@ const result = await createCheckout({
                           }
                         }}
                       >
-{t('subscription.subscribe')}
+                        {t('subscription.subscribe')}
                       </Button>
                     </div>
                   ))}

@@ -18,7 +18,7 @@ import {
   TrendingUp,
   Plane
 } from "lucide-react";
-import { PRICING_PLANS } from "@/config/pricing";
+import { PRICING_PLANS, getTranslatedPlans } from "@/config/pricing";
 import heroCockpit from "@/assets/hero-cockpit.jpg";
 import logo from "@/assets/logo.svg";
 import { useAuth } from "@/hooks/useConvexAuth";
@@ -67,34 +67,6 @@ const features = [
   }
 ];
 
-const pricingPlans = [
-  {
-    name: "Gratuito",
-    price: "€0",
-    featured: false,
-    bestValue: false,
-    description: "Para empezar tu preparación",
-    features: [
-      "Acceso a cursos básicos",
-      "Primera lección de cada curso", 
-      "Máximo 10 preguntas por examen",
-      "Categorías limitadas (A320, B737)"
-    ],
-    cta: "Empezar gratis"
-  },
-  ...PRICING_PLANS.map(plan => ({
-    name: plan.name.includes('A320') ? '1 mes A320' : 
-          plan.name.includes('B737') ? '1 mes B737' :
-          plan.name.includes('Complete') ? '1 año - Mejor Valor' : plan.name,
-    price: `€${plan.price.toFixed(0)}`,
-    featured: plan.name.includes('Premium'),
-    bestValue: plan.name.includes('Complete'),
-    description: plan.description,
-    features: plan.features,
-    cta: "Seleccionar plan"
-  }))
-];
-
 const testimonials = [
   {
     quote: "I passed my A320 exam on the first try. The questions were identical to the real exam. Amazing platform.",
@@ -118,11 +90,48 @@ const Index = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const handlePlanSelect = (planName: string) => {
+  // Define pricing plans with translations
+  const pricingPlans = [
+    {
+      name: t('plans.free.name'),
+      price: "€0",
+      featured: false,
+      bestValue: false,
+      description: t('plans.free.description'),
+      features: [
+        t('features.free.1'),
+        t('features.free.2'), 
+        t('features.free.3'),
+        t('features.free.4')
+      ],
+      cta: t('pricing.startFree'),
+      id: 'pilotprepflightx_gratuito'
+    },
+    ...getTranslatedPlans(PRICING_PLANS.filter(plan => plan.durationMonths > 0), t).map(plan => ({
+      name: plan.name,
+      price: `€${plan.price.toFixed(0)}`,
+      featured: plan.popular || false,
+      bestValue: plan.bestValue || false,
+      description: plan.description,
+      features: plan.features,
+      cta: t('pricing.selectPlan'),
+      id: plan.id
+    }))
+  ];
+
+  const handlePlanSelect = (planData: { id?: string; name: string } | string) => {
     try {
       // Persist chosen plan id for subscription-management
-      const match = PRICING_PLANS.find(p => planName.includes(p.name.split(' ')[0]) || planName === p.name);
-      if (match) localStorage.setItem('selectedPlan', JSON.stringify(match.id));
+      let planId: string;
+      if (typeof planData === 'string') {
+        planId = planData;
+        const match = PRICING_PLANS.find(p => p.name.includes(planData) || planData === p.name);
+        if (match) localStorage.setItem('selectedPlan', JSON.stringify(match.id));
+      } else {
+        planId = planData.id || planData.name;
+        const match = PRICING_PLANS.find(p => p.id === planId || p.name.includes(planData.name));
+        if (match) localStorage.setItem('selectedPlan', JSON.stringify(match.id));
+      }
     } catch {}
 
     if (user) {
@@ -477,7 +486,7 @@ const Index = () => {
                   <Button 
                     className={`w-full ${plan.featured || plan.bestValue ? 'bg-primary hover:bg-primary-dark' : ''}`}
                     variant={plan.featured || plan.bestValue ? 'default' : 'outline'}
-                    onClick={() => handlePlanSelect(plan.name)}
+                    onClick={() => handlePlanSelect({ id: plan.id, name: plan.name })}
                   >
                     {plan.cta}
                   </Button>

@@ -65,7 +65,7 @@ const TypeRating = () => {
   const [selectedAircraft, setSelectedAircraft] = useState<'A320_FAMILY' | 'B737_FAMILY'>('A320_FAMILY');
 
   // Convex type rating progress (A320)
-  const { progressByLesson } = useTypeRatingProgress('A320_FAMILY');
+  const { progressByLesson, mark: markProgressInConvex } = useTypeRatingProgress('A320_FAMILY');
 
   // Load progress data when component mounts - using localStorage for now
   useEffect(() => {
@@ -135,6 +135,15 @@ const TypeRating = () => {
   // Helper function to check if lesson is completed with proper error handling
   const isLessonCompleted = (lessonId: number) => {
     try {
+      // First check Convex data
+      const convexProgress = progressByLesson.get(lessonId);
+      if (convexProgress) {
+        return convexProgress.theoryCompleted && 
+               convexProgress.flashcardsCompleted && 
+               convexProgress.quizCompleted;
+      }
+      
+      // Fallback to localStorage
       const progress = getLessonProgressById(lessonId);
       return progress ? 
         (progress.theoryCompleted && 
@@ -149,10 +158,18 @@ const TypeRating = () => {
   // Helper function to allow marking theory as completed
   const markTheoryCompleted = async (lessonId: number) => {
     try {
-      // For now, use localStorage until Convex is deployed
       const userId = user?._id;
       if (!userId) return;
       
+      // Update Convex backend first
+      try {
+        await markProgressInConvex(lessonId, 'theory');
+        console.log(`Theory completed for lesson ${lessonId} synced to Convex`);
+      } catch (convexError) {
+        console.warn('Failed to sync to Convex, using localStorage fallback:', convexError);
+      }
+      
+      // Update localStorage as fallback
       const progress = getLessonProgressById(lessonId) || {
         lessonId,
         theoryCompleted: false,
@@ -162,7 +179,6 @@ const TypeRating = () => {
       
       progress.theoryCompleted = true;
       
-      // Update localStorage
       const key = `lesson_progress_${userId}`;
       const allProgress = JSON.parse(localStorage.getItem(key) || '[]');
       const existingIndex = allProgress.findIndex((p: any) => p.lessonId === lessonId);
@@ -221,8 +237,20 @@ const TypeRating = () => {
       const userId = user?._id;
       if (!userId) return;
       
-      // Mark all lessons as completed
+      // Mark all lessons as completed in Convex first
       const allLessons = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+      try {
+        for (const lessonId of allLessons) {
+          await markProgressInConvex(lessonId, 'theory');
+          await markProgressInConvex(lessonId, 'flashcards');
+          await markProgressInConvex(lessonId, 'quiz');
+        }
+        console.log('All lessons marked as complete in Convex');
+      } catch (convexError) {
+        console.warn('Failed to sync course completion to Convex:', convexError);
+      }
+      
+      // Update localStorage as fallback
       const allProgress = allLessons.map(lessonId => ({
         lessonId,
         theoryCompleted: true,

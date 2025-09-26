@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   ArrowLeft,
   Edit,
@@ -51,8 +52,24 @@ const Profile = () => {
     navigate('/login');
   };
 
-  const handleAvatarSelect = (avatarUrl: string) => {
-    updateAvatar(avatarUrl);
+  const handleAvatarSelect = async (avatarUrl: string) => {
+    try {
+      // Save to localStorage for immediate persistence
+      localStorage.setItem('userAvatarSelection', JSON.stringify({
+        url: avatarUrl,
+        timestamp: Date.now()
+      }));
+      
+      // Try to update profile via backend
+      if (updateAvatar) {
+        await updateAvatar(avatarUrl);
+      }
+      
+      console.log('Avatar updated successfully:', avatarUrl);
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      // Avatar is still saved in localStorage as fallback
+    }
   };
 
   const handleSave = () => {

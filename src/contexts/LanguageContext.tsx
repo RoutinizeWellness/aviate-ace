@@ -210,10 +210,23 @@ const translations: Record<'es' | 'en', Record<string, string>> = {
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<'es' | 'en'>(() => {
+    // First check localStorage
     const saved = localStorage.getItem('language') as 'es' | 'en' | null;
     if (saved === 'es' || saved === 'en') return saved;
-    const browser = (navigator.language || navigator.languages?.[0] || 'en').toLowerCase();
-    return browser.startsWith('es') ? 'es' : 'en';
+    
+    // Then check browser language - prioritize Spanish detection
+    const browserLanguage = (navigator.language || navigator.languages?.[0] || 'en').toLowerCase();
+    
+    // Enhanced Spanish detection
+    if (browserLanguage.startsWith('es') || 
+        browserLanguage.includes('es-') ||
+        browserLanguage === 'es' ||
+        navigator.languages?.some(lang => lang.toLowerCase().startsWith('es'))) {
+      return 'es';
+    }
+    
+    // Default to English for all other cases
+    return 'en';
   });
 
   useEffect(() => {
@@ -226,17 +239,30 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const handleSetLanguage = (lang: 'es' | 'en') => {
     setLanguage(lang);
     localStorage.setItem('language', lang);
+    
+    // Dispatch a custom event for language change notifications
+    window.dispatchEvent(new CustomEvent('languageChange', { detail: { newLanguage: lang } }));
   };
 
   const t = (key: string): string => {
     return translations[language][key] || key;
   };
 
-  // Reflect language in the <html> tag and force minimal visual updates without reload
+  // Reflect language in the <html> tag and add smooth transition effects
   useEffect(() => {
     try {
       document.documentElement.lang = language;
       document.documentElement.setAttribute('data-lang', language);
+      
+      // Add a temporary class for language transition effects
+      document.documentElement.classList.add('language-changing');
+      
+      // Remove the class after the transition
+      const timeout = setTimeout(() => {
+        document.documentElement.classList.remove('language-changing');
+      }, 300);
+      
+      return () => clearTimeout(timeout);
     } catch {}
   }, [language]);
 

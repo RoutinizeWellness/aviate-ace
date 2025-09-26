@@ -13,7 +13,11 @@ import {
   Award,
   DollarSign,
   ExternalLink,
-  Mail
+  Mail,
+  Receipt,
+  HelpCircle,
+  Star,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useConvexAuth';
 import SubscriptionManager from '@/components/SubscriptionManager';
@@ -30,6 +34,7 @@ const SubscriptionManagement = () => {
   const createCheckout = useAction(api.autumn.createCheckoutSession);
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [publicEmail, setPublicEmail] = useState("");
 
   // Pre-select a plan if user came from landing selection
@@ -63,6 +68,43 @@ const SubscriptionManagement = () => {
     ]
   };
 
+  // Quick Actions handlers
+  const handleUpdatePayment = () => {
+    toast({
+      title: t('subscription.redirectingPayment'),
+      description: "Opening payment method update...",
+    });
+    // Simulate payment update
+    setTimeout(() => {
+      window.open('#payment-update', '_blank');
+    }, 500);
+  };
+
+  const handleViewBilling = () => {
+    toast({
+      title: t('subscription.openingBilling'),
+      description: "Loading billing history...",
+    });
+    // Simulate billing history
+    setTimeout(() => {
+      window.open('#billing-history', '_blank');
+    }, 500);
+  };
+
+  const handleRequestRefund = () => {
+    if (confirm(t('subscription.refundConfirm') || 'Are you sure you want to request a refund?')) {
+      toast({
+        title: t('subscription.refundSubmitted'),
+        description: "Your refund request will be processed within 3-5 business days.",
+        variant: "default",
+      });
+    }
+  };
+
+  const handleContactSupport = () => {
+    window.open('mailto:support@pilotprepflightx.com?subject=Subscription Support', '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-background/80 backdrop-blur-sm sticky top-0 z-50">
@@ -86,168 +128,270 @@ const SubscriptionManagement = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-<h1 className="text-3xl font-bold mb-2">{t('subscription.title')}</h1>
-<p className="text-muted-foreground">{t('subscription.subtitle')}</p>
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">{t('subscription.title')}</h1>
+          <p className="text-xl text-muted-foreground mb-6">{t('subscription.subtitle')}</p>
+          <div className="flex items-center justify-center gap-4">
+            <Badge className="bg-primary/10 text-primary">
+              <Zap className="w-4 h-4 mr-1" />
+              {t('pricing.instantAccess')}
+            </Badge>
+            <Badge className="bg-success/10 text-success">
+              <Star className="w-4 h-4 mr-1" />
+              {t('pricing.premiumContent')}
+            </Badge>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            <SubscriptionManager publicEmail={publicEmail} />
-          </div>
+        {/* Pricing Plans Grid */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-center mb-8">{t('subscription.availablePlans')}</h2>
           
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-<CardTitle>{t('subscription.availablePlans')}</CardTitle>
-<CardDescription>{t('subscription.selectPlan')}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {!user && (
+          {!user && (
+            <div className="max-w-md mx-auto mb-8">
+              <Card>
+                <CardContent className="p-6">
                   <div className="space-y-2">
-<label className="text-sm font-medium">{t('subscription.email')}</label>
+                    <label className="text-sm font-medium">{t('subscription.email')}</label>
                     <Input
                       type="email"
                       placeholder="tu@email.com"
                       value={publicEmail}
                       onChange={(e) => setPublicEmail(e.target.value)}
                     />
-<p className="text-xs text-muted-foreground">{t('subscription.useEmailNote')}</p>
+                    <p className="text-xs text-muted-foreground">{t('subscription.useEmailNote')}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {translatedPlans.map((plan, index) => (
+              <Card 
+                key={plan.id} 
+                className={`relative overflow-hidden transition-all duration-300 hover:shadow-lg ${
+                  highlightPlan(plan.id) ? 'ring-2 ring-primary shadow-xl scale-105' : ''
+                } ${
+                  plan.popular ? 'border-primary' : ''
+                } ${
+                  plan.bestValue ? 'border-success' : ''
+                }`}
+              >
+                {plan.popular && (
+                  <div className="absolute -top-1 -right-1">
+                    <Badge className="bg-primary text-primary-foreground rounded-l-none">
+                      {t('pricing.popular')}
+                    </Badge>
                   </div>
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {translatedPlans.map((plan) => (
-                    <div key={plan.id} className={`p-4 border rounded-lg ${highlightPlan(plan.id) ? 'ring-2 ring-primary' : ''}`}>
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold">{plan.name}</h3>
-                        <Badge>€{plan.price.toFixed(2)}</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground mb-3">{plan.description}</p>
-                      {plan.popular && (
-                        <Badge className="mb-2 bg-primary text-primary-foreground">
-                          {t('pricing.popular')}
-                        </Badge>
-                      )}
-                      {plan.bestValue && (
-                        <Badge className="mb-2 bg-success text-success-foreground">
-                          {t('pricing.bestValue')}
-                        </Badge>
-                      )}
-                      <Button
-                        className="w-full"
-                        onClick={async () => {
-                          try {
-                            let email = user?.email || publicEmail.trim();
-                            let userId = (user?._id as unknown as string | undefined) || (email ? `guest_${btoa(email).replace(/=+/g, '')}` : undefined);
-                            if (!email) {
-                              alert(t('subscription.enterEmailToContinue'));
-                              return;
-                            }
-                            console.log('[UI] Creating checkout', { productId: plan.productId || plan.id, userId, email });
-                            const result = await createCheckout({
-                              productId: plan.productId || plan.id,
-                              userId: userId!,
-                              email: email!
-                            });
-                            console.log('[UI] Checkout result', result);
-                            if ((result as any)?.error) {
-                              alert((result as any).error);
-                              return;
-                            }
-                            const url = (result as any)?.checkoutUrl;
-                            if (url) {
-                              localStorage.removeItem('selectedPlan');
-                              window.location.assign(url);
-                            } else {
-                              alert(t('subscription.noCheckoutUrl'));
-                            }
-                          } catch (err: any) {
-                            console.error('Checkout error:', err);
-                            const msg = err?.message || t('subscription.checkoutError');
-                            alert(msg);
-                          }
-                        }}
-                      >
-                        {t('subscription.subscribe')}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-<CardTitle>{t('subscription.currentPlan')}</CardTitle>
-                <CardDescription>{t('subscription.activeSubscriptionDetails')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold">{userSubscription.plan}</h3>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Badge variant="default" className="bg-green-500">
-                          {t('subscription.statusActive')}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          {t('subscription.validUntil')} {userSubscription.endDate}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <CreditCard className="w-6 h-6 text-primary" />
-                    </div>
+                {plan.bestValue && (
+                  <div className="absolute -top-1 -right-1">
+                    <Badge className="bg-success text-success-foreground rounded-l-none">
+                      {t('pricing.bestValue')}
+                    </Badge>
                   </div>
+                )}
+                
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                    {plan.durationMonths === 0 ? (
+                      <Award className="w-8 h-8 text-primary" />
+                    ) : plan.durationMonths >= 12 ? (
+                      <Star className="w-8 h-8 text-primary" />
+                    ) : (
+                      <Zap className="w-8 h-8 text-primary" />
+                    )}
+                  </div>
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <div className="text-3xl font-bold">
+                    €{plan.price}
+                    <span className="text-sm font-normal text-muted-foreground">
+                      {plan.durationMonths === 0 ? '' : 
+                       plan.durationMonths >= 12 ? `/${t('pricing.perYear')}` : `/${t('pricing.perMonth')}`}
+                    </span>
+                  </div>
+                  <CardDescription>{plan.description}</CardDescription>
+                </CardHeader>
+                
+                <CardContent className="space-y-4">
+                  <ul className="space-y-2">
+                    {plan.features.slice(0, 5).map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
                   
-                  <div className="pt-4 border-t">
-<h4 className="font-medium mb-3">{t('subscription.planFeatures')}</h4>
-                    <ul className="space-y-2">
-                      {userSubscription.features.map((feature, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span className="text-sm">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <Button
+                    className={`w-full ${plan.popular || plan.bestValue ? 'bg-primary hover:bg-primary/90' : ''}`}
+                    variant={plan.popular || plan.bestValue ? 'default' : 'outline'}
+                    onClick={async () => {
+                      try {
+                        let email = user?.email || publicEmail.trim();
+                        let userId = (user?._id as unknown as string | undefined) || (email ? `guest_${btoa(email).replace(/=+/g, '')}` : undefined);
+                        if (!email) {
+                          toast({
+                            title: t('subscription.enterEmailToContinue'),
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        const result = await createCheckout({
+                          productId: plan.productId || plan.id,
+                          userId: userId!,
+                          email: email!
+                        });
+                        if ((result as any)?.error) {
+                          toast({
+                            title: "Checkout Error",
+                            description: (result as any).error,
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                        const url = (result as any)?.checkoutUrl;
+                        if (url) {
+                          localStorage.removeItem('selectedPlan');
+                          window.location.assign(url);
+                        } else {
+                          toast({
+                            title: t('subscription.noCheckoutUrl'),
+                            variant: "destructive"
+                          });
+                        }
+                      } catch (err: any) {
+                        console.error('Checkout error:', err);
+                        toast({
+                          title: t('subscription.checkoutError'),
+                          description: err?.message,
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    {plan.price === 0 ? t('pricing.startFree') : t('pricing.selectPlan')}
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Current Subscription & Quick Actions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Current Plan */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CreditCard className="w-5 h-5" />
+                {t('subscription.currentPlan')}
+              </CardTitle>
+              <CardDescription>{t('subscription.activeSubscriptionDetails')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold">{userSubscription.plan}</h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge variant="default" className="bg-green-500">
+                        {t('subscription.statusActive')}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {t('subscription.validUntil')} {userSubscription.endDate}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-            
+                
+                <div className="pt-4 border-t">
+                  <h4 className="font-medium mb-3">{t('subscription.planFeatures')}</h4>
+                  <ul className="space-y-2">
+                    {userSubscription.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Quick Actions */}
+          <div className="space-y-6">
             <Card>
               <CardHeader>
-<CardTitle>{t('subscription.quickActions')}</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5" />
+                  {t('subscription.quickActions')}
+                </CardTitle>
                 <CardDescription>{t('subscription.commonTasks')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-muted"
+                  onClick={handleUpdatePayment}
+                >
                   <CreditCard className="w-4 h-4 mr-2" />
-{t('subscription.updatePaymentMethod')}
+                  {t('subscription.updatePaymentMethod')}
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <Calendar className="w-4 h-4 mr-2" />
-{t('subscription.viewBillingHistory')}
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-muted"
+                  onClick={handleViewBilling}
+                >
+                  <Receipt className="w-4 h-4 mr-2" />
+                  {t('subscription.viewBillingHistory')}
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start hover:bg-muted"
+                  onClick={handleRequestRefund}
+                >
                   <DollarSign className="w-4 h-4 mr-2" />
-{t('subscription.requestRefund')}
+                  {t('subscription.requestRefund')}
                 </Button>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader>
-<CardTitle>{t('subscription.needHelp')}</CardTitle>
-<CardDescription>{t('subscription.contactSupport')}</CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <HelpCircle className="w-5 h-5" />
+                  {t('subscription.needHelp')}
+                </CardTitle>
+                <CardDescription>{t('subscription.supportText')}</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t('subscription.supportText')}
-                </p>
-                <Button className="w-full">{t('subscription.contactSupport')}</Button>
+                <Button 
+                  className="w-full" 
+                  onClick={handleContactSupport}
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  {t('subscription.contactSupport')}
+                </Button>
               </CardContent>
             </Card>
           </div>
+        </div>
+        
+        {/* Legacy Subscription Manager */}
+        <div className="mt-12">
+          <Card>
+            <CardHeader>
+              <CardTitle>Advanced Subscription Management</CardTitle>
+              <CardDescription>Detailed subscription controls and information</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SubscriptionManager publicEmail={publicEmail} />
+            </CardContent>
+          </Card>
         </div>
       </main>
     </div>

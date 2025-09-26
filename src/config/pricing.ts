@@ -136,7 +136,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   // 1 Year Plan
   {
-    id: 'pilotprepflightx_-_1_ao',
+    id: 'pilotprepflightx_-_1_ano',
     name: 'PilotPrepFlightX - 1 año',
     description: 'Acceso completo por 1 año con máximo descuento',
     nameKey: 'plans.1year.name',
@@ -169,7 +169,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'features.premium.11',
       'features.premium.12'
     ],
-    productId: 'pilotprepflightx_-_1_ao'
+    productId: 'pilotprepflightx_-_1_ano'
   }
 ];
 

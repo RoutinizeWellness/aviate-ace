@@ -3,7 +3,7 @@ import { Autumn as autumn } from "autumn-js";
 
 // Initialize Autumn with the secret key
 // In a real implementation, you would use environment variables
-const AUTUMN_SECRET_KEY = import.meta.env.VITE_AUTUMN_SECRET_KEY || 'am_sk_test_WqABWyZSZsDUXVElpoFPonDlRq5kywOpZQbvUfpPhK';
+const AUTUMN_SECRET_KEY = import.meta.env.VITE_AUTUMN_SECRET_KEY || 'am_sk_live_VSzgGP0BzjnvdMyuzvfO2irSoYx3teJHMw8X6FUghi';
 
 console.log('Initializing Autumn with secret key:', AUTUMN_SECRET_KEY ? 'Key present' : 'No key');
 

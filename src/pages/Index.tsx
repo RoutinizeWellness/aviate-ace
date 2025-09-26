@@ -201,7 +201,7 @@ const Index = () => {
         <div className="relative container mx-auto px-4 text-center">
           <Badge className="mb-6 bg-primary/10 text-primary border-primary/20">
             <Zap className="w-4 h-4 mr-2" />
-            Plataforma Profesional de Aviación
+            {t('home.platformBadge')}
           </Badge>
           
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
@@ -223,7 +223,7 @@ const Index = () => {
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6" onClick={handleStartNow}>
               <BookOpen className="w-5 h-5 mr-2" />
-              Ver Demo
+              {t('home.demo')}
             </Button>
           </div>
 
@@ -236,11 +236,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Entrenamiento Especializado para 
-              <span className="text-primary"> A320 & B737</span>
+              {t('home.aircraftSelection.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Selecciona tu aeronave para comenzar tu preparación específica
+              {t('home.aircraftSelection.subtitle')}
             </p>
           </div>
 
@@ -250,9 +249,9 @@ const Index = () => {
                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Plane className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Airbus A320</h3>
-                <p className="text-muted-foreground mb-6">Entrenamiento completo para habilitación de tipo en Airbus A320</p>
-                <Button className="w-full max-w-xs mx-auto">Iniciar A320</Button>
+                <h3 className="text-2xl font-bold mb-3">{t('home.aircraftSelection.a320.title')}</h3>
+                <p className="text-muted-foreground mb-6">{t('home.aircraftSelection.a320.description')}</p>
+                <Button className="w-full max-w-xs mx-auto">{t('home.aircraftSelection.a320.cta')}</Button>
               </CardContent>
             </Card>
 
@@ -261,9 +260,9 @@ const Index = () => {
                 <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Plane className="w-10 h-10 text-blue-500" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">Boeing 737</h3>
-                <p className="text-muted-foreground mb-6">Entrenamiento completo para habilitación de tipo en Boeing 737</p>
-                <Button variant="outline" className="w-full max-w-xs mx-auto">Iniciar B737</Button>
+                <h3 className="text-2xl font-bold mb-3">{t('home.aircraftSelection.b737.title')}</h3>
+                <p className="text-muted-foreground mb-6">{t('home.aircraftSelection.b737.description')}</p>
+                <Button variant="outline" className="w-full max-w-xs mx-auto">{t('home.aircraftSelection.b737.cta')}</Button>
               </CardContent>
             </Card>
           </div>
@@ -275,12 +274,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              No es un Chat Genérico,{" "}
-              <span className="text-primary">es tu Instructor Personal</span>
+              {t('home.comparison.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Olvídate de los chatbots generales. Nuestra plataforma está diseñada específicamente 
-              para la preparación de exámenes de aviación comercial.
+              {t('home.comparison.subtitle')}
             </p>
           </div>
 
@@ -291,12 +288,12 @@ const Index = () => {
                   <span className="text-2xl">❌</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2 text-error">Chat Genérico (ChatGPT)</h3>
+                  <h3 className="font-semibold mb-2 text-error">{t('home.comparison.generic.title')}</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Respuestas generales e inconsistentes</li>
-                    <li>• Sin estructura de examen real</li>
-                    <li>• No rastrea tu progreso</li>
-                    <li>• Información desactualizada</li>
+                    <li>• {t('home.comparison.generic.feature1')}</li>
+                    <li>• {t('home.comparison.generic.feature2')}</li>
+                    <li>• {t('home.comparison.generic.feature3')}</li>
+                    <li>• {t('home.comparison.generic.feature4')}</li>
                   </ul>
                 </div>
               </div>
@@ -306,12 +303,12 @@ const Index = () => {
                   <CheckCircle2 className="w-6 h-6 text-success" />
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-2 text-success">PilotPrepFlightX</h3>
+                  <h3 className="font-semibold mb-2 text-success">{t('home.comparison.platform.title')}</h3>
                   <ul className="text-sm text-muted-foreground space-y-1">
-                    <li>• Banco exclusivo de 5,000+ preguntas</li>
-                    <li>• Simulacros idénticos al examen real</li>
-                    <li>• Estadísticas avanzadas de rendimiento</li>
-                    <li>• Contenido actualizado mensualmente</li>
+                    <li>• {t('home.comparison.platform.feature1')}</li>
+                    <li>• {t('home.comparison.platform.feature2')}</li>
+                    <li>• {t('home.comparison.platform.feature3')}</li>
+                    <li>• {t('home.comparison.platform.feature4')}</li>
                   </ul>
                 </div>
               </div>
@@ -323,24 +320,24 @@ const Index = () => {
                   <div className="flex items-center gap-3">
                     <Shield className="w-8 h-8 text-primary" />
                     <div>
-                      <h4 className="font-semibold">Contenido Certificado</h4>
-                      <p className="text-sm text-muted-foreground">Por pilotos activos A320/B737</p>
+                      <h4 className="font-semibold">{t('home.comparison.certified.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('home.comparison.certified.subtitle')}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-3">
                     <BarChart3 className="w-8 h-8 text-primary" />
                     <div>
-                      <h4 className="font-semibold">Análisis Inteligente</h4>
-                      <p className="text-sm text-muted-foreground">Identifica tus puntos débiles</p>
+                      <h4 className="font-semibold">{t('home.comparison.analysis.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('home.comparison.analysis.subtitle')}</p>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-3">
                     <Trophy className="w-8 h-8 text-primary" />
                     <div>
-                      <h4 className="font-semibold">Garantía de Éxito</h4>
-                      <p className="text-sm text-muted-foreground">95% de tasa de aprobación</p>
+                      <h4 className="font-semibold">{t('home.comparison.guarantee.title')}</h4>
+                      <p className="text-sm text-muted-foreground">{t('home.comparison.guarantee.subtitle')}</p>
                     </div>
                   </div>
                 </div>

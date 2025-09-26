@@ -33,6 +33,7 @@ import { useState, useEffect } from "react";
 import { UnifiedSidebar } from "@/components/UnifiedSidebar";
 import { useTypeRatingProgress } from "@/hooks/useTypeRatingProgress";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const TypeRating = () => {
   const navigate = useNavigate();
@@ -624,13 +625,16 @@ const TypeRating = () => {
                   {t('typerating.a320Description')}
                 </p>
               </div>
-              <div className="text-right">
-                <Badge className="bg-primary/10 text-primary">
-                  {getSubscriptionDisplayName()}
-                </Badge>
-                {!hasA320Access && (
-                  <p className="text-xs text-warning mt-2">{t('typerating.needsA320Subscription')}</p>
-                )}
+              <div className="flex items-center gap-4">
+                <LanguageToggle />
+                <div className="text-right">
+                  <Badge className="bg-primary/10 text-primary">
+                    {getSubscriptionDisplayName()}
+                  </Badge>
+                  {!hasA320Access && (
+                    <p className="text-xs text-warning mt-2">{t('typerating.needsA320Subscription')}</p>
+                  )}
+                </div>
               </div>
             </div>
           </header>
@@ -651,6 +655,7 @@ const TypeRating = () => {
                   <ToggleLeft className="w-3 h-3" />
                   <span className="text-xs">{t('typerating.b737')}</span>
                 </Button>
+                <LanguageToggle />
                 <Badge className="bg-primary/10 text-primary text-xs">
                   {getSubscriptionDisplayName()}
                 </Badge>

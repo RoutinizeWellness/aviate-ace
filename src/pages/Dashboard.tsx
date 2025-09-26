@@ -35,6 +35,8 @@ import { UnifiedSidebar } from "@/components/UnifiedSidebar";
 import { QuestionSuggestionForm } from "@/components/QuestionSuggestionForm";
 import { UserQuestionSuggestions } from "@/components/UserQuestionSuggestions";
 import { isValidConvexId } from "@/utils/convexHelpers";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 
 
@@ -148,6 +150,7 @@ const MobileNavigation = () => {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useLanguage();
   
   // Add debug logging
   useEffect(() => {
@@ -288,15 +291,18 @@ const Dashboard = () => {
                   <BookOpen className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h1 className="font-bold text-lg">Dashboard</h1>
+                  <h1 className="font-bold text-lg">{t('nav.dashboard') || 'Dashboard'}</h1>
                   <p className="text-xs text-muted-foreground">Resumen de tu progreso</p>
                 </div>
               </div>
-              <UserAvatar 
-                avatarUrl={userProfile?.profile?.avatarUrl} 
-                displayName={displayName}
-                size="sm"
-              />
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <UserAvatar 
+                  avatarUrl={userProfile?.profile?.avatarUrl} 
+                  displayName={displayName}
+                  size="sm"
+                />
+              </div>
             </div>
           )}
           
@@ -307,6 +313,7 @@ const Dashboard = () => {
               <p className="text-muted-foreground">Bienvenido de vuelta, {user?.displayName || user?.email?.split('@')[0] || 'Piloto'}</p>
             </div>
             <div className="flex items-center gap-4">
+              <LanguageToggle />
               <UserAvatar 
                 avatarUrl={user?.avatarUrl}
                 displayName={user?.displayName || user?.email?.split('@')[0]}
@@ -317,7 +324,7 @@ const Dashboard = () => {
               </div>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
-                Salir
+                {t('nav.logout') || 'Salir'}
               </Button>
             </div>
           </header>

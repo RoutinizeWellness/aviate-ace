@@ -46,11 +46,14 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { UnifiedSidebar } from "@/components/UnifiedSidebar";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FreeTrialNotification } from "@/components/FreeTrialNotification";
+import { useFreeTrial } from "@/contexts/FreeTrialContext";
 
 const Exams = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { hasAccessTo, getCurrentSubscription, isAdmin, getSubscriptionDisplayName } = useSubscription();
+  const { checkTrialStatus, isTrialExpired } = useFreeTrial();
   const { exams, isLoadingExams, userExamSessions } = useExams();
   const { profile } = useSupabaseProfile();
   const { t } = useLanguage();
@@ -245,6 +248,13 @@ const Exams = () => {
 
         {/* Exam Categories */}
         <section className="mb-10">
+          {/* Free Trial Notification for non-premium users */}
+          {!adminUser && !hasAccessTo('A320_FAMILY') && !hasAccessTo('B737_FAMILY') && (
+            <div className="mb-6">
+              <FreeTrialNotification />
+            </div>
+          )}
+          
           <h2 className="text-2xl font-bold mb-6">{t('exams.categories')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Practice Mode */}

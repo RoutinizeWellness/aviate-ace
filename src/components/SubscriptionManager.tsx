@@ -138,14 +138,14 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
       });
       
       toast({
-        title: "Success",
-        description: "Your subscription will be cancelled at the end of the billing period",
+        title: t('common.success'),
+        description: t('subscription.subscriptionCancelledSuccess'),
       });
     } catch (error) {
       console.error('Error cancelling subscription:', error);
       toast({
-        title: "Error",
-        description: "Failed to cancel subscription",
+        title: t('common.error'),
+        description: t('subscription.cancelFailed'),
         variant: "destructive",
       });
     } finally {
@@ -180,14 +180,14 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
       }
       
       toast({
-        title: "Success",
-        description: "Your subscription plan has been updated",
+        title: t('common.success'),
+        description: t('subscription.planUpdated'),
       });
     } catch (error) {
       console.error('Error updating subscription plan:', error);
       toast({
-        title: "Error",
-        description: "Failed to update subscription plan",
+        title: t('common.error'),
+        description: t('subscription.planUpdateFailed'),
         variant: "destructive",
       });
     } finally {
@@ -202,14 +202,14 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
-        title: "Success",
-        description: "Refund request has been submitted and will be processed within 3-5 business days",
+        title: t('common.success'),
+        description: t('subscription.refundSubmitted'),
       });
     } catch (error) {
       console.error('Error processing refund:', error);
       toast({
-        title: "Error",
-        description: "Failed to process refund",
+        title: t('common.error'),
+        description: t('subscription.refundFailed'),
         variant: "destructive",
       });
     }
@@ -219,7 +219,7 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
     // Navigate in same tab instead of opening new window
     toast({
       title: t('subscription.updatePayment'),
-      description: "Redirecting to payment method update page",
+      description: t('subscription.redirectingPayment'),
     });
     
     // Navigate to billing management page in same tab
@@ -231,7 +231,7 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
   const handleViewBillingHistory = () => {
     toast({
       title: t('subscription.viewBilling'),
-      description: "Opening billing history",
+      description: t('subscription.openingBilling'),
     });
     
     // Navigate to billing history in same tab
@@ -246,7 +246,7 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
   };
 
   if (loading) {
-    return <div>Loading subscription details...</div>;
+    return <div>{t('subscription.loadingDetails')}</div>;
   }
 
   if (!subscription) {
@@ -255,15 +255,15 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
         <Card>
           <CardContent className="p-6 text-center">
             <HelpCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="font-semibold mb-2">No Active Subscription Found</h3>
+            <h3 className="font-semibold mb-2">{t('subscription.noActiveSubscription')}</h3>
             <p className="text-sm text-muted-foreground mb-4">
               {!user 
-                ? "Sign in or enter your email in 'Available Plans' to start a checkout and link your subscription." 
-                : "You don't have an active subscription yet. Browse our pricing plans to get started."
+                ? t('subscription.signInMessage')
+                : t('subscription.noSubscriptionMessage')
               }
             </p>
             <Button onClick={() => window.location.href = '/pricing'}>
-              View Pricing Plans
+              {t('subscription.viewPricingPlans')}
             </Button>
           </CardContent>
         </Card>
@@ -335,28 +335,28 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Subscription Details</CardTitle>
+          <CardTitle>{t('subscription.subscriptionDetails')}</CardTitle>
           <CardDescription>
-            Manage your subscription plan and billing information
+            {t('subscription.manageSubscriptionBilling')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <h3 className="font-medium">Plan</h3>
-              <p>{subscription.plan?.name || 'Unknown Plan'}</p>
+              <h3 className="font-medium">{t('subscription.plan')}</h3>
+              <p>{subscription.plan?.name || t('subscription.unknownPlan')}</p>
             </div>
             <div>
-              <h3 className="font-medium">Status</h3>
+              <h3 className="font-medium">{t('subscription.status')}</h3>
               <p className="capitalize">{subscription.status}</p>
             </div>
             <div>
-              <h3 className="font-medium">Billing Period</h3>
+              <h3 className="font-medium">{t('subscription.billingPeriod')}</h3>
               <p>{new Date(subscription.currentPeriodEnd).toLocaleDateString()}</p>
             </div>
             <div>
-              <h3 className="font-medium">Auto-renewal</h3>
-              <p>{subscription.cancelAtPeriodEnd ? 'Cancelled' : 'Active'}</p>
+              <h3 className="font-medium">{t('subscription.autoRenewal')}</h3>
+              <p>{subscription.cancelAtPeriodEnd ? t('subscription.cancelled') : t('subscription.active')}</p>
             </div>
           </div>
         </CardContent>
@@ -367,11 +367,11 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
               onClick={handleCancelSubscription}
               disabled={cancelling}
             >
-              {cancelling ? 'Cancelling...' : 'Cancel Subscription'}
+              {cancelling ? t('subscription.cancelling') : t('subscription.cancelSubscription')}
             </Button>
           ) : (
             <Button variant="outline" disabled>
-              Subscription Cancelled
+              {t('subscription.subscriptionCancelled')}
             </Button>
           )}
         </CardFooter>
@@ -379,9 +379,9 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Change Plan</CardTitle>
+          <CardTitle>{t('subscription.changePlan')}</CardTitle>
           <CardDescription>
-            Upgrade or downgrade your subscription plan
+            {t('subscription.upgradeDowngrade')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -405,7 +405,7 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
                     onClick={() => handleUpdatePlan(plan.id)}
                     disabled={updating}
                   >
-                    {updating ? 'Updating...' : 'Switch to this plan'}
+                    {updating ? t('subscription.updating') : t('subscription.switchToPlan')}
                   </Button>
                 </CardFooter>
               </Card>
@@ -416,31 +416,31 @@ const SubscriptionManager = ({ publicEmail }: Props) => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Receipts & Refunds</CardTitle>
+          <CardTitle>{t('subscription.receiptsRefunds')}</CardTitle>
           <CardDescription>
-            Access your payment receipts or request a refund
+            {t('subscription.accessReceipts')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
-              <h3 className="font-medium mb-2">Recent Payments</h3>
+              <h3 className="font-medium mb-2">{t('subscription.recentPayments')}</h3>
               <div className="space-y-2">
                 <div className="flex justify-between items-center p-3 border rounded">
                   <div>
-                    <p className="font-medium">Aviate Ace {subscription.plan?.name} Subscription</p>
-                    <p className="text-sm text-muted-foreground">Paid on {new Date().toLocaleDateString()}</p>
+                    <p className="font-medium">{t('subscription.aviateAceSubscription')} {subscription.plan?.name}</p>
+                    <p className="text-sm text-muted-foreground">{t('subscription.paidOn')} {new Date().toLocaleDateString()}</p>
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm">
-                      View Receipt
+                      {t('subscription.viewReceipt')}
                     </Button>
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => handleRefund('pi_mock1234567890')}
                     >
-                      Request Refund
+                      {t('subscription.requestRefund')}
                     </Button>
                   </div>
                 </div>

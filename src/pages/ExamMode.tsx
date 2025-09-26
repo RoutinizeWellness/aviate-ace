@@ -24,8 +24,11 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import type { Id } from '../../convex/_generated/dataModel';
+import { FreeTrialManager } from '@/services/FreeTrialManager';
+import { FreeTrialNotification } from '@/components/FreeTrialNotification';
 // Debug components removed for production
 import { loadAndFilterQuestions } from "@/utils/questionLoader";
+import { debugQuestionLoading } from "@/utils/debugQuestionLoading";
 
 // Import test utility in development
 if (import.meta.env.DEV) {
@@ -57,6 +60,24 @@ const ExamMode = () => {
   const { toast } = useToast();
   const { exams, isLoadingExams } = useExams();
   
+  // Check if this is a free trial session
+  const isTrialMode = searchParams.get('trial') === 'true';
+  const trialState = FreeTrialManager.getFreeTrialState(user?._id);
+  
+  // Free trial protection
+  useEffect(() => {
+    if (isTrialMode && trialState.isTrialExpired) {
+      toast({
+        title: "Prueba Gratuita Terminada",
+        description: "Has usado todas tus preguntas gratuitas. Suscríbete para continuar.",
+        variant: "destructive",
+        duration: 5000,
+      });
+      navigate('/subscription-management');
+      return;
+    }
+  }, [isTrialMode, trialState.isTrialExpired, navigate, toast]);
+  
   // Mutations for tracking incorrect questions
   const recordIncorrectQuestion = useMutation(api.auth.recordIncorrectQuestion);
   const markQuestionResolved = useMutation(api.auth.markQuestionResolved);
@@ -79,6 +100,17 @@ const ExamMode = () => {
   const selectedAircraft = searchParams.get('aircraft') || 'A320_FAMILY';
   const timeLimit = parseInt(searchParams.get('timeLimit') || (examMode === 'timed' ? '60' : '0'));
   const questionCount = parseInt(searchParams.get('questionCount') || '20');
+  
+  // For free trial, load all subjects for the selected aircraft with adjusted questionCount
+  if (isTrialMode && selectedAircraft) {
+    const trialSubjects = FreeTrialManager.getAvailableSubjects(user?._id);
+    if (trialSubjects.length > 0 && !selectedCategory) {
+      selectedCategory = trialSubjects.join(',');
+      // Adjust question count to 25 total for free trial (5 per subject x 5 subjects)
+      const adjustedQuestionCount = 25;
+      console.log('Free trial detected - loading', adjustedQuestionCount, 'questions for aircraft:', selectedAircraft, 'subjects:', selectedCategory);
+    }
+  }
   
   // If no category is provided but we have an exam title pattern, extract category from title
   const examTitle = searchParams.get('title') || '';
@@ -149,6 +181,13 @@ const ExamMode = () => {
       if (shouldLoadDynamicQuestions(selectedExamId, selectedCategory, examMode)) {
         setIsLoadingDynamicQuestions(true);
         setQuestionsError(null);
+        
+        // Debug question loading for free trial
+        if (isTrialMode) {
+          console.log('Free trial question loading debug:');
+          await debugQuestionLoading(user?._id);
+        }
+        
         try {
           // Use optimized question loader
           const { OptimizedQuestionLoader } = await import('@/services/OptimizedQuestionLoader');
@@ -158,7 +197,7 @@ const ExamMode = () => {
             category: selectedCategory,
             aircraft: selectedAircraft,
             difficulty: selectedDifficulty,
-            questionCount
+            questionCount: isTrialMode ? 25 : questionCount // Use 25 questions for free trial
           });
           
           // Validate that we have questions
@@ -442,6 +481,65 @@ const ExamMode = () => {
   const confirmAnswer = useCallback((questionId: string) => {
     if (selectedAnswer === null || !questionId?.trim()) return;
     
+    // Handle free trial question tracking
+    if (isTrialMode) {
+      try {
+        const canUseQuestion = FreeTrialManager.useTrialQuestion(user?._id);
+        
+        if (!canUseQuestion) {
+          toast({
+            title: "Prueba Gratuita Terminada",
+            description: "Has usado todas tus preguntas gratuitas. Suscríbete para continuar.",
+            variant: "destructive",
+            duration: 5000,
+          });
+          navigate('/subscription-management');
+          return;
+        }
+        
+        // Check if this is the last question
+        const updatedAnswerCount = examState.answers.filter(a => a.questionId !== questionId).length + 1;
+        const isLastQuestion = updatedAnswerCount >= (currentQuestions?.length || 0);
+        
+        if (isLastQuestion) {
+          // Calculate exam results
+          const correctAnswers = examState.answers.filter((answer, index) => {
+            const question = currentQuestions?.find(q => q._id === answer.questionId);
+            return question && answer.selectedAnswer === question.correctAnswer;
+          }).length + (selectedAnswer === (getCurrentQuestion()?.correctAnswer) ? 1 : 0);
+          
+          const totalQuestions = currentQuestions?.length || 0;
+          const score = Math.round((correctAnswers / totalQuestions) * 100);
+          
+          // Complete the exam
+          FreeTrialManager.completeExam({
+            score,
+            totalQuestions,
+            correctAnswers
+          }, user?._id);
+          
+          // Show completion message after a delay
+          setTimeout(() => {
+            navigate('/exam-results');
+          }, 2000);
+        } else {
+          // Show remaining questions notification
+          const remainingQuestions = FreeTrialManager.getRemainingQuestions(user?._id);
+          if (remainingQuestions <= 3 && remainingQuestions > 0) {
+            toast({
+              title: "Prueba Gratuita",
+              description: `Te quedan ${remainingQuestions} preguntas gratuitas.`,
+              variant: "default",
+              duration: 3000,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error tracking free trial question:', error);
+        // Continue with normal flow even if tracking fails
+      }
+    }
+    
     const timeSpent = Math.floor((Date.now() - examState.startTime.getTime()) / 1000);
     
     setExamState(prev => {
@@ -486,7 +584,7 @@ const ExamMode = () => {
         // Question tracking failed - continue silently
       });
     }
-  }, [selectedAnswer, examState.startTime, setExamState, getCurrentQuestion, examMode, user, recordIncorrectQuestion]);
+  }, [selectedAnswer, examState.startTime, setExamState, getCurrentQuestion, examMode, user, recordIncorrectQuestion, isTrialMode, toast, navigate]);
 
   // Function to answer a question (for non-practice modes)
   const answerQuestion = (questionId: string, selectedAnswerIndex: number) => {

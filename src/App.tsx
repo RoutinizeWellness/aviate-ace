@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useConvexAuth";
 import { Elements } from '@stripe/react-stripe-js';
 import { getStripe } from '@/lib/stripe';
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { DeviceValidation } from "@/components/DeviceValidation";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
@@ -24,6 +25,8 @@ import Flashcards from "./pages/Flashcards";
 import QuizDemo from "./pages/QuizDemo";
 import AdvancedAnalytics from "./pages/AdvancedAnalytics";
 import AdminPanel from "./pages/AdminPanel";
+import AircraftSelection from "./pages/AircraftSelection";
+import ExamResults from "./pages/ExamResults";
 import SubscriptionManagement from "./pages/SubscriptionManagement";
 import ConvexTest from "./pages/ConvexTest";
 import IntegrationTest from "./pages/IntegrationTest";
@@ -33,7 +36,9 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import FreeTrialDemo from "./pages/FreeTrialDemo";
 import { useLanguage } from "./contexts/LanguageContext";
+import { FreeTrialProvider } from "./contexts/FreeTrialContext";
 
 // Initialize Convex client with better error handling
 let convex: ConvexReactClient;
@@ -81,11 +86,18 @@ const App = () => {
   <QueryClientProvider client={queryClient}>
     <ConvexProvider client={convex}>
       <AuthProvider>
-        <Elements stripe={stripePromise}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <a href="#main" className="skip-link">Saltar al contenido</a>
+        <FreeTrialProvider>
+          <Elements stripe={stripePromise}>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <div style={{ display: 'none' }}>
+                <DeviceValidation 
+                  onValidationComplete={() => console.log('Device validated')}
+                  onDeviceUpdate={() => console.log('Device updated')}
+                />
+              </div>
+              <a href="#main" className="skip-link">Saltar al contenido</a>
             <BrowserRouter key={language} future={{
               v7_startTransition: true,
               v7_relativeSplatPath: true
@@ -93,6 +105,8 @@ const App = () => {
               <main id="main" role="main">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/aircraft-selection" element={<AircraftSelection />} />
+                <Route path="/exam-results" element={<ExamResults />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -142,6 +156,7 @@ const App = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="/quiz-demo" element={<QuizDemo />} />
+                <Route path="/free-trial-demo" element={<FreeTrialDemo />} />
                 <Route path="/analytics" element={
                   <ProtectedRoute>
                     <AdvancedAnalytics />
@@ -166,6 +181,7 @@ const App = () => {
             </BrowserRouter>
           </TooltipProvider>
         </Elements>
+        </FreeTrialProvider>
       </AuthProvider>
     </ConvexProvider>
   </QueryClientProvider>

@@ -26,6 +26,7 @@ import { useB737Progress } from "@/hooks/useAircraftProgress";
 import { useTypeRatingProgress } from "@/hooks/useTypeRatingProgress";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { ModuleCompletionService } from "@/services/ModuleCompletionService";
 
 const B737TypeRating = () => {
   const navigate = useNavigate();
@@ -175,6 +176,20 @@ const B737TypeRating = () => {
       
     } catch (error) {
       console.error('Error marking theory completed:', error);
+    }
+  };
+  
+  // Handler for module completion button
+  const handleCompleteModule = async (moduleId: string) => {
+    const userId = user?._id;
+    if (!userId) return;
+    
+    const success = await ModuleCompletionService.completeModule(moduleId, 'B737', userId);
+    if (success) {
+      // Update local state to reflect completion
+      // Force re-render by updating module progress
+      const updatedProgress = [...moduleProgress];
+      setModuleProgress(updatedProgress);
     }
   };
   
@@ -822,6 +837,37 @@ const B737TypeRating = () => {
                     )}
                   </div>
                 ))}
+                
+                {/* Module Completion Button */}
+                {module.progress === 100 && (
+                  <div className={`${isMobile ? 'mt-4 pt-3' : 'mt-6 pt-4'} border-t border-border`}>
+                    {ModuleCompletionService.isModuleMarkedAsCompleted(
+                      module.id === 1 ? 'b737_fundamentos' : 'b737_sistemas', 
+                      user?._id || ''
+                    ) ? (
+                      <div className="flex items-center justify-center gap-2 text-success">
+                        <CheckCircle2 className="w-5 h-5" />
+                        <span className="font-medium">{t('typerating.moduleCompleted')}</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-3">
+                        <p className="text-sm text-muted-foreground text-center">
+                          ¡Felicidades! Has completado todas las lecciones de este módulo.
+                        </p>
+                        <Button 
+                          onClick={() => handleCompleteModule(
+                            module.id === 1 ? 'b737_fundamentos' : 'b737_sistemas'
+                          )}
+                          className="bg-success hover:bg-success/90 text-white"
+                          size={isMobile ? 'sm' : 'default'}
+                        >
+                          <CheckCircle2 className="w-4 h-4 mr-2" />
+                          {t('typerating.completeModule')}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

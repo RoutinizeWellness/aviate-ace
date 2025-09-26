@@ -141,10 +141,11 @@ export class QuestionFilterService {
     debugLog('Sample question categories:', questions.slice(0, 5).map(q => q.category));
     
     const filtered = questions.filter(q => {
+      // STRICT FILTERING: Only include questions that match selected subjects
       return categories.some(selectedCat => {
         // Handle empty or undefined categories
         if (!selectedCat || selectedCat === 'none' || selectedCat === 'all') {
-          return true;
+          return false; // Don't include unless specifically selected
         }
         
         // Create cache key for memoization
@@ -153,40 +154,58 @@ export class QuestionFilterService {
           return categoryMatchCache.get(cacheKey);
         }
         
+        // First try exact matching with category mappings
         const targetCategories = categoryMappings[selectedCat] || [selectedCat];
-        const matches = matchesCategory(q.category, targetCategories);
+        let matches = matchesCategory(q.category, targetCategories);
+        
+        // If no exact match, try normalized matching
+        if (!matches) {
+          const normalizedQuestionCat = (q.category || '').toLowerCase().replace(/[^\w\s]/g, '').trim();
+          const normalizedSelectedCat = selectedCat.toLowerCase().replace(/[^\w\s]/g, '').trim();
+          
+          // EXACT subject matching - must be from selected subject only
+          if (normalizedQuestionCat === normalizedSelectedCat) {
+            matches = true;
+          }
+          // Subject-specific keyword matching
+          else if (normalizedSelectedCat.includes('electrical') && normalizedQuestionCat.includes('electrical')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('hydraulic') && normalizedQuestionCat.includes('hydraulic')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('aircraft') && normalizedQuestionCat.includes('aircraft')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('general') && normalizedQuestionCat.includes('general')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('performance') && normalizedQuestionCat.includes('performance')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('engine') && normalizedQuestionCat.includes('engine')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('navigation') && normalizedQuestionCat.includes('navigation')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('weather') && normalizedQuestionCat.includes('weather')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('regulation') && normalizedQuestionCat.includes('regulation')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('procedure') && normalizedQuestionCat.includes('procedure')) {
+            matches = true;
+          }
+          else if (normalizedSelectedCat.includes('system') && normalizedQuestionCat.includes('system')) {
+            matches = true;
+          }
+        }
         
         // Cache the result with size limit
         if (categoryMatchCache.size < CACHE_SIZE_LIMIT) {
           categoryMatchCache.set(cacheKey, matches);
-        }
-        
-        // Additional direct matching for common cases
-        if (!matches) {
-          const normalizedQuestionCat = q.category?.toLowerCase().replace(/[^\w\s]/g, '').trim();
-          const normalizedSelectedCat = selectedCat.toLowerCase().replace(/[^\w\s]/g, '').trim();
-          
-          // Direct match
-          if (normalizedQuestionCat === normalizedSelectedCat) {
-            return true;
-          }
-          
-          // Partial match for systems
-          if (normalizedSelectedCat.includes('electrical') && normalizedQuestionCat.includes('electrical')) {
-            return true;
-          }
-          if (normalizedSelectedCat.includes('hydraulic') && normalizedQuestionCat.includes('hydraulic')) {
-            return true;
-          }
-          if (normalizedSelectedCat.includes('aircraft') && normalizedQuestionCat.includes('aircraft')) {
-            return true;
-          }
-          if (normalizedSelectedCat.includes('general') && normalizedQuestionCat.includes('general')) {
-            return true;
-          }
-          if (normalizedSelectedCat.includes('airplane') && normalizedQuestionCat.includes('airplane')) {
-            return true;
-          }
         }
         
         return matches;
@@ -194,6 +213,12 @@ export class QuestionFilterService {
     });
     
     debugLog(`Category filter: ${categories.join(', ')} -> ${beforeCount} to ${filtered.length} questions`);
+    
+    // If strict filtering returns no questions, log warning but don't fallback
+    if (filtered.length === 0) {
+      debugLog('WARNING: Strict category filtering returned 0 questions. Selected categories may not exist in question bank.');
+      debugLog('Available categories in question bank:', [...new Set(questions.map(q => q.category).filter(Boolean))]);
+    }
     
     return filtered;
   }
@@ -213,50 +238,72 @@ export class QuestionFilterService {
   private applyFallbackLogic(criteria: FilterCriteria): RealAviationQuestion[] {
     debugLog('Applying fallback logic for criteria:', criteria);
     
-    // Step 1: Try with relaxed aircraft filter (include GENERAL questions)
-    let fallbackQuestions = this.questions.filter(q => 
-      q.aircraftType === 'GENERAL' || 
-      q.aircraftType === criteria.aircraft ||
-      (criteria.aircraft === 'A320_FAMILY' && q.aircraftType === 'A320_FAMILY') ||
-      (criteria.aircraft === 'B737_FAMILY' && q.aircraftType === 'B737_FAMILY')
-    );
+    // IMPORTANT: Fallback must still respect subject filtering
+    // We should NOT mix subjects even in fallback scenarios
     
-    if (fallbackQuestions.length > 0) {
-      debugLog('Fallback step 1 - relaxed aircraft filter:', fallbackQuestions.length);
-      return fallbackQuestions.slice(0, criteria.questionCount);
+    // Step 1: Try with exact category match but relaxed aircraft filter
+    if (criteria.categories.length > 0) {
+      let fallbackQuestions = this.questions.filter(q => {
+        const aircraftMatch = q.aircraftType === 'GENERAL' || 
+          q.aircraftType === criteria.aircraft ||
+          (criteria.aircraft === 'A320_FAMILY' && q.aircraftType === 'A320_FAMILY') ||
+          (criteria.aircraft === 'B737_FAMILY' && q.aircraftType === 'B737_FAMILY');
+        
+        const categoryMatch = criteria.categories.some(selectedCat => {
+          const normalizedQuestionCat = (q.category || '').toLowerCase().replace(/[^\w\s]/g, '').trim();
+          const normalizedSelectedCat = selectedCat.toLowerCase().replace(/[^\w\s]/g, '').trim();
+          return normalizedQuestionCat.includes(normalizedSelectedCat) || 
+                 normalizedSelectedCat.includes(normalizedQuestionCat);
+        });
+        
+        return aircraftMatch && categoryMatch;
+      });
+      
+      if (fallbackQuestions.length > 0) {
+        debugLog('Fallback step 1 - relaxed aircraft filter with category matching:', fallbackQuestions.length);
+        return fallbackQuestions.slice(0, criteria.questionCount);
+      }
     }
     
-    // Step 2: Try with just aircraft filter, ignore categories
-    fallbackQuestions = this.questions.filter(q => 
-      q.aircraftType === criteria.aircraft ||
-      (criteria.aircraft === 'A320_FAMILY' && q.aircraftType === 'A320_FAMILY') ||
-      (criteria.aircraft === 'B737_FAMILY' && q.aircraftType === 'B737_FAMILY')
-    );
-    
-    if (fallbackQuestions.length > 0) {
-      debugLog('Fallback step 2 - aircraft only:', fallbackQuestions.length);
-      return fallbackQuestions.slice(0, criteria.questionCount);
+    // Step 2: Try with ANY aircraft but STRICT category filter
+    if (criteria.categories.length > 0) {
+      let fallbackQuestions = this.questions.filter(q => {
+        return criteria.categories.some(selectedCat => {
+          const normalizedQuestionCat = (q.category || '').toLowerCase().replace(/[^\w\s]/g, '').trim();
+          const normalizedSelectedCat = selectedCat.toLowerCase().replace(/[^\w\s]/g, '').trim();
+          return normalizedQuestionCat === normalizedSelectedCat ||
+                 normalizedQuestionCat.includes(normalizedSelectedCat) ||
+                 normalizedSelectedCat.includes(normalizedQuestionCat);
+        });
+      });
+      
+      if (fallbackQuestions.length > 0) {
+        debugLog('Fallback step 2 - any aircraft with strict category:', fallbackQuestions.length);
+        return fallbackQuestions.slice(0, criteria.questionCount);
+      }
     }
     
-    // Step 3: Try any questions from the aircraft type
-    fallbackQuestions = this.questions.filter(q => {
-      const aircraftMatch = criteria.aircraft === 'A320_FAMILY' ? 
-        q.aircraftType?.includes('A320') : 
-        criteria.aircraft === 'B737_FAMILY' ? 
-          (q.aircraftType?.includes('B737') || q.aircraftType?.includes('BOEING')) :
-          q.aircraftType === criteria.aircraft;
-      return aircraftMatch;
-    });
-    
-    if (fallbackQuestions.length > 0) {
-      debugLog('Fallback step 3 - loose aircraft matching:', fallbackQuestions.length);
-      return fallbackQuestions.slice(0, criteria.questionCount);
+    // Step 3: Only if NO categories specified, provide aircraft-based fallback
+    if (criteria.categories.length === 0) {
+      let fallbackQuestions = this.questions.filter(q => 
+        q.aircraftType === criteria.aircraft ||
+        (criteria.aircraft === 'A320_FAMILY' && q.aircraftType === 'A320_FAMILY') ||
+        (criteria.aircraft === 'B737_FAMILY' && q.aircraftType === 'B737_FAMILY')
+      );
+      
+      if (fallbackQuestions.length > 0) {
+        debugLog('Fallback step 3 - aircraft only (no categories specified):', fallbackQuestions.length);
+        return fallbackQuestions.slice(0, criteria.questionCount);
+      }
     }
     
-    // Step 4: Provide sample questions as last resort
-    debugLog('Fallback step 4 - using sample questions as last resort');
-    const sampleQuestions = this.questions.filter((_, index) => index % 3 === 0);
-    return sampleQuestions.slice(0, Math.min(criteria.questionCount, 20));
+    // Step 4: Log error and provide NO questions rather than mixing subjects
+    debugLog('FALLBACK FAILED: No questions found matching selected subjects. This prevents subject mixing.');
+    debugLog('Selected categories:', criteria.categories);
+    debugLog('Available categories:', [...new Set(this.questions.map(q => q.category).filter(Boolean))]);
+    
+    // Return empty array to prevent subject mixing
+    return [];
   }
 
   private shuffleAndLimit(questions: RealAviationQuestion[], limit: number): RealAviationQuestion[] {

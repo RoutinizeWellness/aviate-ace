@@ -140,7 +140,7 @@ const SubscriptionManagement = () => {
                             let email = user?.email || publicEmail.trim();
                             let userId = (user?._id as unknown as string | undefined) || (email ? `guest_${btoa(email).replace(/=+/g, '')}` : undefined);
                             if (!email) {
-                              alert('Introduce tu correo para continuar.');
+                              alert(t('subscription.enterEmailToContinue'));
                               return;
                             }
                             console.log('[UI] Creating checkout', { productId: plan.productId || plan.id, userId, email });
@@ -159,11 +159,11 @@ const SubscriptionManagement = () => {
                               localStorage.removeItem('selectedPlan');
                               window.location.assign(url);
                             } else {
-                              alert('No se recibió URL de checkout.');
+                              alert(t('subscription.noCheckoutUrl'));
                             }
                           } catch (err: any) {
                             console.error('Checkout error:', err);
-                            const msg = err?.message || 'No se pudo iniciar el checkout.';
+                            const msg = err?.message || t('subscription.checkoutError');
                             alert(msg);
                           }
                         }}
@@ -178,7 +178,7 @@ const SubscriptionManagement = () => {
             <Card>
               <CardHeader>
 <CardTitle>{t('subscription.currentPlan')}</CardTitle>
-                <CardDescription>Your active subscription details</CardDescription>
+                <CardDescription>{t('subscription.activeSubscriptionDetails')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -187,10 +187,10 @@ const SubscriptionManagement = () => {
                       <h3 className="font-semibold">{userSubscription.plan}</h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="default" className="bg-green-500">
-                          {userSubscription.status}
+                          {t('subscription.statusActive')}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          Valid until {userSubscription.endDate}
+                          {t('subscription.validUntil')} {userSubscription.endDate}
                         </span>
                       </div>
                     </div>
@@ -217,7 +217,7 @@ const SubscriptionManagement = () => {
             <Card>
               <CardHeader>
 <CardTitle>{t('subscription.quickActions')}</CardTitle>
-                <CardDescription>Common subscription tasks</CardDescription>
+                <CardDescription>{t('subscription.commonTasks')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button variant="outline" className="w-full justify-start">
@@ -242,9 +242,9 @@ const SubscriptionManagement = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  If you have any questions about your subscription, our support team is here to help.
+                  {t('subscription.supportText')}
                 </p>
-                <Button className="w-full">Contact Support</Button>
+                <Button className="w-full">{t('subscription.contactSupport')}</Button>
               </CardContent>
             </Card>
           </div>

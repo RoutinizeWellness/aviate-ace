@@ -1,13 +1,14 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Plane, Mail, Lock, AlertCircle, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
+import { DeviceFingerprintService } from "@/services/DeviceFingerprintService";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,6 +32,15 @@ const Login = () => {
       // The password field is kept for UI consistency but not used in the actual login
       const user = await signIn(email);
       if (user) {
+        // Register device fingerprint after successful login
+        try {
+          await DeviceFingerprintService.registerDevice(user._id);
+          console.log('Device registered successfully');
+        } catch (deviceError) {
+          console.warn('Device registration failed:', deviceError);
+          // Don't block login for device registration failure
+        }
+
         // Check if there's a return URL in the state or query parameters
         const searchParams = new URLSearchParams(location.search);
         const returnUrl = searchParams.get('returnUrl') || '/dashboard';

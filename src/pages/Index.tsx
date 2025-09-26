@@ -4,6 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useConvexAuth";
+import { FreeTrialManager } from "@/services/FreeTrialManager";
+import { toast } from "@/hooks/use-toast";
 import { 
   Target, 
   BarChart3, 
@@ -19,9 +22,8 @@ import {
   Plane
 } from "lucide-react";
 import { PRICING_PLANS, getTranslatedPlans } from "@/config/pricing";
-import heroCockpit from "@/assets/hero-cockpit.jpg";
+import heroCockpit from "@/assets/new-hero-cockpit.jpg";
 import logo from "@/assets/logo.svg";
-import { useAuth } from "@/hooks/useConvexAuth";
 
 interface PricingPlan {
   name: string;
@@ -89,6 +91,28 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+
+  // Handler for "Comenzar ahora" button
+  const handleStartNow = async () => {
+    try {
+      await FreeTrialManager.handleStartNow(
+        user?._id,
+        navigate,
+        (message: string, type: 'info' | 'warning') => {
+          toast({
+            title: type === 'warning' ? "Prueba Terminada" : "Prueba Gratuita",
+            description: message,
+            variant: type === 'warning' ? "destructive" : "default",
+            duration: 4000,
+          });
+        }
+      );
+    } catch (error) {
+      console.error('Error handling start now:', error);
+      // Fallback to dashboard
+      navigate('/dashboard');
+    }
+  };
 
   // Define pricing plans with translations
   const pricingPlans = [
@@ -189,13 +213,17 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-primary hover:bg-primary-dark text-lg px-8 py-6">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary-dark text-lg px-8 py-6"
+              onClick={handleStartNow}
+            >
               <Target className="w-5 h-5 mr-2" />
-              <a href="/dashboard" className="no-underline text-inherit">{t('home.cta')}</a>
+              {t('home.cta')}
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+            <Button variant="outline" size="lg" className="text-lg px-8 py-6" onClick={handleStartNow}>
               <BookOpen className="w-5 h-5 mr-2" />
-              <a href="/exam" className="no-underline text-inherit">Ver Demo</a>
+              Ver Demo
             </Button>
           </div>
 
@@ -217,7 +245,7 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={() => window.location.href = '/type-rating'}>
+            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={handleStartNow}>
               <CardContent className="p-8 text-center">
                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Plane className="w-10 h-10 text-primary" />
@@ -228,7 +256,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={() => window.location.href = '/b737-type-rating'}>
+            <Card className="surface-mid border-border/50 hover-lift cursor-pointer" onClick={handleStartNow}>
               <CardContent className="p-8 text-center">
                 <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Plane className="w-10 h-10 text-blue-500" />
@@ -543,7 +571,11 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             Únete a más de 1,200 pilotos que ya han obtenido su certificación A320 y B737 con nuestra plataforma.
           </p>
-          <Button size="lg" className="bg-primary hover:bg-primary-dark text-lg px-12 py-6">
+          <Button 
+            size="lg" 
+            className="bg-primary hover:bg-primary-dark text-lg px-12 py-6"
+            onClick={handleStartNow}
+          >
             <TrendingUp className="w-5 h-5 mr-2" />
             {t('home.cta')}
           </Button>
@@ -551,27 +583,54 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 surface-dark border-t border-border">
+      <footer className="py-12 bg-slate-900 border-t border-slate-800">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center gap-3 mb-4 md:mb-0">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
-                <Plane className="w-5 h-5" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand Section */}
+            <div className="col-span-1 md:col-span-1">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground">
+                  <Plane className="w-5 h-5" />
+                </div>
+                <h1 className="font-bold text-white">PilotPrepFlightX</h1>
               </div>
-              <div>
-                <h1 className="font-bold">PilotPrepFlightX</h1>
-                <p className="text-xs text-muted-foreground">Professional Training</p>
-              </div>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                La plataforma líder para la preparación de type ratings de aeronaves comerciales.
+              </p>
             </div>
-            
-            <div className="flex gap-8 text-sm text-muted-foreground">
-              <a href="/terms" className="hover:text-primary transition-colors">Términos</a>
-              <a href="/privacy" className="hover:text-primary transition-colors">Privacidad</a>
-              <a href="mailto:pilotprepflightx@outlook.es" className="hover:text-primary transition-colors">Contacto</a>
+
+            {/* Producto Section */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Producto</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="/type-rating" className="hover:text-teal-400 transition-colors">Cursos</a></li>
+                <li><a href="/exams" className="hover:text-teal-400 transition-colors">Exámenes</a></li>
+                <li><a href="/aircraft-selection" className="hover:text-teal-400 transition-colors">Prueba gratis</a></li>
+              </ul>
+            </div>
+
+            {/* Soporte Section */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Soporte</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">Centro de ayuda</a></li>
+                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">Contacto</a></li>
+                <li><a href="/subscription-management" className="hover:text-teal-400 transition-colors">Estado del servicio</a></li>
+              </ul>
+            </div>
+
+            {/* Legal Section */}
+            <div>
+              <h3 className="font-semibold text-white mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm text-slate-400">
+                <li><a href="/terms" className="hover:text-teal-400 transition-colors">Términos</a></li>
+                <li><a href="/privacy" className="hover:text-teal-400 transition-colors">Privacidad</a></li>
+                <li><a href="/terms" className="hover:text-teal-400 transition-colors">Cookies</a></li>
+              </ul>
             </div>
           </div>
           
-          <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+          <div className="pt-8 border-t border-slate-800 text-center text-sm text-slate-400">
             <p>&copy; 2024 PilotPrepFlightX. Todos los derechos reservados.</p>
           </div>
         </div>

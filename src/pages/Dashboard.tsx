@@ -291,8 +291,8 @@ const Dashboard = () => {
                   <BookOpen className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h1 className="font-bold text-lg">{t('nav.dashboard') || 'Dashboard'}</h1>
-                  <p className="text-xs text-muted-foreground">Resumen de tu progreso</p>
+                  <h1 className="font-bold text-lg">{t('dashboard.title')}</h1>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.summaryOfProgress')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -309,8 +309,8 @@ const Dashboard = () => {
           {/* Desktop header */}
           <header className="hidden md:flex items-center justify-between p-6 border-b">
             <div>
-              <h1 className="text-2xl font-bold">Panel de Control</h1>
-              <p className="text-muted-foreground">Bienvenido de vuelta, {user?.displayName || user?.email?.split('@')[0] || 'Piloto'}</p>
+              <h1 className="text-2xl font-bold">{t('dashboard.title')}</h1>
+              <p className="text-muted-foreground">{t('dashboard.subtitle')}, {user?.displayName || user?.email?.split('@')[0] || t('dashboard.pilot')}</p>
             </div>
             <div className="flex items-center gap-4">
               <LanguageToggle />
@@ -324,7 +324,7 @@ const Dashboard = () => {
               </div>
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
-                {t('nav.logout') || 'Salir'}
+                {t('nav.logout')}
               </Button>
             </div>
           </header>
@@ -336,20 +336,20 @@ const Dashboard = () => {
               <TabsList className={`grid w-full ${isMobile ? 'grid-cols-3' : 'grid-cols-4'}`}>
                 <TabsTrigger value="overview" className={`${isMobile ? 'text-xs' : ''}`}>
                   <BookOpen className="w-4 h-4 mr-2" />
-                  Overview
+                  {t('dashboard.overview')}
                 </TabsTrigger>
                 <TabsTrigger value="gamification" className={`${isMobile ? 'text-xs' : ''}`}>
                   <Gamepad2 className="w-4 h-4 mr-2" />
-                  Achievements
+                  {t('dashboard.achievements')}
                 </TabsTrigger>
                 <TabsTrigger value="suggestions" className={`${isMobile ? 'text-xs' : ''}`}>
                   <Lightbulb className="w-4 h-4 mr-2" />
-                  Sugerencias
+                  {t('dashboard.suggestions')}
                 </TabsTrigger>
                 {!isMobile && (
                   <TabsTrigger value="analytics">
                     <BarChart3 className="w-4 h-4 mr-2" />
-                    Analytics
+                    {t('dashboard.analytics')}
                   </TabsTrigger>
                 )}
               </TabsList>
@@ -358,14 +358,14 @@ const Dashboard = () => {
 
         {/* Progress Overview */}
         <section className={`${isMobile ? 'mb-6' : 'mb-10'}`}>
-          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold ${isMobile ? 'mb-4' : 'mb-6'}`}>Progreso General</h2>
+          <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold ${isMobile ? 'mb-4' : 'mb-6'}`}>{t('dashboard.overallProgress')}</h2>
           <Card className="surface-mid border-border/50">
             <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
               <div className={`${isMobile ? 'space-y-4' : 'flex justify-between items-center mb-4'}`}>
                 <div>
-                  <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>Progreso Total</h3>
+                  <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>{t('dashboard.overallProgress')}</h3>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                    {totalCourses} cursos activos • {totalLessonsCompleted} lecciones completadas
+                    {totalCourses} {t('dashboard.activeCourses')} • {totalLessonsCompleted} {t('dashboard.lessonsCompleted')}
                   </p>
                 </div>
                 <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
@@ -373,7 +373,7 @@ const Dashboard = () => {
                     {Math.round(overallProgress)}%
                   </div>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                    Completado
+                    {t('dashboard.completed')}
                   </p>
                 </div>
               </div>
@@ -381,9 +381,9 @@ const Dashboard = () => {
               <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                 <CheckCircle2 className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-success`} />
                 <span>
-                  {overallProgress > 75 ? "¡Excelente progreso!" : 
-                   overallProgress > 50 ? "¡Buen avance!" : 
-                   "¡Sigue adelante!"} Nivel {currentLevel}
+                  {overallProgress > 75 ? t('dashboard.excellentProgress') : 
+                   overallProgress > 50 ? t('dashboard.goodProgress') : 
+                   t('dashboard.keepGoing')} {t('dashboard.level')} {currentLevel}
                 </span>
               </div>
             </CardContent>
@@ -393,11 +393,11 @@ const Dashboard = () => {
         {/* My Courses */}
         {/* Fixed isLoadingUserCourses reference */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold mb-6">Mis Cursos</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('dashboard.myCourses')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {userCoursesData === undefined ? (
               <div className="col-span-2 text-center py-8">
-                <div className="text-muted-foreground">Cargando cursos...</div>
+                <div className="text-muted-foreground">{t('dashboard.loadingCourses')}</div>
               </div>
             ) : userCoursesData && userCoursesData.length > 0 ? (
               userCoursesData.map((course) => {
@@ -420,17 +420,17 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <Badge className="bg-primary/10 text-primary">
-                          Activo
+                          {t('dashboard.active')}
                         </Badge>
                       </div>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
-                          <span>Progreso:</span>
+                          <span>{t('dashboard.progress')}</span>
                           <span className="font-medium">{courseProgress}%</span>
                         </div>
                         <Progress value={courseProgress} className="h-2" />
                         <div className="text-sm text-muted-foreground">
-                          {course.description || "Curso de preparación completa"}
+                          {course.description || t('dashboard.fullPreparationCourse')}
                         </div>
                       </div>
                     </CardContent>
@@ -444,9 +444,9 @@ const Dashboard = () => {
                     <div className="w-16 h-16 bg-muted/50 rounded-lg flex items-center justify-center mx-auto mb-4">
                       <BookOpen className="w-8 h-8 text-muted-foreground" />
                     </div>
-                    <h3 className="font-medium mb-2">No hay cursos inscritos</h3>
-                    <p className="text-sm text-muted-foreground mb-4">Explora nuestros cursos disponibles para comenzar tu preparación.</p>
-                    <Button onClick={() => navigate('/exams')}>Ver Cursos Disponibles</Button>
+                    <h3 className="font-medium mb-2">{t('dashboard.noCourses')}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">{t('dashboard.noCoursesDesc')}</p>
+                    <Button onClick={() => navigate('/exams')}>{t('dashboard.viewAvailableCourses')}</Button>
                   </CardContent>
                 </Card>
               </div>
@@ -458,7 +458,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Quick Access Modules */}
           <section>
-            <h2 className="text-2xl font-bold mb-6">Acceso Rápido</h2>
+            <h2 className="text-2xl font-bold mb-6">{t('dashboard.quickAccess')}</h2>
             <div className="grid grid-cols-2 gap-4">
               <Card 
                 className="surface-mid border-border/50 hover-lift cursor-pointer group"
@@ -468,8 +468,8 @@ const Dashboard = () => {
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Target className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="font-semibold text-sm mb-1">Modo Práctica</h3>
-                  <p className="text-xs text-muted-foreground">Preguntas aleatorias</p>
+                  <h3 className="font-semibold text-sm mb-1">{t('dashboard.practiceMode')}</h3>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.randomQuestions')}</p>
                 </CardContent>
               </Card>
 
@@ -481,8 +481,8 @@ const Dashboard = () => {
                   <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Clock className="w-6 h-6 text-warning" />
                   </div>
-                  <h3 className="font-semibold text-sm mb-1">Examen Rápido</h3>
-                  <p className="text-xs text-muted-foreground">30 min cronometrado</p>
+                  <h3 className="font-semibold text-sm mb-1">{t('dashboard.quickExam')}</h3>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.timedExam')}</p>
                 </CardContent>
               </Card>
 
@@ -494,8 +494,8 @@ const Dashboard = () => {
                   <div className="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <Trophy className="w-6 h-6 text-success" />
                   </div>
-                  <h3 className="font-semibold text-sm mb-1">Logros</h3>
-                  <p className="text-xs text-muted-foreground">Ver progreso</p>
+                  <h3 className="font-semibold text-sm mb-1">{t('dashboard.achievements')}</h3>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.viewProgress')}</p>
                 </CardContent>
               </Card>
 
@@ -507,8 +507,8 @@ const Dashboard = () => {
                   <div className="w-12 h-12 bg-info/10 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <TrendingUp className="w-6 h-6 text-info" />
                   </div>
-                  <h3 className="font-semibold text-sm mb-1">Estadísticas</h3>
-                  <p className="text-xs text-muted-foreground">Análisis detallado</p>
+                  <h3 className="font-semibold text-sm mb-1">{t('dashboard.statistics')}</h3>
+                  <p className="text-xs text-muted-foreground">{t('dashboard.detailedAnalysis')}</p>
                 </CardContent>
               </Card>
             </div>
@@ -516,7 +516,7 @@ const Dashboard = () => {
 
           {/* Performance Stats */}
           <section>
-            <h2 className="text-2xl font-bold mb-6">Rendimiento</h2>
+            <h2 className="text-2xl font-bold mb-6">{t('dashboard.performance')}</h2>
             <div className="space-y-4">
               <Card className="surface-mid border-border/50">
                 <CardContent className="p-4">
@@ -526,9 +526,9 @@ const Dashboard = () => {
                         <Trophy className="w-4 h-4 text-success" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Exámenes Aprobados</p>
+                        <p className="font-medium text-sm">{t('dashboard.passedExams')}</p>
                         <p className="text-xs text-muted-foreground">
-                          {examStats?.passedExams || 0} de {examStats?.totalExams || 0}
+                          {examStats?.passedExams || 0} {t('common.of')} {examStats?.totalExams || 0}
                         </p>
                       </div>
                     </div>
@@ -547,8 +547,8 @@ const Dashboard = () => {
                         <Target className="w-4 h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Promedio General</p>
-                        <p className="text-xs text-muted-foreground">Últimos exámenes</p>
+                        <p className="font-medium text-sm">{t('dashboard.overallAverage')}</p>
+                        <p className="text-xs text-muted-foreground">{t('dashboard.lastExams')}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -566,8 +566,8 @@ const Dashboard = () => {
                         <Clock className="w-4 h-4 text-warning" />
                       </div>
                       <div>
-                        <p className="font-medium text-sm">Tiempo Total</p>
-                        <p className="text-xs text-muted-foreground">Esta semana</p>
+                        <p className="font-medium text-sm">{t('dashboard.totalTime')}</p>
+                        <p className="text-xs text-muted-foreground">{t('dashboard.thisWeek')}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -582,7 +582,7 @@ const Dashboard = () => {
 
         {/* Recent Activity */}
         <section className="mt-10">
-          <h2 className="text-2xl font-bold mb-6">Actividad Reciente</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('dashboard.recentActivity')}</h2>
           <Card className="surface-mid border-border/50">
             <CardContent className="p-6">
               {recentProgress && recentProgress.length > 0 ? (
@@ -595,12 +595,12 @@ const Dashboard = () => {
                       <div className="flex-1">
                         <p className="text-sm font-medium">
                           {activity.activity_type === 'exam_taken' && activity.exams ? 
-                            `Completaste el examen "${activity.exams.title}"` :
+                            `${t('dashboard.completedExam')} "${activity.exams.title}"` :
                           activity.activity_type === 'lesson_completed' && activity.lessons ?
-                            `Completaste la lección "${activity.lessons.title}"` :
+                            `${t('dashboard.completedLesson')} "${activity.lessons.title}"` :
                           activity.activity_type === 'course_completed' && activity.courses ?
-                            `Completaste el curso "${activity.courses.title}"` :
-                            `Actividad: ${activity.activity_type.replace('_', ' ')}`
+                            `${t('dashboard.completedCourse')} "${activity.courses.title}"` :
+                            `${t('dashboard.activity')} ${activity.activity_type.replace('_', ' ')}`
                           }
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -614,7 +614,7 @@ const Dashboard = () => {
                       </div>
                       {activity.points_earned && (
                         <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-                          +{activity.points_earned} pts
+                          +{activity.points_earned} {t('dashboard.pts')}
                         </Badge>
                       )}
                     </div>
@@ -625,9 +625,9 @@ const Dashboard = () => {
                   <div className="w-16 h-16 bg-muted/50 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <Clock className="w-8 h-8 text-muted-foreground" />
                   </div>
-                  <h3 className="font-medium mb-2">Sin actividad reciente</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Comienza a practicar para ver tu actividad aquí.</p>
-                  <Button onClick={() => navigate('/exam')}>Iniciar Práctica</Button>
+                  <h3 className="font-medium mb-2">{t('dashboard.noRecentActivity')}</h3>
+                  <p className="text-sm text-muted-foreground mb-4">{t('dashboard.noActivityDesc')}</p>
+                  <Button onClick={() => navigate('/exam')}>{t('dashboard.startPractice')}</Button>
                 </div>
               )}
             </CardContent>
@@ -650,12 +650,12 @@ const Dashboard = () => {
                 <TabsContent value="analytics" className="space-y-6">
                   <div className="text-center py-12">
                     <Award className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Advanced Analytics</h3>
+                    <h3 className="text-lg font-semibold mb-2">{t('dashboard.advancedAnalytics')}</h3>
                     <p className="text-muted-foreground mb-4">
-                      Get detailed insights into your learning progress and performance.
+                      {t('dashboard.advancedAnalyticsDesc')}
                     </p>
                     <Button onClick={() => navigate('/analytics')}>
-                      View Full Analytics
+                      {t('dashboard.viewFullAnalytics')}
                     </Button>
                   </div>
                 </TabsContent>

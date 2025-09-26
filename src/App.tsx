@@ -81,7 +81,7 @@ const queryClient = new QueryClient({
 const stripePromise = getStripe();
 
 const App = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   return (
   <QueryClientProvider client={queryClient}>
     <ConvexProvider client={convex}>
@@ -97,7 +97,7 @@ const App = () => {
                   onDeviceUpdate={() => console.log('Device updated')}
                 />
               </div>
-              <a href="#main" className="skip-link">Saltar al contenido</a>
+              <a href="#main" className="skip-link">{t('app.skipToContent')}</a>
             <BrowserRouter key={language} future={{
               v7_startTransition: true,
               v7_relativeSplatPath: true

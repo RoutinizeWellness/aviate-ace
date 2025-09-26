@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
@@ -36,39 +36,6 @@ interface PricingPlan {
 }
 
 // Data arrays
-const features = [
-  {
-    icon: Target,
-    title: "Simulacros Reales",
-    description: "Exámenes idénticos al formato oficial con tiempo limitado y condiciones reales de evaluación."
-  },
-  {
-    icon: BarChart3,
-    title: "Estadísticas Avanzadas",
-    description: "Análisis detallado de tu rendimiento por categorías, identificando tus fortalezas y debilidades."
-  },
-  {
-    icon: BookOpen,
-    title: "Banco Exclusivo",
-    description: "5,000+ preguntas actualizadas mensualmente, organizadas por sistemas A320 y B737."
-  },
-  {
-    icon: Clock,
-    title: "Práctica Cronometrada",
-    description: "Entrenamientos con tiempo real para desarrollar velocidad y precisión bajo presión."
-  },
-  {
-    icon: Shield,
-    title: "Contenido Certificado",
-    description: "Material validado por pilotos activos con experiencia en A320 y B737."
-  },
-  {
-    icon: TrendingUp,
-    title: "Progreso Inteligente",
-    description: "Sistema adaptativo que ajusta la dificultad según tu nivel de conocimiento."
-  }
-];
-
 const testimonials = [
   {
     quote: "I passed my A320 exam on the first try. The questions were identical to the real exam. Amazing platform.",
@@ -91,6 +58,40 @@ const Index = () => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
   const navigate = useNavigate();
+
+  // Features array with translations
+  const features = [
+    {
+      icon: Target,
+      title: t('home.features.real.title'),
+      description: t('home.features.real.description')
+    },
+    {
+      icon: BarChart3,
+      title: t('home.features.statistics.title'),
+      description: t('home.features.statistics.description')
+    },
+    {
+      icon: BookOpen,
+      title: t('home.features.bank.title'),
+      description: t('home.features.bank.description')
+    },
+    {
+      icon: Clock,
+      title: t('home.features.timed.title'),
+      description: t('home.features.timed.description')
+    },
+    {
+      icon: Shield,
+      title: t('home.features.certified.title'),
+      description: t('home.features.certified.description')
+    },
+    {
+      icon: TrendingUp,
+      title: t('home.features.progress.title'),
+      description: t('home.features.progress.description')
+    }
+  ];
 
   // Handler for "Comenzar ahora" button
   const handleStartNow = async () => {
@@ -129,7 +130,7 @@ const Index = () => {
         t('features.free.4')
       ],
       cta: t('pricing.startFree'),
-      id: 'pilotprepflightx_gratuito'
+      id: 'pilotprepflight_x_-_free'
     },
     ...getTranslatedPlans(PRICING_PLANS.filter(plan => plan.durationMonths > 0), t).map(plan => ({
       name: plan.name,
@@ -195,7 +196,7 @@ const Index = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
-            backgroundImage: `linear-gradient(135deg, rgba(13, 26, 19, 0.95) 0%, rgba(13, 26, 19, 0.7) 50%, rgba(13, 26, 19, 0.95) 100%), url(${heroCockpit})`
+            backgroundImage: `linear-gradient(135deg, rgba(13, 26, 19, 0.85) 0%, rgba(13, 26, 19, 0.6) 50%, rgba(13, 26, 19, 0.85) 100%), url(/airplane-background.svg), url(${heroCockpit})`
           }}
         />
         <div className="relative container mx-auto px-4 text-center">
@@ -352,11 +353,10 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              <span className="text-primary">Sobre nosotros</span>
+              <span className="text-primary">{t('home.about.title')}</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Ayudamos a pilotos a prepararse para sus type ratings con una plataforma moderna,
-              práctica y enfocada en resultados.
+              {t('home.about.subtitle')}
             </p>
           </div>
 
@@ -364,27 +364,27 @@ const Index = () => {
             <div className="space-y-8">
               <Card className="surface-mid border-border/50">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-3 text-primary">Misión</h3>
+                  <h3 className="font-semibold text-lg mb-3 text-primary">{t('home.about.mission.title')}</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Proveer una preparación efectiva y realista que acelere el camino al éxito en evaluaciones oficiales.
+                    {t('home.about.mission.text')}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="surface-mid border-border/50">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-3 text-primary">Visión</h3>
+                  <h3 className="font-semibold text-lg mb-3 text-primary">{t('home.about.vision.title')}</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Ser el estándar en preparación digital de pilotos para aeronaves Airbus y Boeing.
+                    {t('home.about.vision.text')}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="surface-mid border-border/50">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-3 text-primary">Valores</h3>
+                  <h3 className="font-semibold text-lg mb-3 text-primary">{t('home.about.values.title')}</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    Precisión, mejora continua y experiencia de aprendizaje centrada en el piloto.
+                    {t('home.about.values.text')}
                   </p>
                 </CardContent>
               </Card>
@@ -393,45 +393,41 @@ const Index = () => {
             <div className="space-y-8">
               <Card className="surface-mid border-border/50">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-4 text-primary">Nuestra historia</h3>
+                  <h3 className="font-semibold text-lg mb-4 text-primary">{t('home.about.story.title')}</h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Nacimos de la necesidad de una preparación práctica y actualizada, inspirada por
-                    experiencias reales en cabina y evaluaciones técnicas.
+                    {t('home.about.story.text1')}
                   </p>
                   <p className="text-muted-foreground leading-relaxed">
-                    Con feedback de pilotos activos, construimos un sistema de estudio
-                    enfocado en categorías clave, simulación de examen y análisis de
-                    rendimiento.
+                    {t('home.about.story.text2')}
                   </p>
                 </CardContent>
               </Card>
 
               <Card className="surface-mid border-border/50">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-lg mb-4 text-primary">Qué nos diferencia</h3>
+                  <h3 className="font-semibold text-lg mb-4 text-primary">{t('home.about.difference.title')}</h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    Contenido específico por aeronave, práctica orientada a objetivos y una
-                    experiencia pulida para maximizar tu tiempo de estudio.
+                    {t('home.about.difference.text')}
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                        A320 - B737
+                        {t('home.about.badge1')}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="bg-success/10 text-success border-success/30">
-                        Simulación real
+                        {t('home.about.badge2')}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="bg-warning/10 text-warning border-warning/30">
-                        Análisis por categorías
+                        {t('home.about.badge3')}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="bg-info/10 text-info border-info/30">
-                        Enfoque práctico
+                        {t('home.about.badge4')}
                       </Badge>
                     </div>
                   </div>
@@ -447,8 +443,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Características que Garantizan tu{" "}
-              <span className="text-primary">Aprobación</span>
+              {t('home.features.title')}
             </h2>
           </div>
 
@@ -527,8 +522,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Lo que Dicen Nuestros{" "}
-              <span className="text-primary">Pilotos</span>
+              {t('home.testimonials.title')}
             </h2>
           </div>
 
@@ -562,11 +556,10 @@ const Index = () => {
       <section className="py-20 surface-mid">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            ¿Listo para Aprobar tu{" "}
-            <span className="text-primary">Habilitación?</span>
+            {t('home.cta.title')}
           </h2>
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-            Únete a más de 1,200 pilotos que ya han obtenido su certificación A320 y B737 con nuestra plataforma.
+            {t('home.cta.subtitle')}
           </p>
           <Button 
             size="lg" 
@@ -592,43 +585,43 @@ const Index = () => {
                 <h1 className="font-bold text-white">PilotPrepFlightX</h1>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed">
-                La plataforma líder para la preparación de type ratings de aeronaves comerciales.
+                {t('footer.brand.description')}
               </p>
             </div>
 
             {/* Producto Section */}
             <div>
-              <h3 className="font-semibold text-white mb-4">Producto</h3>
+              <h3 className="font-semibold text-white mb-4">{t('footer.product.title')}</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/type-rating" className="hover:text-teal-400 transition-colors">Cursos</a></li>
-                <li><a href="/exams" className="hover:text-teal-400 transition-colors">Exámenes</a></li>
-                <li><a href="/aircraft-selection" className="hover:text-teal-400 transition-colors">Prueba gratis</a></li>
+                <li><a href="/type-rating" className="hover:text-teal-400 transition-colors">{t('footer.product.courses')}</a></li>
+                <li><a href="/exams" className="hover:text-teal-400 transition-colors">{t('footer.product.exams')}</a></li>
+                <li><a href="/aircraft-selection" className="hover:text-teal-400 transition-colors">{t('footer.product.freeTrial')}</a></li>
               </ul>
             </div>
 
             {/* Soporte Section */}
             <div>
-              <h3 className="font-semibold text-white mb-4">Soporte</h3>
+              <h3 className="font-semibold text-white mb-4">{t('footer.support.title')}</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">Centro de ayuda</a></li>
-                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">Contacto</a></li>
-                <li><a href="/subscription-management" className="hover:text-teal-400 transition-colors">Estado del servicio</a></li>
+                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">{t('footer.support.helpCenter')}</a></li>
+                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">{t('footer.support.contact')}</a></li>
+                <li><a href="/subscription-management" className="hover:text-teal-400 transition-colors">{t('footer.support.serviceStatus')}</a></li>
               </ul>
             </div>
 
             {/* Legal Section */}
             <div>
-              <h3 className="font-semibold text-white mb-4">Legal</h3>
+              <h3 className="font-semibold text-white mb-4">{t('footer.legal.title')}</h3>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/terms" className="hover:text-teal-400 transition-colors">Términos</a></li>
-                <li><a href="/privacy" className="hover:text-teal-400 transition-colors">Privacidad</a></li>
-                <li><a href="/terms" className="hover:text-teal-400 transition-colors">Cookies</a></li>
+                <li><a href="/terms" className="hover:text-teal-400 transition-colors">{t('footer.legal.terms')}</a></li>
+                <li><a href="/privacy" className="hover:text-teal-400 transition-colors">{t('footer.legal.privacy')}</a></li>
+                <li><a href="/terms" className="hover:text-teal-400 transition-colors">{t('footer.legal.cookies')}</a></li>
               </ul>
             </div>
           </div>
           
           <div className="pt-8 border-t border-slate-800 text-center text-sm text-slate-400">
-            <p>&copy; 2024 PilotPrepFlightX. Todos los derechos reservados.</p>
+            <p>{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>

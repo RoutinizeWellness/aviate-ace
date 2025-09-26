@@ -88,9 +88,9 @@ const Exams = () => {
   // Available aircraft types
   const getAvailableAircraftTypes = () => {
     const allTypes = [
-      { value: "A320_FAMILY", label: "Airbus A320 Family", description: "A318, A319, A320, A321" },
-      { value: "B737_FAMILY", label: "Boeing 737", description: "B737-700, B737-800, B737 MAX" },
-      { value: "ALL", label: "Todos los Tipos", description: "Preguntas mixtas de todas las aeronaves" }
+      { value: "A320_FAMILY", label: t('exams.airbusA320Family'), description: t('exams.airbusA320FamilyDesc') },
+      { value: "B737_FAMILY", label: t('exams.boeing737'), description: t('exams.boeing737Desc') },
+      { value: "ALL", label: t('exams.allTypes'), description: t('exams.allTypesDesc') }
     ];
     
     if (adminUser) {
@@ -117,27 +117,27 @@ const Exams = () => {
   // Available categories
   const getAvailableCategoriesFor = (aircraft: string) => {
     const a320Categories = [
-      { value: "aircraft-general", label: "General de Aeronave", description: "Conocimiento general y limitaciones de aeronave" },
-      { value: "electrical", label: "Eléctrico", description: "Generación y distribución de energía eléctrica" },
-      { value: "hydraulics", label: "Hidráulico", description: "Sistemas de potencia hidráulica" },
-      { value: "performance", label: "Rendimiento", description: "Cálculos y limitaciones de rendimiento" },
-      { value: "air-bleed-cond-press-vent", label: "Aire/Cond/Presur/Vent", description: "Aire acondicionado, presurización y ventilación" },
-      { value: "autoflight", label: "Vuelo Automático", description: "Piloto automático y sistemas de gestión de vuelo" },
-      { value: "engines", label: "Motores", description: "Operaciones, limitaciones y procedimientos de motores" },
-      { value: "flight-controls", label: "Controles de Vuelo", description: "Sistemas de control de vuelo primario y secundario" },
-      { value: "fuel", label: "Combustible", description: "Sistemas de combustible, distribución y monitoreo" },
-      { value: "landing-gear", label: "Tren de Aterrizaje", description: "Operación del tren de aterrizaje, frenos y dirección" }
+      { value: "aircraft-general", label: t('exams.aircraftGeneral'), description: t('exams.aircraftGeneralDesc') },
+      { value: "electrical", label: t('exams.electrical'), description: t('exams.electricalDesc') },
+      { value: "hydraulics", label: t('exams.hydraulics'), description: t('exams.hydraulicsDesc') },
+      { value: "performance", label: t('exams.performance'), description: t('exams.performanceDesc') },
+      { value: "air-bleed-cond-press-vent", label: t('exams.airCondPressVent'), description: t('exams.airCondPressVentDesc') },
+      { value: "autoflight", label: t('exams.autoflight'), description: t('exams.autoflightDesc') },
+      { value: "engines", label: t('exams.engines'), description: t('exams.enginesDesc') },
+      { value: "flight-controls", label: t('exams.flightControls'), description: t('exams.flightControlsDesc') },
+      { value: "fuel", label: t('exams.fuel'), description: t('exams.fuelDesc') },
+      { value: "landing-gear", label: t('exams.landingGear'), description: t('exams.landingGearDesc') }
     ];
     
     const b737Categories = [
-      { value: "airplane-general", label: "general de avión", description: "Información general y limitaciones del avión" },
-      { value: "air-systems", label: "sistemas de aire", description: "Sistemas neumáticos, presurización y aire acondicionado" },
-      { value: "electrical", label: "eléctrico", description: "Sistemas de energía eléctrica" },
-      { value: "engines-apu", label: "motores y apu", description: "Sistemas de motor y unidad de potencia auxiliar" },
-      { value: "flight-controls", label: "controles de vuelo", description: "Sistemas de control de vuelo primario y secundario" },
-      { value: "fuel", label: "combustible", description: "Almacenamiento, distribución e indicación de combustible" },
-      { value: "hydraulics", label: "hidráulico", description: "Sistemas de potencia hidráulica" },
-      { value: "landing-gear", label: "tren de aterrizaje", description: "Extensión, retracción e indicación del tren de aterrizaje" }
+      { value: "airplane-general", label: t('exams.aircraftGeneral'), description: t('exams.aircraftGeneralDesc') },
+      { value: "air-systems", label: t('exams.airSystems'), description: t('exams.airSystemsDesc') },
+      { value: "electrical", label: t('exams.electrical'), description: t('exams.electricalDesc') },
+      { value: "engines-apu", label: t('exams.enginesApu'), description: t('exams.enginesApuDesc') },
+      { value: "flight-controls", label: t('exams.flightControls'), description: t('exams.flightControlsDesc') },
+      { value: "fuel", label: t('exams.fuel'), description: t('exams.fuelDesc') },
+      { value: "hydraulics", label: t('exams.hydraulics'), description: t('exams.hydraulicsDesc') },
+      { value: "landing-gear", label: t('exams.landingGear'), description: t('exams.landingGearDesc') }
     ];
     
     const allCategories = [...a320Categories, ...b737Categories.filter(cat => !a320Categories.some(a320Cat => a320Cat.value === cat.value))];
@@ -172,17 +172,17 @@ const Exams = () => {
   };
 
   const difficulties = [
-    { value: "beginner", label: "Básico", description: "Conceptos fundamentales" },
-    { value: "intermediate", label: "Intermedio", description: "Procedimientos estándar" },
-    { value: "advanced", label: "Avanzado", description: "Situaciones complejas" }
+    { value: "beginner", label: t('exams.basicLevel'), description: t('exams.fundamentalConcepts') },
+    { value: "intermediate", label: t('exams.intermediateLevel'), description: t('exams.standardProcedures') },
+    { value: "advanced", label: t('exams.advancedLevel'), description: t('exams.complexSituations') }
   ];
 
   const questionCounts = [
-    { value: "10", label: "10 preguntas", description: "Sesión corta - 15 minutos" },
-    { value: "20", label: "20 preguntas", description: "Sesión estándar - 30 minutos" },
-    { value: "30", label: "30 preguntas", description: "Sesión extendida - 45 minutos" },
-    { value: "50", label: "50 preguntas", description: "Sesión intensiva - 75 minutos" },
-    { value: "75", label: "75 preguntas", description: "Simulación de examen completo" }
+    { value: "10", label: `10 ${t('exams.questions')}`, description: `${t('exams.shortSession')} - 15 ${t('exams.minutes')}` },
+    { value: "20", label: `20 ${t('exams.questions')}`, description: `${t('exams.standardSession')} - 30 ${t('exams.minutes')}` },
+    { value: "30", label: `30 ${t('exams.questions')}`, description: `${t('exams.extendedSession')} - 45 ${t('exams.minutes')}` },
+    { value: "50", label: `50 ${t('exams.questions')}`, description: `${t('exams.intensiveSession')} - 75 ${t('exams.minutes')}` },
+    { value: "75", label: `75 ${t('exams.questions')}`, description: t('exams.fullExamSimulation') }
   ];
 
   const handleStartPractice = () => {

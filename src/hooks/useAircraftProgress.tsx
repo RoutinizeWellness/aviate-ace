@@ -4,6 +4,11 @@ import { api } from '../../convex/_generated/api';
 import { useAuth } from './useConvexAuth';
 import { useToast } from './use-toast';
 
+// Helper function to validate Convex IDs
+const isValidConvexId = (id: string): boolean => {
+  return /^[a-z0-9]{32}$/.test(id);
+};
+
 export interface AircraftProgress {
   totalQuestions: number;
   answeredQuestions: number;
@@ -37,13 +42,13 @@ export const useA320Progress = () => {
   // Get user's exam sessions for A320
   const examSessions = useQuery(
     api.exams.getUserExamSessions,
-    user ? { userId: user._id } : "skip"
+    user && isValidConvexId(user._id) ? { userId: user._id } : "skip"
   );
 
   // Get user's incorrect questions for A320
   const incorrectQuestions = useQuery(
     api.auth.getUserIncorrectQuestions,
-    user ? { userId: user._id } : "skip"
+    user && isValidConvexId(user._id) ? { userId: user._id } : "skip"
   );
 
   useEffect(() => {
@@ -130,7 +135,7 @@ export const useA320Progress = () => {
   return {
     progress,
     categoryProgress,
-    isLoading: !examSessions || !incorrectQuestions,
+    isLoading: user && isValidConvexId(user._id) ? (!examSessions || !incorrectQuestions) : false,
     refresh: () => {
       // Trigger a refresh by clearing local state
       setProgress(null);
@@ -146,19 +151,41 @@ export const useB737Progress = () => {
   const [progress, setProgress] = useState<AircraftProgress | null>(null);
   const [categoryProgress, setCategoryProgress] = useState<CategoryProgress[]>([]);
 
-  // Get user's exam sessions for B737
+  // Get user's exam sessions for B737 - with ID validation
   const examSessions = useQuery(
     api.exams.getUserExamSessions,
-    user ? { userId: user._id } : "skip"
+    user && isValidConvexId(user._id) ? { userId: user._id } : "skip"
   );
 
-  // Get user's incorrect questions for B737
+  // Get user's incorrect questions for B737 - with ID validation
   const incorrectQuestions = useQuery(
     api.auth.getUserIncorrectQuestions,
-    user ? { userId: user._id } : "skip"
+    user && isValidConvexId(user._id) ? { userId: user._id } : "skip"
   );
 
   useEffect(() => {
+    // If user ID is invalid, set up mock progress data
+    if (user && !isValidConvexId(user._id)) {
+      console.warn("Using demo mode for B737 progress - invalid Convex ID:", user._id);
+      
+      // Set up demo progress data
+      setProgress({
+        totalQuestions: 0,
+        answeredQuestions: 0,
+        correctAnswers: 0,
+        incorrectAnswers: 0,
+        accuracy: 0,
+        timeSpent: 0,
+        lastStudied: null,
+        completedCategories: [],
+        weakCategories: [],
+        strongCategories: []
+      });
+      
+      setCategoryProgress([]);
+      return;
+    }
+
     if (examSessions && incorrectQuestions) {
       // Filter B737 sessions
       const b737Sessions = examSessions.filter(session => 
@@ -242,7 +269,7 @@ export const useB737Progress = () => {
   return {
     progress,
     categoryProgress,
-    isLoading: !examSessions || !incorrectQuestions,
+    isLoading: user && isValidConvexId(user._id) ? (!examSessions || !incorrectQuestions) : false,
     refresh: () => {
       // Trigger a refresh by clearing local state
       setProgress(null);

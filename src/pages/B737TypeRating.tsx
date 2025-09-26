@@ -55,7 +55,7 @@ const B737TypeRating = () => {
   
   // Show language toggle in header for 737 page
 
-  // Convex type rating progress (B737)
+  // Convex type rating progress (B737) - hook handles ID validation internally
   const { progressByLesson: trProgressByLesson } = useTypeRatingProgress('B737_FAMILY');
   
   const [isLoading, setIsLoading] = useState(true);
@@ -102,7 +102,7 @@ const B737TypeRating = () => {
                      user?.email?.split('@')[0] || 
                      'Usuario';
 
-  // Use the B737 progress hook
+  // Use the B737 progress hook - it handles ID validation internally
   const { progress: b737Progress, categoryProgress, isLoading: isProgressLoading } = useB737Progress();
   
   const HeaderActions = () => (
@@ -111,6 +111,11 @@ const B737TypeRating = () => {
     </div>
   );
   
+  // Helper function to validate Convex IDs
+  const isValidConvexId = (id: string): boolean => {
+    return typeof id === 'string' && /^[a-z0-9]{32}$/.test(id);
+  };
+
   // Helper functions for lesson progress
   const getLessonProgressById = (lessonId: number) => {
     const convex = trProgressByLesson.get(lessonId);
@@ -498,7 +503,7 @@ const B737TypeRating = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Cargando progreso...</p>
+          <p className="text-muted-foreground">{t('b737.typeRating.loadingProgress')}</p>
         </div>
       </div>
     );
@@ -521,8 +526,8 @@ const B737TypeRating = () => {
           <div className="flex items-center justify-between mb-6 bg-background/95 backdrop-blur sticky top-0 z-30 py-4 border-b">
             <div className="flex items-center gap-3">
               <div>
-                <h1 className="font-bold text-lg">Type Rating</h1>
-                <p className="text-xs text-muted-foreground">B737 Training</p>
+                <h1 className="font-bold text-lg">{t('nav.typeRating')}</h1>
+                <p className="text-xs text-muted-foreground">{t('b737.typeRating.aircraftDescription')}</p>
               </div>
             </div>
             <UserAvatar 
@@ -543,12 +548,12 @@ const B737TypeRating = () => {
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Volver al Dashboard
+                {t('common.back')}
               </Button>
               {!hasBoeingAccess && (
                 <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">
                   <Lock className="w-3 h-3 mr-1" />
-                  Contenido Restringido
+                  {t('b737.typeRating.restrictedContent')}
                 </Badge>
               )}
             </div>
@@ -561,14 +566,14 @@ const B737TypeRating = () => {
                 className="flex items-center gap-2 hover:bg-muted"
               >
                 <ToggleRight className="w-4 h-4" />
-                <span>Cambiar a Airbus A320</span>
+                <span>{t('b737.typeRating.switchToA320')}</span>
               </Button>
             </div>
             
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-4xl font-bold mb-2">B737 Type Rating</h1>
-                <p className="text-muted-foreground">Entrenamiento completo para habilitación de tipo en Boeing 737. Aprende la teoría y practica con exámenes.</p>
+                <h1 className="text-4xl font-bold mb-2">{t('b737.typeRating.title')}</h1>
+                <p className="text-muted-foreground">{t('b737.typeRating.description')}</p>
               </div>
               <div className="flex items-center gap-4">
                 <LanguageToggle />
@@ -577,7 +582,7 @@ const B737TypeRating = () => {
                     {getSubscriptionDisplayName()}
                   </Badge>
                   {!hasBoeingAccess && (
-                    <p className="text-xs text-warning mt-2">Necesitas suscripción Boeing 737</p>
+                    <p className="text-xs text-warning mt-2">{t('b737.typeRating.needsSubscription')}</p>
                   )}
                 </div>
               </div>
@@ -589,7 +594,7 @@ const B737TypeRating = () => {
         {isMobile && (
           <header className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h1 className="text-2xl font-bold">B737 Type Rating</h1>
+              <h1 className="text-2xl font-bold">{t('b737.typeRating.title')}</h1>
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -598,7 +603,7 @@ const B737TypeRating = () => {
                   className="flex items-center gap-1"
                 >
                   <ToggleRight className="w-3 h-3" />
-                  <span className="text-xs">A320</span>
+                  <span className="text-xs">{t('typerating.a320')}</span>
                 </Button>
                 <LanguageToggle />
                 <Badge className="bg-primary/10 text-primary text-xs">
@@ -606,11 +611,11 @@ const B737TypeRating = () => {
                 </Badge>
               </div>
             </div>
-            <p className="text-sm text-muted-foreground mb-3">Entrenamiento completo para habilitación de tipo en Boeing 737.</p>
+            <p className="text-sm text-muted-foreground mb-3">{t('b737.typeRating.description')}</p>
             {!hasBoeingAccess && (
               <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20 text-xs">
                 <Lock className="w-3 h-3 mr-1" />
-                Contenido Restringido - Necesitas suscripción Boeing 737
+                {t('b737.typeRating.restrictedContent')} - {t('b737.typeRating.needsSubscription')}
               </Badge>
             )}
           </header>
@@ -622,9 +627,9 @@ const B737TypeRating = () => {
             <CardContent className={`${isMobile ? 'p-4' : 'p-6'}`}>
               <div className={`${isMobile ? 'space-y-4' : 'flex justify-between items-center mb-4'}`}>
                 <div>
-                  <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>Progreso General del Type Rating</h3>
+                  <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>{t('b737.typeRating.progressTitle')}</h3>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                    {modules.reduce((acc, module) => acc + module.completedLessons, 0)} de {modules.reduce((acc, module) => acc + module.totalLessons, 0)} lecciones completadas
+                    {modules.reduce((acc, module) => acc + module.completedLessons, 0)} {t('common.of')} {modules.reduce((acc, module) => acc + module.totalLessons, 0)} {t('b737.typeRating.lessonsCompleted')}
                   </p>
                 </div>
                 <div className={`${isMobile ? 'text-center' : 'text-right'}`}>
@@ -634,7 +639,7 @@ const B737TypeRating = () => {
                        modules.reduce((acc, module) => acc + module.totalLessons, 0)) * 100
                     ) : 0}%
                   </div>
-                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Completado</p>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>{t('b737.typeRating.completed')}</p>
                 </div>
               </div>
               <Progress 
@@ -647,7 +652,7 @@ const B737TypeRating = () => {
               />
               <div className={`flex items-center gap-2 ${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                 <Lightbulb className={`${isMobile ? 'w-3 h-3' : 'w-4 h-4'} text-warning`} />
-                <span>Completa las lecciones de teoría antes de tomar los exámenes oficiales</span>
+                <span>{t('b737.lessons.completeTheory')}</span>
               </div>
             </CardContent>
           </Card>
@@ -667,7 +672,7 @@ const B737TypeRating = () => {
                     <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground mt-1`}>{module.description}</p>
                   </div>
                   <Badge className={`${module.progress > 0 ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"} ${isMobile ? 'text-xs' : ''}`}>
-                    {module.progress}% completado • {module.totalLessons} lecciones
+                    {module.progress}% {t('b737.lessons.completed')} • {module.totalLessons} {t('b737.lessons.lessons')}
                   </Badge>
                 </div>
                 {module.progress > 0 && (
@@ -727,19 +732,19 @@ const B737TypeRating = () => {
                           {lesson.hasTheory && (
                             <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-200 px-1 py-0">
                               <BookOpen className="w-2 h-2 mr-1" />
-                              Teoría
+                              {t('b737.sections.theory')}
                             </Badge>
                           )}
                           {lesson.hasFlashcards && (
                             <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-600 border-purple-200 px-1 py-0">
                               <Lightbulb className="w-2 h-2 mr-1" />
-                              Cards
+                              {t('b737.sections.cards')}
                             </Badge>
                           )}
                           {lesson.hasQuiz && (
                             <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-200 px-1 py-0">
                               <Target className="w-2 h-2 mr-1" />
-                              Quiz
+                              {t('b737.sections.quiz')}
                             </Badge>
                           )}
                         </div>
@@ -755,7 +760,7 @@ const B737TypeRating = () => {
                               }
                             }}
                           >
-                            {lesson.isCompleted ? 'Revisar' : 'Abrir'}
+                            {lesson.isCompleted ? t('b737.lessons.review') : t('b737.lessons.open')}
                           </Button>
                         </div>
                       </div>
@@ -797,19 +802,19 @@ const B737TypeRating = () => {
                               {lesson.hasTheory && (
                                 <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 border-blue-200">
                                   <BookOpen className="w-3 h-3 mr-1" />
-                                  Teoría
+                                  {t('b737.sections.theory')}
                                 </Badge>
                               )}
                               {lesson.hasFlashcards && (
                                 <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-600 border-purple-200">
                                   <Lightbulb className="w-3 h-3 mr-1" />
-                                  Flashcards
+                                  {t('b737.sections.flashcards')}
                                 </Badge>
                               )}
                               {lesson.hasQuiz && (
                                 <Badge variant="outline" className="text-xs bg-green-500/10 text-green-600 border-green-200">
                                   <Target className="w-3 h-3 mr-1" />
-                                  Quiz
+                                  {t('b737.sections.quiz')}
                                 </Badge>
                               )}
                             </div>
@@ -830,7 +835,7 @@ const B737TypeRating = () => {
                               }
                             }}
                           >
-                            {lesson.isCompleted ? 'Revisar' : 'Abrir'}
+                            {lesson.isCompleted ? t('b737.lessons.review') : t('b737.lessons.open')}
                           </Button>
                         </div>
                       </>
@@ -852,7 +857,7 @@ const B737TypeRating = () => {
                     ) : (
                       <div className="flex flex-col items-center gap-3">
                         <p className="text-sm text-muted-foreground text-center">
-                          ¡Felicidades! Has completado todas las lecciones de este módulo.
+                          {t('b737.modules.congratulations')}
                         </p>
                         <Button 
                           onClick={() => handleCompleteModule(
@@ -883,7 +888,7 @@ const B737TypeRating = () => {
                   <Target className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-primary`} />
                 </div>
 <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>{t('typerating.practiceExam')}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Practica con preguntas del examen oficial B737</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>{t('b737.lessons.practiceQuestions')}</p>
 <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>{t('typerating.startPractice')}</Button>
               </CardContent>
             </Card>
@@ -894,7 +899,7 @@ const B737TypeRating = () => {
                   <Lightbulb className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-warning`} />
                 </div>
 <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>{t('typerating.flashcards')}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Study key concepts with advanced interactive flashcards</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>{t('b737.lessons.flashcardsDesc')}</p>
                 <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} onClick={() => navigate('/flashcards/b737')}>
                   <Lightbulb className="w-4 h-4 mr-2" />
 {t('typerating.startFlashcards')}
@@ -908,7 +913,7 @@ const B737TypeRating = () => {
                   <CheckCircle2 className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} text-success`} />
                 </div>
 <h3 className={`font-semibold ${isMobile ? 'text-sm mb-1' : 'mb-2'}`}>{t('typerating.examSimulator')}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>Examen completo con límite de tiempo</p>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>{t('b737.lessons.completeExam')}</p>
                 <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} onClick={() => navigate('/exam?mode=timed&aircraft=B737_FAMILY&timeLimit=60&questionCount=50')}>
 {t('typerating.startExam')}
                 </Button>
@@ -936,14 +941,14 @@ const B737TypeRating = () => {
                   {!hasAccessTo('A320_FAMILY') && <Lock className="w-4 h-4 text-muted-foreground" />}
                 </div>
                 <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
-                  Entrenamiento completo para habilitación de tipo en Airbus A320
+                  {t('home.aircraftSelection.a320.description')}
                 </p>
                 {hasAccessTo('A320_FAMILY') ? (
-                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>Iniciar A320</Button>
+                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`}>{t('home.aircraftSelection.a320.cta')}</Button>
                 ) : (
                   <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
                     <Lock className="w-4 h-4 mr-2" />
-                    Requiere Suscripción A320
+                    {t('typerating.needsA320Subscription')}
                   </Button>
                 )}
               </CardContent>
@@ -964,14 +969,14 @@ const B737TypeRating = () => {
                   {!hasBoeingAccess && <Lock className="w-4 h-4 text-muted-foreground" />}
                 </div>
                 <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground ${isMobile ? 'mb-3' : 'mb-4'}`}>
-                  Entrenamiento completo para habilitación de tipo en Boeing 737
+                  {t('home.aircraftSelection.b737.description')}
                 </p>
                 {hasBoeingAccess ? (
-                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} variant="outline">Iniciar B737</Button>
+                  <Button className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} variant="outline">{t('home.aircraftSelection.b737.cta')}</Button>
                 ) : (
                   <Button variant="outline" className={`w-full ${isMobile ? 'text-xs h-8' : ''}`} disabled>
                     <Lock className="w-4 h-4 mr-2" />
-                    Requiere Suscripción Boeing
+                    {t('typerating.needsB737Subscription')}
                   </Button>
                 )}
               </CardContent>

@@ -13,9 +13,17 @@ export interface TRLessonProgress {
 export const useTypeRatingProgress = (aircraftType: 'A320_FAMILY' | 'B737_FAMILY') => {
   const { user } = useAuth();
 
+  // Helper function to validate Convex IDs
+  const isValidConvexId = (id: string): boolean => {
+    return typeof id === 'string' && /^[a-z0-9]{32}$/.test(id);
+  };
+
+  // Only query if user exists and has valid Convex ID
+  const canUseConvex = user && user._id && isValidConvexId(user._id);
+  
   const progressList = useQuery(
     api.typeRating.getUserTypeRatingProgress,
-    user ? { userId: user._id as Id<'users'>, aircraftType } : 'skip'
+    canUseConvex ? { userId: user._id as Id<'users'>, aircraftType } : 'skip'
   );
 
   const update = useMutation(api.typeRating.updateTypeRatingLessonProgress);
@@ -34,7 +42,7 @@ export const useTypeRatingProgress = (aircraftType: 'A320_FAMILY' | 'B737_FAMILY
     lessonNumericId: number,
     step: 'theory' | 'flashcards' | 'quiz'
   ) => {
-    if (!user) return;
+    if (!canUseConvex) return;
     const payload: any = {
       userId: user._id as Id<'users'>,
       aircraftType,
@@ -47,7 +55,7 @@ export const useTypeRatingProgress = (aircraftType: 'A320_FAMILY' | 'B737_FAMILY
   };
 
   return {
-    isLoading: user ? progressList === undefined : false,
+    isLoading: canUseConvex ? progressList === undefined : false,
     progressList: progressList || [],
     progressByLesson,
     mark,

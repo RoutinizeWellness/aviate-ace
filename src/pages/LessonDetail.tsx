@@ -23,6 +23,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { useTypeRatingProgress } from '@/hooks/useTypeRatingProgress';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { LessonContentService } from '@/services/lessonContentService';
 
 const LessonDetail = () => {
   const navigate = useNavigate();
@@ -53,9 +54,40 @@ const LessonDetail = () => {
   const updateProgress = useMutation(api.lessons.updateLessonProgress);
   const resetProgressMutation = useMutation(api.lessons.resetLessonProgress);
 
-  // Aircraft-specific lesson data based on the aircraft parameter
+  // Enhanced lesson data from content service
   const getLessonData = () => {
     const lessonNumber = parseInt(lessonId || '1');
+    
+    // Try to get enhanced lesson content first
+    const enhancedContent = LessonContentService.getLessonContent(lessonNumber);
+    if (enhancedContent) {
+      return {
+        id: lessonId || '1',
+        title: enhancedContent.title,
+        description: enhancedContent.description,
+        category: enhancedContent.module,
+        aircraft: enhancedContent.aircraft,
+        duration: enhancedContent.duration,
+        difficulty: enhancedContent.difficulty,
+        content: enhancedContent.theory.sections.map(section => `
+          <h3>${section.title}</h3>
+          <div>${section.content.replace(/\n/g, '<br>')}</div>
+          ${section.keyPoints ? `
+            <h4>Key Points:</h4>
+            <ul>${section.keyPoints.map(point => `<li>${point}</li>`).join('')}</ul>
+          ` : ''}
+          ${section.technicalSpecs ? `
+            <h4>Technical Specifications:</h4>
+            <table>
+              ${Object.entries(section.technicalSpecs).map(([key, value]) => 
+                `<tr><td><strong>${key}:</strong></td><td>${value}</td></tr>`
+              ).join('')}
+            </table>
+          ` : ''}
+        `).join(''),
+        objectives: enhancedContent.learningObjectives
+      };
+    }
     
     if (aircraftParam === 'B737_FAMILY') {
       // Boeing 737 specific content

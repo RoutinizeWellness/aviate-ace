@@ -156,6 +156,108 @@ Certificado bajo EASA CS-25 y FAA Part 25, cumpliendo los más altos estándares
         passingScore: 80,
         timeLimit: 30
       }
+    },
+    
+    // A320 Anti-Ice & Rain Protection
+    3: {
+      id: 3,
+      title: "Anti-ice and Rain",
+      description: "A320 ice protection systems including engine anti-ice, wing anti-ice, and rain protection systems",
+      duration: "50m",
+      module: "Sistemas",
+      aircraft: "A320",
+      difficulty: "intermediate",
+      prerequisites: [1],
+      learningObjectives: [
+        "Understand ice formation and detection systems",
+        "Master engine and wing anti-ice operations", 
+        "Learn rain protection and visibility systems",
+        "Analyze anti-ice system limitations and procedures"
+      ],
+      theory: {
+        sections: [
+          {
+            title: "Ice Protection Systems Overview",
+            content: `The A320 ice protection systems prevent ice accumulation on critical surfaces, ensuring safe flight operations in icing conditions.
+
+**Ice Detection:**
+- **Ice Detection System**: Sensors detect ice crystal impact
+- **TAT Probes**: Heated to prevent ice blockage
+- **Pitot Probes**: Automatically heated when engines running
+- **Static Ports**: Heated to maintain pressure readings
+
+**Engine Anti-Ice System:**
+- **Hot Bleed Air**: Directed to engine inlet lips
+- **Automatic Operation**: Activates when ice detected
+- **Manual Control**: Pilot can override system
+- **Cowl Anti-Ice**: Prevents ice on engine inlet
+
+**Wing Anti-Ice System:**
+- **Piccolo Tubes**: Distribute hot air along leading edge
+- **Three Sections**: Per wing (inboard, middle, outboard)
+- **Bleed Air Source**: From engine or APU
+- **Thermal Protection**: Prevents overheating
+
+**Rain Protection:**
+- **Windshield Rain Repellent**: Chemical treatment system
+- **Windshield Wipers**: Mechanical backup system
+- **Windshield Heating**: Prevents ice formation
+- **Side Window Heating**: Pilot visibility maintenance`,
+            keyPoints: [
+              "Automatic ice detection triggers protection systems",
+              "Engine anti-ice uses hot bleed air to inlet lips",
+              "Wing anti-ice covers three sections per wing",
+              "Rain repellent provides better visibility than wipers",
+              "All pitot-static probes heated automatically"
+            ],
+            technicalSpecs: {
+              "Ice Detection Sensitivity": "0.1mm ice accumulation",
+              "Engine Anti-Ice Temperature": "200-250°C at inlet lip",
+              "Wing Anti-Ice Sections": "3 per wing (6 total)",
+              "Windshield Heating Power": "600W per panel",
+              "Rain Repellent Coverage": "Full windshield area",
+              "Pitot Heating Power": "120W per probe"
+            }
+          }
+        ]
+      },
+      flashcards: [
+        {
+          id: 7,
+          front: "How does the A320 ice detection system work?",
+          back: "Sensors detect ice crystal impacts on fuselage sides, automatically activating anti-ice systems when icing conditions detected",
+          difficulty: "intermediate",
+          category: "Ice Detection"
+        },
+        {
+          id: 8,
+          front: "What are the three wing anti-ice sections per wing?",
+          back: "Inboard, middle, and outboard sections, each with independent bleed air supply and thermal protection",
+          difficulty: "basic",
+          category: "Wing Anti-Ice"
+        }
+      ],
+      quiz: {
+        questions: [
+          {
+            id: 3,
+            question: "When are the pitot probes automatically heated in the A320?",
+            options: [
+              "Only when ice is detected",
+              "When engines are running",
+              "Only during flight",
+              "When anti-ice is selected ON"
+            ],
+            correctAnswer: 1,
+            explanation: "Pitot probes are automatically heated whenever engines are running to prevent ice blockage and ensure accurate airspeed readings.",
+            difficulty: "intermediate",
+            category: "Pitot-Static System",
+            reference: "A320 FCOM 30-10-00"
+          }
+        ],
+        passingScore: 80,
+        timeLimit: 40
+      }
     }
   };
 

@@ -19,7 +19,7 @@ export interface PricingPlan {
 export const PRICING_PLANS: PricingPlan[] = [
   // Free Plan
   {
-    id: 'pilotprepflightx_gratuito',
+    id: 'pilotprepflight_x_-_free',
     name: 'PilotPrepFlightX - Gratuito',
     description: 'Acceso limitado a cursos y preguntas',
     nameKey: 'plans.free.name',
@@ -41,7 +41,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       'features.free.3',
       'features.free.4'
     ],
-    productId: 'pilotprepflightx_gratuito'
+    productId: 'pilotprepflight_x_-_free'
   },
   // 1 Month Plan
   {

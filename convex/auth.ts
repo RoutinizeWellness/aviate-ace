@@ -494,10 +494,28 @@ export const getUserIncorrectQuestions = query({
 
     const incorrectQuestions = await query.collect();
     
-    // Get the actual question data
+    // Helper function to validate Convex IDs (32-char base32)
+    const isValidConvexId = (id: string): boolean => {
+      return typeof id === 'string' && /^[a-z0-9]{32}$/.test(id);
+    };
+    
+    // Get the actual question data - with ID validation
     const questionsWithData = await Promise.all(
       incorrectQuestions.map(async (iq) => {
-        const question = await ctx.db.get(iq.questionId);
+        let question = null;
+        
+        // Only attempt to fetch question if questionId is valid
+        if (iq.questionId && isValidConvexId(iq.questionId)) {
+          try {
+            question = await ctx.db.get(iq.questionId as any); // Cast to any to bypass type check
+          } catch (error) {
+            console.warn(`Failed to fetch question with ID ${iq.questionId}:`, error);
+            question = null;
+          }
+        } else {
+          console.warn(`Invalid questionId format: ${iq.questionId}`);
+        }
+        
         return {
           ...iq,
           question,

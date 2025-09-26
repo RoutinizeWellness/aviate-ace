@@ -1,0 +1,77 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Sky gradient background -->
+  <defs>
+    <linearGradient id="skyGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#4682B4;stop-opacity:0.1" />
+    </linearGradient>
+    
+    <linearGradient id="planeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E8E8E8;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#FFFFFF;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#D3D3D3;stop-opacity:0.8" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#skyGradient)"/>
+  
+  <!-- Clouds -->
+  <ellipse cx="200" cy="150" rx="60" ry="30" fill="white" opacity="0.3"/>
+  <ellipse cx="180" cy="140" rx="40" ry="20" fill="white" opacity="0.3"/>
+  <ellipse cx="220" cy="140" rx="40" ry="20" fill="white" opacity="0.3"/>
+  
+  <ellipse cx="800" cy="100" rx="80" ry="40" fill="white" opacity="0.2"/>
+  <ellipse cx="770" cy="90" rx="50" ry="25" fill="white" opacity="0.2"/>
+  <ellipse cx="830" cy="90" rx="50" ry="25" fill="white" opacity="0.2"/>
+  
+  <ellipse cx="1000" cy="200" rx="70" ry="35" fill="white" opacity="0.25"/>
+  <ellipse cx="970" cy="190" rx="45" ry="22" fill="white" opacity="0.25"/>
+  <ellipse cx="1030" cy="190" rx="45" ry="22" fill="white" opacity="0.25"/>
+  
+  <!-- Commercial airplane silhouette -->
+  <g transform="translate(400,350) scale(2.5)" opacity="0.6">
+    <!-- Fuselage -->
+    <ellipse cx="0" cy="0" rx="120" ry="15" fill="url(#planeGradient)"/>
+    
+    <!-- Wings -->
+    <ellipse cx="-30" cy="0" rx="80" ry="8" fill="url(#planeGradient)"/>
+    
+    <!-- Tail -->
+    <polygon points="100,-2 120,-2 125,-8 125,8 120,2 100,2" fill="url(#planeGradient)"/>
+    
+    <!-- Vertical stabilizer -->
+    <polygon points="110,-2 125,-2 125,-15 115,-12" fill="url(#planeGradient)"/>
+    
+    <!-- Engines -->
+    <ellipse cx="-50" cy="-12" rx="15" ry="6" fill="url(#planeGradient)"/>
+    <ellipse cx="-50" cy="12" rx="15" ry="6" fill="url(#planeGradient)"/>
+    
+    <!-- Windows -->
+    <rect x="-80" y="-3" width="100" height="2" fill="rgba(173,216,230,0.4)" rx="1"/>
+    
+    <!-- Nose -->
+    <ellipse cx="-120" cy="0" rx="8" ry="12" fill="url(#planeGradient)"/>
+  </g>
+  
+  <!-- Additional smaller planes in distance -->
+  <g transform="translate(150,250) scale(0.8)" opacity="0.3">
+    <ellipse cx="0" cy="0" rx="40" ry="5" fill="white"/>
+    <ellipse cx="-10" cy="0" rx="25" ry="3" fill="white"/>
+    <polygon points="35,-1 42,-1 44,-3 44,3 42,1 35,1" fill="white"/>
+  </g>
+  
+  <g transform="translate(950,180) scale(1.2)" opacity="0.4">
+    <ellipse cx="0" cy="0" rx="50" ry="6" fill="white"/>
+    <ellipse cx="-12" cy="0" rx="30" ry="4" fill="white"/>
+    <polygon points="42,-1 50,-1 52,-4 52,4 50,1 42,1" fill="white"/>
+  </g>
+  
+  <!-- Subtle aviation elements -->
+  <g opacity="0.1">
+    <!-- Runway lines suggestion -->
+    <rect x="0" y="700" width="1200" height="2" fill="white"/>
+    <rect x="0" y="720" width="1200" height="1" fill="white"/>
+    <rect x="0" y="740" width="1200" height="1" fill="white"/>
+  </g>
+</svg>

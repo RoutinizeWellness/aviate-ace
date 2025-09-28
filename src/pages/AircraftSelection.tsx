@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useConvexAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ const AircraftSelection: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [selectedAircraft, setSelectedAircraft] = useState<'A320' | 'B737' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,8 +55,8 @@ const AircraftSelection: React.FC = () => {
       
       if (success) {
         toast({
-          title: "¡Excelente elección!",
-          description: `Has seleccionado el ${selectedAircraft}. Tu examen gratuito comenzará ahora.`,
+          title: t('aircraftSelection.excellent'),
+          description: t('aircraftSelection.examStarting').replace('{aircraft}', selectedAircraft),
           duration: 3000,
         });
         
@@ -62,16 +64,16 @@ const AircraftSelection: React.FC = () => {
         navigate(`/exam?mode=practice&trial=true&aircraft=${selectedAircraft}`);
       } else {
         toast({
-          title: "Error",
-          description: "No se pudo iniciar el examen. Inténtalo de nuevo.",
+          title: t('common.error'),
+          description: t('aircraftSelection.error'),
           variant: "destructive",
         });
       }
     } catch (error) {
       console.error('Error starting exam:', error);
       toast({
-        title: "Error",
-        description: "Hubo un problema al iniciar el examen.",
+        title: t('common.error'),
+        description: t('aircraftSelection.problemError'),
         variant: "destructive",
       });
     } finally {
@@ -81,27 +83,39 @@ const AircraftSelection: React.FC = () => {
 
   const aircraftData = {
     A320: {
-      name: 'Airbus A320',
-      description: 'Familia de aviones comerciales de pasillo único',
+      name: t('aircraftSelection.a320.name'),
+      description: t('aircraftSelection.a320.description'),
       features: [
-        'Sistema fly-by-wire',
-        'ECAM (Electronic Centralized Aircraft Monitor)',
-        'Sidestick controls',
-        'Advanced autopilot systems'
+        t('aircraftSelection.a320.feature1'),
+        t('aircraftSelection.a320.feature2'),
+        t('aircraftSelection.a320.feature3'),
+        t('aircraftSelection.a320.feature4')
       ],
-      subjects: ['Eléctrico', 'Hidráulico', 'Performance', 'Sistemas', 'Procedimientos'],
+      subjects: [
+        t('aircraftSelection.subjects.electrical'),
+        t('aircraftSelection.subjects.hydraulic'),
+        t('aircraftSelection.subjects.performance'),
+        t('aircraftSelection.subjects.systems'),
+        t('aircraftSelection.subjects.procedures')
+      ],
       color: 'blue'
     },
     B737: {
-      name: 'Boeing 737',
-      description: 'Serie de aviones comerciales de corto y medio alcance',
+      name: t('aircraftSelection.b737.name'),
+      description: t('aircraftSelection.b737.description'),
       features: [
-        'Traditional yoke controls',
-        'EICAS (Engine Indication and Crew Alerting System)',
-        'Reliable hydraulic systems',
-        'Proven flight management systems'
+        t('aircraftSelection.b737.feature1'),
+        t('aircraftSelection.b737.feature2'),
+        t('aircraftSelection.b737.feature3'),
+        t('aircraftSelection.b737.feature4')
       ],
-      subjects: ['Eléctrico', 'Hidráulico', 'Performance', 'Sistemas', 'Procedimientos'],
+      subjects: [
+        t('aircraftSelection.subjects.electrical'),
+        t('aircraftSelection.subjects.hydraulic'),
+        t('aircraftSelection.subjects.performance'),
+        t('aircraftSelection.subjects.systems'),
+        t('aircraftSelection.subjects.procedures')
+      ],
       color: 'emerald'
     }
   };
@@ -111,8 +125,8 @@ const AircraftSelection: React.FC = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card className="max-w-md mx-auto p-6 text-center">
           <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <h2 className="text-lg font-semibold mb-2">Redirigiendo...</h2>
-          <p className="text-muted-foreground">Preparando tu examen del {existingAircraft}...</p>
+          <h2 className="text-lg font-semibold mb-2">{t('aircraftSelection.redirecting')}</h2>
+          <p className="text-muted-foreground">{t('aircraftSelection.preparingExam').replace('{aircraft}', existingAircraft || '')}</p>
         </Card>
       </div>
     );
@@ -127,21 +141,21 @@ const AircraftSelection: React.FC = () => {
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Volver al Inicio
+                {t('aircraftSelection.backToHome')}
               </Button>
               
               <div className="flex items-center gap-3">
                 <Plane className="w-6 h-6 text-primary" />
                 <div>
-                  <h1 className="font-bold">Selección de Aeronave</h1>
-                  <p className="text-xs text-muted-foreground">Prueba Gratuita</p>
+                  <h1 className="font-bold">{t('aircraftSelection.title')}</h1>
+                  <p className="text-xs text-muted-foreground">{t('aircraftSelection.freeTrial')}</p>
                 </div>
               </div>
             </div>
 
             <Badge variant="outline" className="bg-primary/10 text-primary">
               <Star className="w-3 h-3 mr-1" />
-              Gratis
+              {t('aircraftSelection.free')}
             </Badge>
           </div>
         </div>
@@ -151,13 +165,13 @@ const AircraftSelection: React.FC = () => {
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-4">
-            Elige tu Aeronave para la Prueba Gratuita
+            {t('aircraftSelection.pageTitle')}
           </h1>
           <p className="text-lg text-muted-foreground mb-2">
-            Selecciona el avión que quieres estudiar. Una vez elegido, no podrás cambiar.
+            {t('aircraftSelection.subtitle')}
           </p>
           <p className="text-sm text-amber-600 font-medium">
-            ⚠️ Esta elección es permanente. Cada examen contiene 25 preguntas (5 por asignatura)
+            {t('aircraftSelection.warning')}
           </p>
         </div>
 
@@ -203,21 +217,21 @@ const AircraftSelection: React.FC = () => {
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4 text-primary" />
-                      <span>25 preguntas</span>
+                      <span>{t('aircraftSelection.examDetails.questions')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4 text-warning" />
-                      <span>Sin límite de tiempo</span>
+                      <span>{t('aircraftSelection.examDetails.timeLimit')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <BookOpen className="w-4 h-4 text-success" />
-                      <span>5 asignaturas</span>
+                      <span>{t('aircraftSelection.examDetails.subjects')}</span>
                     </div>
                   </div>
 
                   {/* Subjects */}
                   <div>
-                    <h4 className="font-semibold text-sm mb-2">Asignaturas incluidas:</h4>
+                    <h4 className="font-semibold text-sm mb-2">{t('aircraftSelection.subjectsTitle')}</h4>
                     <div className="flex flex-wrap gap-2">
                       {aircraft.subjects.map((subject, index) => (
                         <Badge 
@@ -233,7 +247,7 @@ const AircraftSelection: React.FC = () => {
 
                   {/* Features */}
                   <div>
-                    <h4 className="font-semibold text-sm mb-2">Características principales:</h4>
+                    <h4 className="font-semibold text-sm mb-2">{t('aircraftSelection.featuresTitle')}</h4>
                     <ul className="text-sm text-muted-foreground space-y-1">
                       {aircraft.features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
@@ -254,7 +268,7 @@ const AircraftSelection: React.FC = () => {
           {selectedAircraft ? (
             <div className="space-y-4">
               <p className="text-lg font-medium">
-                Has seleccionado: <span className="text-primary">{aircraftData[selectedAircraft].name}</span>
+                {t('aircraftSelection.selectedText')} <span className="text-primary">{aircraftData[selectedAircraft].name}</span>
               </p>
               <Button 
                 onClick={handleStartExam}
@@ -263,21 +277,21 @@ const AircraftSelection: React.FC = () => {
                 className="bg-primary hover:bg-primary/90"
               >
                 {isLoading ? (
-                  "Iniciando examen..."
+                  t('aircraftSelection.startingExam')
                 ) : (
                   <>
-                    Comenzar Examen Gratuito
+                    {t('aircraftSelection.startExam')}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </>
                 )}
               </Button>
               <p className="text-sm text-muted-foreground">
-                Recuerda: Esta elección es permanente y no se puede cambiar después.
+                {t('aircraftSelection.permanentNote')}
               </p>
             </div>
           ) : (
             <p className="text-muted-foreground">
-              Selecciona una aeronave para continuar
+              {t('aircraftSelection.selectPrompt')}
             </p>
           )}
         </div>
@@ -290,11 +304,9 @@ const AircraftSelection: React.FC = () => {
                 <Target className="w-4 h-4 text-blue-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-blue-800 mb-2">¿Por qué solo puedo elegir una aeronave?</h3>
+                <h3 className="font-semibold text-blue-800 mb-2">{t('aircraftSelection.whyOnlyOne.title')}</h3>
                 <p className="text-blue-700 text-sm leading-relaxed">
-                  Cada aeronave tiene sistemas y procedimientos específicos. Para ofrecerte la mejor experiencia 
-                  de aprendizaje, tu prueba gratuita se enfoca en una sola aeronave. Después de la prueba, 
-                  podrás acceder a todos los tipos de aeronaves con una suscripción.
+                  {t('aircraftSelection.whyOnlyOne.text')}
                 </p>
               </div>
             </div>

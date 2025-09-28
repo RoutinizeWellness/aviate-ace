@@ -3,10 +3,12 @@ import { Badge } from '@/components/ui/badge';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useAuth } from '@/hooks/useConvexAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Clock, CheckCircle2, XCircle, AlertTriangle, FileText } from 'lucide-react';
 
 export const UserQuestionSuggestions = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const suggestions = useQuery(
     api.questionSuggestions.getUserQuestionSuggestions,
     user ? { userId: user._id } : "skip"
@@ -32,15 +34,15 @@ export const UserQuestionSuggestions = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'pending':
-        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">Pendiente</Badge>;
+        return <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">{t('suggestions.status.pending') || 'Pendiente'}</Badge>;
       case 'approved':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Aprobada</Badge>;
+        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">{t('suggestions.status.approved') || 'Aprobada'}</Badge>;
       case 'rejected':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Rechazada</Badge>;
+        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">{t('suggestions.status.rejected') || 'Rechazada'}</Badge>;
       case 'needs_review':
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">Necesita Revisión</Badge>;
+        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">{t('suggestions.status.needsReview') || 'Necesita Revisión'}</Badge>;
       default:
-        return <Badge variant="outline">Desconocido</Badge>;
+        return <Badge variant="outline">{t('suggestions.status.unknown') || 'Desconocido'}</Badge>;
     }
   };
 
@@ -73,15 +75,15 @@ export const UserQuestionSuggestions = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Mis Sugerencias
+            {t('suggestions.mySuggestions') || 'Mis Sugerencias'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8">
             <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-medium mb-2">No has enviado sugerencias</h3>
+            <h3 className="font-medium mb-2">{t('suggestions.noSuggestions') || 'No has enviado sugerencias'}</h3>
             <p className="text-sm text-muted-foreground">
-              Cuando envíes sugerencias de preguntas, aparecerán aquí con su estado de revisión.
+              {t('suggestions.noSuggestionsDesc') || 'Cuando envíes sugerencias de preguntas, aparecerán aquí con su estado de revisión.'}
             </p>
           </div>
         </CardContent>
@@ -94,7 +96,7 @@ export const UserQuestionSuggestions = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileText className="w-5 h-5" />
-          Mis Sugerencias ({suggestions.length})
+          {t('suggestions.mySuggestions') || 'Mis Sugerencias'} ({suggestions.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -112,14 +114,14 @@ export const UserQuestionSuggestions = () => {
               </div>
               
               <div className="mb-3">
-                <p className="text-sm font-medium mb-1">Pregunta:</p>
+                <p className="text-sm font-medium mb-1">{t('suggestions.question') || 'Pregunta'}:</p>
                 <p className="text-sm text-muted-foreground">
                   {suggestion.question.length > 150 ? suggestion.question.substring(0, 150) + '...' : suggestion.question}
                 </p>
               </div>
 
               <div className="mb-3">
-                <p className="text-sm font-medium mb-1">Respuesta correcta:</p>
+                <p className="text-sm font-medium mb-1">{t('suggestions.correctAnswer') || 'Respuesta correcta'}:</p>
                 <p className="text-sm text-muted-foreground">
                   {String.fromCharCode(65 + suggestion.correctAnswer)}. {suggestion.options[suggestion.correctAnswer]}
                 </p>
@@ -127,15 +129,15 @@ export const UserQuestionSuggestions = () => {
 
               {suggestion.adminNotes && (
                 <div className="mb-3 p-3 bg-muted/50 rounded-lg">
-                  <p className="text-sm font-medium mb-1">Notas del administrador:</p>
+                  <p className="text-sm font-medium mb-1">{t('suggestions.adminNotes') || 'Notas del administrador'}:</p>
                   <p className="text-sm text-muted-foreground">{suggestion.adminNotes}</p>
                 </div>
               )}
 
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Enviada: {formatDate(suggestion.createdAt)}</span>
+                <span>{t('suggestions.submitted') || 'Enviada'}: {formatDate(suggestion.createdAt)}</span>
                 {suggestion.reviewedAt && (
-                  <span>Revisada: {formatDate(suggestion.reviewedAt)}</span>
+                  <span>{t('suggestions.reviewed') || 'Revisada'}: {formatDate(suggestion.reviewedAt)}</span>
                 )}
               </div>
             </div>

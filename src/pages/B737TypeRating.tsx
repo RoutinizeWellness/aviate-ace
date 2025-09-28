@@ -195,6 +195,17 @@ const B737TypeRating = () => {
       // Force re-render by updating module progress
       const updatedProgress = [...moduleProgress];
       setModuleProgress(updatedProgress);
+      
+      // Also update lesson progress to trigger re-render
+      setLessonProgress(prev => [...prev]);
+      
+      // Show success toast
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: t('typerating.moduleCompletedSuccess') || 'Module completed successfully!',
+        description: t('typerating.moduleCompletedDesc') || 'You can now proceed to the next module.',
+        duration: 5000,
+      });
     }
   };
   
@@ -510,6 +521,17 @@ const B737TypeRating = () => {
   }
 
   const handleLessonClick = (lesson: any) => {
+    // Check if user has access to B737 content
+    if (!hasBoeingAccess) {
+      const { toast } = require('@/hooks/use-toast');
+      toast({
+        title: t('b737.typeRating.restrictedContent') || 'Restricted Content',
+        description: t('b737.typeRating.needsSubscription') || 'Requires Boeing 737 subscription',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     // Navigate to lesson content with aircraft context for Convex progress tracking
     navigate(`/lesson/${lesson.id}?aircraft=B737_FAMILY`);
   };

@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { useAuth } from '@/hooks/useConvexAuth';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { validateQuestion, sanitizeText } from '@/utils/validation';
 import { Lightbulb, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 
@@ -20,6 +21,7 @@ interface QuestionSuggestionFormProps {
 export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   const submitSuggestion = useMutation(api.questionSuggestions.submitQuestionSuggestion);
 
   const [formData, setFormData] = useState({

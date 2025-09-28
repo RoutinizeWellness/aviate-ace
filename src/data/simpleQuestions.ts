@@ -119,6 +119,114 @@ export const b737Questions: SimpleAviationQuestion[] = [
     isActive: true,
     _creationTime: Date.now(),
     reference: "B737 FCOM"
+  },
+  {
+    _id: generateId(),
+    question: "How many hydraulic systems does the Boeing 737 have?",
+    options: [
+      "1",
+      "2",
+      "3", 
+      "4"
+    ],
+    correctAnswer: 1,
+    explanation: "The Boeing 737 has 2 independent hydraulic systems: System A and System B.",
+    aircraftType: "B737_FAMILY",
+    category: "hydraulics",
+    difficulty: "basic",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "B737 FCOM"
+  },
+  {
+    _id: generateId(),
+    question: "What type of engines does the Boeing 737-800 typically use?",
+    options: [
+      "CFM56-7B",
+      "CFM56-5B",
+      "IAE V2500", 
+      "PW6000"
+    ],
+    correctAnswer: 0,
+    explanation: "The Boeing 737-800 typically uses CFM56-7B engines manufactured by CFMI.",
+    aircraftType: "B737_FAMILY",
+    category: "engines-apu",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "B737 FCOM"
+  },
+  {
+    _id: generateId(),
+    question: "How many main fuel tanks does the Boeing 737 have?",
+    options: [
+      "1",
+      "2",
+      "3", 
+      "4"
+    ],
+    correctAnswer: 1,
+    explanation: "The Boeing 737 has 2 main fuel tanks, one in each wing.",
+    aircraftType: "B737_FAMILY",
+    category: "fuel",
+    difficulty: "basic",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "B737 FCOM"
+  },
+  {
+    _id: generateId(),
+    question: "What type of flight control system does the Boeing 737 use?",
+    options: [
+      "Fly-by-wire",
+      "Hydraulically assisted manual controls",
+      "Fully manual controls", 
+      "Electric controls"
+    ],
+    correctAnswer: 1,
+    explanation: "The Boeing 737 uses hydraulically assisted manual flight controls, not fly-by-wire like the A320.",
+    aircraftType: "B737_FAMILY",
+    category: "flight-controls",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "B737 FCOM"
+  },
+  {
+    _id: generateId(),
+    question: "How many main electrical generators does the Boeing 737 have?",
+    options: [
+      "1",
+      "2",
+      "3", 
+      "4"
+    ],
+    correctAnswer: 1,
+    explanation: "The Boeing 737 has 2 main electrical generators, one driven by each engine.",
+    aircraftType: "B737_FAMILY",
+    category: "electrical",
+    difficulty: "basic",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "B737 FCOM"
+  },
+  {
+    _id: generateId(),
+    question: "What system provides bleed air for the Boeing 737 air conditioning?",
+    options: [
+      "Separate air compressor",
+      "Engine bleed air and APU",
+      "Electric air pumps", 
+      "Ram air only"
+    ],
+    correctAnswer: 1,
+    explanation: "The Boeing 737 air conditioning system uses hot bleed air from the engines and APU.",
+    aircraftType: "B737_FAMILY",
+    category: "air-systems",
+    difficulty: "intermediate",
+    isActive: true,
+    _creationTime: Date.now(),
+    reference: "B737 FCOM"
   }
 ];
 

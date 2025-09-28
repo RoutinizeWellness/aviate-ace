@@ -137,7 +137,13 @@ const Exams = () => {
       { value: "flight-controls", label: t('exams.flightControls'), description: t('exams.flightControlsDesc') },
       { value: "fuel", label: t('exams.fuel'), description: t('exams.fuelDesc') },
       { value: "hydraulics", label: t('exams.hydraulics'), description: t('exams.hydraulicsDesc') },
-      { value: "landing-gear", label: t('exams.landingGear'), description: t('exams.landingGearDesc') }
+      { value: "landing-gear", label: t('exams.landingGear'), description: t('exams.landingGearDesc') },
+      { value: "anti-ice-rain", label: "Anti-Ice and Rain", description: "Ice protection and rain removal systems" },
+      { value: "automatic-flight", label: "Automatic Flight", description: "Autopilot and flight management systems" },
+      { value: "communication", label: "Communication", description: "Radio and communication systems" },
+      { value: "fire-protection", label: "Fire Protection", description: "Fire detection and suppression systems" },
+      { value: "flight-instruments", label: "Flight Instruments", description: "Flight displays and instrumentation" },
+      { value: "warning-systems", label: "Warning Systems", description: "Alert and warning systems" }
     ];
     
     const allCategories = [...a320Categories, ...b737Categories.filter(cat => !a320Categories.some(a320Cat => a320Cat.value === cat.value))];

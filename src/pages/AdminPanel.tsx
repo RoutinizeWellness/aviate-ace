@@ -16,7 +16,6 @@ import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { QuestionSuggestionsAdmin } from '@/components/QuestionSuggestionsAdmin';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState, useEffect } from 'react';
 import { 
   Users, 
   Settings, 

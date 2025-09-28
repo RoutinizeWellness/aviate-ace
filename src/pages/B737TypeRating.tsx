@@ -173,9 +173,18 @@ const B737TypeRating = () => {
   // Helper function to allow marking theory as completed
   const markTheoryCompleted = async (lessonId: number) => {
     try {
-      // For now, use localStorage until Convex is deployed
       const userId = user?._id;
       if (!userId) return;
+      
+      // Try Convex backend first if available
+      try {
+        await markProgressInConvex(lessonId, 'theory');
+        await markProgressInConvex(lessonId, 'flashcards');
+        await markProgressInConvex(lessonId, 'quiz');
+        console.log(`All components completed for lesson ${lessonId} synced to Convex`);
+      } catch (convexError) {
+        console.warn('Failed to sync to Convex, using localStorage fallback:', convexError);
+      }
       
       const progress = getLessonProgressById(lessonId) || {
         lessonId,
@@ -185,7 +194,11 @@ const B737TypeRating = () => {
         quizCompleted: false
       };
       
+      // Mark all components as completed
       progress.theoryCompleted = true;
+      progress.flashcardsCompleted = true;
+      progress.quizCompleted = true;
+      progress.isCompleted = true;
       
       // Update localStorage
       const key = `lesson_progress_${userId}`;
@@ -200,6 +213,17 @@ const B737TypeRating = () => {
       
       localStorage.setItem(key, JSON.stringify(allProgress));
       setLessonProgress(allProgress);
+      
+      // Update module progress
+      updateModuleProgress();
+      
+      // Show success toast
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: t('typerating.lessonCompleted') || 'Lesson Completed!',
+        description: t('typerating.lessonCompletedDesc') || 'All components of this lesson have been marked as complete.',
+        duration: 3000,
+      });
       
     } catch (error) {
       console.error('Error marking theory completed:', error);

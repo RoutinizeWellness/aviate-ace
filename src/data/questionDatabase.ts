@@ -319,6 +319,204 @@ export const B737_FLIGHT_CONTROLS_QUESTIONS: Question[] = [
   // Continue with more B737 flight controls questions...
 ];
 
+// Boeing 737 Air Systems Questions
+export const B737_AIR_SYSTEMS_QUESTIONS: Question[] = [
+  {
+    id: 'b737-air-001',
+    question: '¿Cuáles son las fuentes principales de aire de sangrado en el Boeing 737?',
+    options: ['Solo motores', 'Motores y APU', 'APU únicamente', 'Compresor auxiliar'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 obtiene aire de sangrado principalmente de los motores y del APU.',
+    category: 'Air Systems',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  },
+  {
+    id: 'b737-air-002',
+    question: '¿Cuál es la presión típica del aire de sangrado del motor?',
+    options: ['15-25 PSI', '25-60 PSI', '80-100 PSI', '150-200 PSI'],
+    correctAnswer: 1,
+    explanation: 'La presión típica del aire de sangrado del motor varía entre 25-60 PSI dependiendo de la configuración del motor.',
+    category: 'Air Systems',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Electrical Questions
+export const B737_ELECTRICAL_QUESTIONS: Question[] = [
+  {
+    id: 'b737-elec-001',
+    question: '¿Cuántos generadores principales tiene el Boeing 737?',
+    options: ['1', '2', '3', '4'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 tiene 2 generadores principales, uno por cada motor.',
+    category: 'Electrical',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'easy',
+    isTrial: true
+  },
+  {
+    id: 'b737-elec-002',
+    question: '¿Cuál es el voltaje de salida de los generadores principales?',
+    options: ['115V AC', '28V DC', '220V AC', '12V DC'],
+    correctAnswer: 0,
+    explanation: 'Los generadores principales del Boeing 737 producen 115V AC a 400Hz.',
+    category: 'Electrical',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Hydraulics Questions
+export const B737_HYDRAULICS_QUESTIONS: Question[] = [
+  {
+    id: 'b737-hyd-001',
+    question: '¿Cuántos sistemas hidráulicos independientes tiene el Boeing 737?',
+    options: ['1', '2', '3', '4'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 tiene 2 sistemas hidráulicos independientes: Sistema A y Sistema B.',
+    category: 'Hydraulics',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'easy',
+    isTrial: true
+  },
+  {
+    id: 'b737-hyd-002',
+    question: '¿Cuál es la presión normal de operación del sistema hidráulico?',
+    options: ['2000 PSI', '3000 PSI', '4000 PSI', '5000 PSI'],
+    correctAnswer: 1,
+    explanation: 'La presión normal de operación del sistema hidráulico del Boeing 737 es de 3000 PSI.',
+    category: 'Hydraulics',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Fuel Questions
+export const B737_FUEL_QUESTIONS: Question[] = [
+  {
+    id: 'b737-fuel-001',
+    question: '¿Cuántos tanques de combustible principales tiene el Boeing 737?',
+    options: ['1', '2', '3', '4'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 tiene 2 tanques de combustible principales, uno en cada ala.',
+    category: 'Fuel',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'easy',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Landing Gear Questions
+export const B737_LANDING_GEAR_QUESTIONS: Question[] = [
+  {
+    id: 'b737-lg-001',
+    question: '¿Qué tipo de tren de aterrizaje tiene el Boeing 737?',
+    options: ['Tren fijo', 'Tren retráctil triciclo', 'Tren convencional', 'Patines'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 tiene tren de aterrizaje retráctil tipo triciclo con rueda de nariz y dos trenes principales.',
+    category: 'Landing Gear',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'easy',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Anti-Ice Questions
+export const B737_ANTI_ICE_QUESTIONS: Question[] = [
+  {
+    id: 'b737-ai-001',
+    question: '¿Qué sistema se utiliza para el antihielo de las alas en el Boeing 737?',
+    options: ['Fluido antihielo', 'Aire caliente de sangrado', 'Resistencias eléctricas', 'Ultrasonidos'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 utiliza aire caliente de sangrado de los motores para el sistema antihielo de las alas.',
+    category: 'Anti-Ice Rain',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Automatic Flight Questions
+export const B737_AUTOMATIC_FLIGHT_QUESTIONS: Question[] = [
+  {
+    id: 'b737-af-001',
+    question: '¿Cómo se llama el sistema de gestión de vuelo del Boeing 737?',
+    options: ['FMGS', 'FMS', 'AFCS', 'MCDU'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 utiliza el sistema FMS (Flight Management System) para la gestión de vuelo.',
+    category: 'Automatic Flight',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Communication Questions
+export const B737_COMMUNICATION_QUESTIONS: Question[] = [
+  {
+    id: 'b737-comm-001',
+    question: '¿Cuántas radios VHF tiene típicamente el Boeing 737?',
+    options: ['1', '2', '3', '4'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 típicamente tiene 2 radios VHF para comunicaciones.',
+    category: 'Communication',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'easy',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Fire Protection Questions
+export const B737_FIRE_PROTECTION_QUESTIONS: Question[] = [
+  {
+    id: 'b737-fire-001',
+    question: '¿Cuántas botellas de extinción de incendios tiene cada motor del Boeing 737?',
+    options: ['1', '2', '3', '4'],
+    correctAnswer: 0,
+    explanation: 'Cada motor del Boeing 737 tiene 1 botella de extinción de incendios.',
+    category: 'Fire Protection',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Flight Instruments Questions
+export const B737_FLIGHT_INSTRUMENTS_QUESTIONS: Question[] = [
+  {
+    id: 'b737-fi-001',
+    question: '¿Qué tipo de pantallas utiliza el Boeing 737 moderno?',
+    options: ['Instrumentos analógicos', 'LCD/LED displays', 'CRT displays', 'Instrumentos mecánicos'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 moderno utiliza pantallas LCD/LED para los instrumentos de vuelo.',
+    category: 'Flight Instruments',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'easy',
+    isTrial: true
+  }
+];
+
+// Boeing 737 Warning Systems Questions
+export const B737_WARNING_SYSTEMS_QUESTIONS: Question[] = [
+  {
+    id: 'b737-warn-001',
+    question: '¿Cómo se llama el sistema principal de alertas del Boeing 737?',
+    options: ['ECAM', 'EICAS', 'CAS', 'WAS'],
+    correctAnswer: 1,
+    explanation: 'El Boeing 737 utiliza el sistema EICAS (Engine Indication and Crew Alerting System) para las alertas principales.',
+    category: 'Warning Systems',
+    aircraftType: 'B737_FAMILY',
+    difficulty: 'medium',
+    isTrial: true
+  }
+];
+
 // Combine all questions by category
 export const QUESTION_DATABASE = {
   A320_FAMILY: {
@@ -329,7 +527,17 @@ export const QUESTION_DATABASE = {
   B737_FAMILY: {
     Engines: B737_ENGINE_QUESTIONS,
     'Flight Controls': B737_FLIGHT_CONTROLS_QUESTIONS,
-    // Add more categories...
+    'Air Systems': B737_AIR_SYSTEMS_QUESTIONS,
+    'Electrical': B737_ELECTRICAL_QUESTIONS,
+    'Hydraulics': B737_HYDRAULICS_QUESTIONS,
+    'Fuel': B737_FUEL_QUESTIONS,
+    'Landing Gear': B737_LANDING_GEAR_QUESTIONS,
+    'Anti-Ice Rain': B737_ANTI_ICE_QUESTIONS,
+    'Automatic Flight': B737_AUTOMATIC_FLIGHT_QUESTIONS,
+    'Communication': B737_COMMUNICATION_QUESTIONS,
+    'Fire Protection': B737_FIRE_PROTECTION_QUESTIONS,
+    'Flight Instruments': B737_FLIGHT_INSTRUMENTS_QUESTIONS,
+    'Warning Systems': B737_WARNING_SYSTEMS_QUESTIONS
   }
 };
 

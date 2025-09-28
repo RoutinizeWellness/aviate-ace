@@ -93,26 +93,10 @@ const Index = () => {
     }
   ];
 
-  // Handler for "Comenzar ahora" button
+  // Handler for "Get Started" button - redirect to login
   const handleStartNow = async () => {
-    try {
-      await FreeTrialManager.handleStartNow(
-        user?._id,
-        navigate,
-        (message: string, type: 'info' | 'warning') => {
-          toast({
-            title: type === 'warning' ? "Prueba Terminada" : "Prueba Gratuita",
-            description: message,
-            variant: type === 'warning' ? "destructive" : "default",
-            duration: 4000,
-          });
-        }
-      );
-    } catch (error) {
-      console.error('Error handling start now:', error);
-      // Fallback to dashboard
-      navigate('/dashboard');
-    }
+    // Always redirect to login page instead of trying to start free trial directly
+    navigate('/login');
   };
 
   // Define pricing plans with translations
@@ -182,10 +166,10 @@ const Index = () => {
           <div className="flex items-center gap-3">
             <LanguageToggle />
             <Button variant="outline" size="sm">
-              <a href="/login" className="no-underline">Iniciar Sesión</a>
+              <a href="/login" className="no-underline">{t('nav.login') || 'Iniciar Sesión'}</a>
             </Button>
             <Button size="sm" className="bg-primary hover:bg-primary-dark">
-              <a href="/dashboard" className="no-underline text-inherit">Prueba Gratis</a>
+              <a href="/login" className="no-underline text-inherit">{t('nav.freeTrial') || 'Prueba Gratis'}</a>
             </Button>
           </div>
         </div>
@@ -573,7 +557,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-slate-900 border-t border-slate-800">
+      <footer className="py-12 bg-green-900 border-t border-green-800">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             {/* Brand Section */}
@@ -584,7 +568,7 @@ const Index = () => {
                 </div>
                 <h1 className="font-bold text-white">PilotPrepFlightX</h1>
               </div>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <p className="text-sm text-green-400 leading-relaxed">
                 {t('footer.brand.description')}
               </p>
             </div>
@@ -592,35 +576,35 @@ const Index = () => {
             {/* Producto Section */}
             <div>
               <h3 className="font-semibold text-white mb-4">{t('footer.product.title')}</h3>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/type-rating" className="hover:text-teal-400 transition-colors">{t('footer.product.courses')}</a></li>
-                <li><a href="/exams" className="hover:text-teal-400 transition-colors">{t('footer.product.exams')}</a></li>
-                <li><a href="/aircraft-selection" className="hover:text-teal-400 transition-colors">{t('footer.product.freeTrial')}</a></li>
+              <ul className="space-y-2 text-sm text-green-400">
+                <li><a href="/type-rating" className="hover:text-green-300 transition-colors">{t('footer.product.courses')}</a></li>
+                <li><a href="/exams" className="hover:text-green-300 transition-colors">{t('footer.product.exams')}</a></li>
+                <li><a href="/aircraft-selection" className="hover:text-green-300 transition-colors">{t('footer.product.freeTrial')}</a></li>
               </ul>
             </div>
 
             {/* Soporte Section */}
             <div>
               <h3 className="font-semibold text-white mb-4">{t('footer.support.title')}</h3>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">{t('footer.support.helpCenter')}</a></li>
-                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-teal-400 transition-colors">{t('footer.support.contact')}</a></li>
-                <li><a href="/subscription-management" className="hover:text-teal-400 transition-colors">{t('footer.support.serviceStatus')}</a></li>
+              <ul className="space-y-2 text-sm text-green-400">
+                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-green-300 transition-colors">{t('footer.support.helpCenter')}</a></li>
+                <li><a href="mailto:pilotprepflightx@outlook.es" className="hover:text-green-300 transition-colors">{t('footer.support.contact')}</a></li>
+                <li><a href="/subscription-management" className="hover:text-green-300 transition-colors">{t('footer.support.serviceStatus')}</a></li>
               </ul>
             </div>
 
             {/* Legal Section */}
             <div>
               <h3 className="font-semibold text-white mb-4">{t('footer.legal.title')}</h3>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/terms" className="hover:text-teal-400 transition-colors">{t('footer.legal.terms')}</a></li>
-                <li><a href="/privacy" className="hover:text-teal-400 transition-colors">{t('footer.legal.privacy')}</a></li>
-                <li><a href="/terms" className="hover:text-teal-400 transition-colors">{t('footer.legal.cookies')}</a></li>
+              <ul className="space-y-2 text-sm text-green-400">
+                <li><a href="/terms" className="hover:text-green-300 transition-colors">{t('footer.legal.terms')}</a></li>
+                <li><a href="/privacy" className="hover:text-green-300 transition-colors">{t('footer.legal.privacy')}</a></li>
+                <li><a href="/terms" className="hover:text-green-300 transition-colors">{t('footer.legal.cookies')}</a></li>
               </ul>
             </div>
           </div>
           
-          <div className="pt-8 border-t border-slate-800 text-center text-sm text-slate-400">
+          <div className="pt-8 border-t border-green-800 text-center text-sm text-green-400">
             <p>{t('footer.copyright')}</p>
           </div>
         </div>

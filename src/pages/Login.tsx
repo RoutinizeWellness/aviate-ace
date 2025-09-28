@@ -8,12 +8,14 @@ import { Plane, Mail, Lock, AlertCircle, AlertTriangle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useConvexAuth";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { DeviceFingerprintService } from "@/services/DeviceFingerprintService";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { signIn, isLoading } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -76,16 +78,16 @@ const Login = () => {
               <p className="text-xs text-muted-foreground">Professional Training</p>
             </div>
           </div>
-          <h2 className="text-3xl font-bold mb-2">Bienvenido de Vuelta</h2>
+          <h2 className="text-3xl font-bold mb-2">{t('login.welcomeBack') || 'Bienvenido de Vuelta'}</h2>
           <p className="text-muted-foreground">
-            Inicia sesión para continuar tu preparación
+            {t('login.subtitle') || 'Inicia sesión para continuar tu preparación'}
           </p>
         </div>
 
         {/* Login Form */}
         <Card className="surface-mid border-border/50">
           <CardHeader className="text-center pb-4">
-            <CardTitle className="text-xl">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-xl">{t('login.title') || 'Iniciar Sesión'}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             {error && (

@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   Trophy,
   Star,
@@ -17,6 +18,8 @@ interface GamificationDashboardProps {
 }
 
 export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ isMobile = false }) => {
+  const { t } = useLanguage();
+  
   // Mock gamification data
   const stats = {
     level: 12,
@@ -25,20 +28,38 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
     totalExperience: 3000,
     streak: 7,
     achievements: 15,
-    rank: 'Captain'
+    rank: t('achievements.currentLevel') === 'English' ? 'Captain' : 'Capitán'
   };
 
   const recentAchievements = [
-    { id: 1, title: 'Quick Learner', description: 'Complete 5 lessons in one day', earned: true, date: '2023-05-15' },
-    { id: 2, title: 'Perfect Score', description: 'Score 100% on Systems Quiz', earned: true, date: '2023-05-12' },
-    { id: 3, title: 'Streak Master', description: 'Maintain a 7-day study streak', earned: false, date: '' },
+    { 
+      id: 1, 
+      title: t('achievements.quickLearner') || 'Quick Learner', 
+      description: t('achievements.quickLearner.desc') || 'Complete 5 lessons in one day', 
+      earned: true, 
+      date: '2023-05-15' 
+    },
+    { 
+      id: 2, 
+      title: t('achievements.perfectScore') || 'Perfect Score', 
+      description: t('achievements.perfectScore.desc') || 'Score 100% on Systems Quiz', 
+      earned: true, 
+      date: '2023-05-12' 
+    },
+    { 
+      id: 3, 
+      title: t('achievements.streakMaster') || 'Streak Master', 
+      description: t('achievements.streakMaster.desc') || 'Maintain a 7-day study streak', 
+      earned: false, 
+      date: '' 
+    },
   ];
 
   const skillProgress = [
-    { name: 'Aircraft Systems', level: 8, progress: 75, nextMilestone: 'Expert' },
-    { name: 'Navigation', level: 6, progress: 60, nextMilestone: 'Advanced' },
-    { name: 'Meteorology', level: 7, progress: 70, nextMilestone: 'Expert' },
-    { name: 'Regulations', level: 5, progress: 50, nextMilestone: 'Intermediate' },
+    { name: t('achievements.aircraftSystems') || 'Aircraft Systems', level: 8, progress: 75, nextMilestone: t('achievements.expert') || 'Expert' },
+    { name: t('achievements.navigation') || 'Navigation', level: 6, progress: 60, nextMilestone: t('achievements.advanced') || 'Advanced' },
+    { name: t('achievements.meteorology') || 'Meteorology', level: 7, progress: 70, nextMilestone: t('achievements.expert') || 'Expert' },
+    { name: t('achievements.regulations') || 'Regulations', level: 5, progress: 50, nextMilestone: t('achievements.intermediate') || 'Intermediate' },
   ];
 
   return (
@@ -52,7 +73,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
                 <Zap className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>Level</p>
+                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>{t('achievements.level')}</p>
                 <p className={`text-${isMobile ? 'lg' : 'xl'} font-bold`}>{stats.level}</p>
               </div>
             </div>
@@ -66,7 +87,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
                 <TrendingUp className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>Rank</p>
+                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>{t('achievements.rank') || 'Rank'}</p>
                 <p className={`text-${isMobile ? 'lg' : 'xl'} font-bold`}>{stats.rank}</p>
               </div>
             </div>
@@ -80,8 +101,8 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
                 <Target className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>Streak</p>
-                <p className={`text-${isMobile ? 'lg' : 'xl'} font-bold`}>{stats.streak} days</p>
+                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>{t('analytics.studyStreak') || 'Streak'}</p>
+                <p className={`text-${isMobile ? 'lg' : 'xl'} font-bold`}>{stats.streak} {t('analytics.days') || 'days'}</p>
               </div>
             </div>
           </CardContent>
@@ -94,7 +115,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
                 <Award className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>Achievements</p>
+                <p className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>{t('achievements.achievements') || 'Achievements'}</p>
                 <p className={`text-${isMobile ? 'lg' : 'xl'} font-bold`}>{stats.achievements}</p>
               </div>
             </div>
@@ -107,14 +128,14 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star className="w-5 h-5" />
-            Experience Progress
+            {t('achievements.experience') || 'Experience Progress'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className={`flex justify-between text-${isMobile ? 'xs' : 'sm'}`}>
-              <span>Level {stats.level}</span>
-              <span>Level {stats.level + 1}</span>
+              <span>{t('achievements.level')} {stats.level}</span>
+              <span>{t('achievements.level')} {stats.level + 1}</span>
             </div>
             <Progress 
               value={(stats.experience / stats.totalExperience) * 100} 
@@ -122,7 +143,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
             />
             <div className={`flex justify-between text-${isMobile ? 'xs' : 'sm'}`}>
               <span>{stats.experience} XP</span>
-              <span>{stats.experienceToNext} XP to next level</span>
+              <span>{stats.experienceToNext} XP {t('achievements.nextLevel') || 'to next level'}</span>
             </div>
           </div>
         </CardContent>
@@ -133,7 +154,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Skill Progress
+            {t('achievements.progress') || 'Skill Progress'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -143,7 +164,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
                 <div className={`flex justify-between mb-1 text-${isMobile ? 'xs' : 'sm'}`}>
                   <span className="font-medium">{skill.name}</span>
                   <span className={`text-${isMobile ? 'xs' : 'sm'} text-muted-foreground`}>
-                    Level {skill.level} • {skill.nextMilestone}
+                    {t('achievements.level')} {skill.level} • {skill.nextMilestone}
                   </span>
                 </div>
                 <Progress value={skill.progress} className="h-2" />
@@ -158,7 +179,7 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Trophy className="w-5 h-5" />
-            Recent Achievements
+            {t('achievements.recentAchievements') || 'Recent Achievements'}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -184,9 +205,9 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ is
                   <p className={`text-${isMobile ? 'xs' : 'xs'} text-muted-foreground`}>{achievement.description}</p>
                 </div>
                 {achievement.earned ? (
-                  <Badge variant="default" className={isMobile ? 'text-xs' : ''}>Earned</Badge>
+                  <Badge variant="default" className={isMobile ? 'text-xs' : ''}>{t('achievements.earned') || 'Earned'}</Badge>
                 ) : (
-                  <Badge variant="secondary" className={isMobile ? 'text-xs' : ''}>Locked</Badge>
+                  <Badge variant="secondary" className={isMobile ? 'text-xs' : ''}>{t('achievements.locked') || 'Locked'}</Badge>
                 )}
               </div>
             ))}

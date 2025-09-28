@@ -74,9 +74,9 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
   };
 
   const difficulties = [
-    { value: 'beginner', label: 'Básico' },
-    { value: 'intermediate', label: 'Intermedio' },
-    { value: 'advanced', label: 'Avanzado' }
+    { value: 'beginner', label: t('suggestions.difficulty.basic') || 'Básico' },
+    { value: 'intermediate', label: t('suggestions.difficulty.intermediate') || 'Intermedio' },
+    { value: 'advanced', label: t('suggestions.difficulty.advanced') || 'Avanzado' }
   ];
 
   const validateForm = () => {
@@ -124,8 +124,8 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
     
     if (!user) {
       toast({
-        title: "Error",
-        description: "Debes estar autenticado para enviar sugerencias",
+        title: t('suggestions.form.authRequired') || "Error",
+        description: t('suggestions.form.authRequired') || "Debes estar autenticado para enviar sugerencias",
         variant: "destructive",
       });
       return;
@@ -153,8 +153,8 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
       await submitSuggestion(sanitizedData);
 
       toast({
-        title: "¡Sugerencia enviada!",
-        description: "Tu pregunta ha sido enviada para revisión. Te notificaremos cuando sea aprobada.",
+        title: t('suggestions.form.success') || "¡Sugerencia enviada!",
+        description: t('suggestions.form.successDesc') || "Tu pregunta ha sido enviada para revisión. Te notificaremos cuando sea aprobada.",
       });
 
       // Reset form
@@ -171,8 +171,8 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
       onSuccess?.();
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "No se pudo enviar la sugerencia",
+        title: t('common.error') || "Error",
+        description: error.message || t('suggestions.form.submitError') || "No se pudo enviar la sugerencia",
         variant: "destructive",
       });
     } finally {
@@ -202,11 +202,10 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Lightbulb className="w-5 h-5 text-yellow-500" />
-          Sugerir Nueva Pregunta
+          {t('suggestions.form.title') || 'Sugerir Nueva Pregunta'}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Ayuda a mejorar la plataforma sugiriendo nuevas preguntas de examen. 
-          Todas las sugerencias serán revisadas por nuestro equipo antes de ser incluidas.
+          {t('suggestions.form.description') || 'Ayuda a mejorar la plataforma sugiriendo nuevas preguntas de examen. Todas las sugerencias serán revisadas por nuestro equipo antes de ser incluidas.'}
         </p>
       </CardHeader>
       <CardContent>
@@ -214,7 +213,7 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
           {/* Aircraft Type and Category */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="aircraftType">Tipo de Aeronave</Label>
+              <Label htmlFor="aircraftType">{t('suggestions.form.aircraftType') || 'Tipo de Aeronave'}</Label>
               <Select 
                 value={formData.aircraftType} 
                 onValueChange={(value) => {
@@ -239,7 +238,7 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
             </div>
 
             <div>
-              <Label htmlFor="category">Categoría</Label>
+              <Label htmlFor="category">{t('suggestions.form.category') || 'Categoría'}</Label>
               <Select 
                 value={formData.category} 
                 onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
@@ -260,7 +259,7 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
 
           {/* Difficulty */}
           <div>
-            <Label htmlFor="difficulty">Dificultad</Label>
+            <Label htmlFor="difficulty">{t('suggestions.form.difficulty') || 'Dificultad'}</Label>
             <Select 
               value={formData.difficulty} 
               onValueChange={(value) => setFormData(prev => ({ ...prev, difficulty: value }))}
@@ -280,10 +279,10 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
 
           {/* Question */}
           <div>
-            <Label htmlFor="question">Pregunta *</Label>
+            <Label htmlFor="question">{t('suggestions.form.question') || 'Pregunta *'}</Label>
             <Textarea
               id="question"
-              placeholder="Escribe tu pregunta aquí..."
+              placeholder={t('suggestions.form.questionPlaceholder') || 'Escribe tu pregunta aquí...'}
               value={formData.question}
               onChange={(e) => {
                 setFormData(prev => ({ ...prev, question: e.target.value }));
@@ -301,7 +300,7 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
 
           {/* Options */}
           <div>
-            <Label>Opciones de Respuesta *</Label>
+            <Label>{t('suggestions.form.options') || 'Opciones de Respuesta *'}</Label>
             <div className="space-y-3 mt-2">
               {formData.options.map((option, index) => (
                 <div key={index} className="flex items-center gap-3">
@@ -316,7 +315,7 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
                     <span className="text-sm font-medium">{String.fromCharCode(65 + index)}.</span>
                   </div>
                   <Input
-                    placeholder={`Opción ${String.fromCharCode(65 + index)}`}
+                    placeholder={`${t('suggestions.form.optionPlaceholder') || 'Opción'} ${String.fromCharCode(65 + index)}`}
                     value={option}
                     onChange={(e) => handleOptionChange(index, e.target.value)}
                     className={errors[`option${index}`] ? 'border-red-500' : ''}
@@ -328,16 +327,16 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
               ))}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              Selecciona la opción correcta marcando el círculo correspondiente
+              {t('suggestions.form.selectCorrect') || 'Selecciona la opción correcta marcando el círculo correspondiente'}
             </p>
           </div>
 
           {/* Explanation */}
           <div>
-            <Label htmlFor="explanation">Explicación *</Label>
+            <Label htmlFor="explanation">{t('suggestions.form.explanation') || 'Explicación *'}</Label>
             <Textarea
               id="explanation"
-              placeholder="Explica por qué la respuesta seleccionada es correcta..."
+              placeholder={t('suggestions.form.explanationPlaceholder') || 'Explica por qué la respuesta seleccionada es correcta...'}
               value={formData.explanation}
               onChange={(e) => {
                 setFormData(prev => ({ ...prev, explanation: e.target.value }));
@@ -357,8 +356,7 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Tu sugerencia será revisada por nuestro equipo de expertos antes de ser incluida en los exámenes. 
-              Esto puede tomar entre 1-3 días hábiles.
+              {t('suggestions.form.reviewNote') || 'Tu sugerencia será revisada por nuestro equipo de expertos antes de ser incluida en los exámenes. Esto puede tomar entre 1-3 días hábiles.'}
             </AlertDescription>
           </Alert>
 
@@ -371,12 +369,12 @@ export const QuestionSuggestionForm = ({ onSuccess }: QuestionSuggestionFormProp
             {isSubmitting ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                Enviando...
+                {t('suggestions.form.sending') || 'Enviando...'}
               </>
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                Enviar Sugerencia
+                {t('suggestions.form.submit') || 'Enviar Sugerencia'}
               </>
             )}
           </Button>

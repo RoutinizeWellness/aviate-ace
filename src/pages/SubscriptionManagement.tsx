@@ -79,34 +79,69 @@ const SubscriptionManagement = () => {
   };
 
   // Quick Actions handlers
-  const handleUpdatePayment = () => {
-    toast({
-      title: t('subscription.redirectingPayment'),
-      description: "Opening payment method update...",
-    });
-    // Simulate payment update
-    setTimeout(() => {
-      window.open('#payment-update', '_blank');
-    }, 500);
-  };
-
-  const handleViewBilling = () => {
-    toast({
-      title: t('subscription.openingBilling'),
-      description: "Loading billing history...",
-    });
-    // Simulate billing history
-    setTimeout(() => {
-      window.open('#billing-history', '_blank');
-    }, 500);
-  };
-
-  const handleRequestRefund = () => {
-    if (confirm(t('subscription.refundConfirm') || 'Are you sure you want to request a refund?')) {
+  const handleUpdatePayment = async () => {
+    try {
       toast({
-        title: t('subscription.refundSubmitted'),
-        description: "Your refund request will be processed within 3-5 business days.",
-        variant: "default",
+        title: t('quickActions.updating') || 'Updating payment method...',
+        description: "Redirecting to payment update page...",
+      });
+      
+      // Simulate actual payment update functionality
+      const updateUrl = `https://billing.autumn.com/customer/payment-methods?customer_id=${user?.email || publicEmail}`;
+      
+      setTimeout(() => {
+        window.open(updateUrl, '_blank');
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: t('common.error') || 'Error',
+        description: 'Failed to open payment update page',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleViewBilling = async () => {
+    try {
+      toast({
+        title: t('quickActions.viewingBilling') || 'Opening billing history...',
+        description: "Loading your billing information...",
+      });
+      
+      // Simulate actual billing history functionality
+      const billingUrl = `https://billing.autumn.com/customer/invoices?customer_id=${user?.email || publicEmail}`;
+      
+      setTimeout(() => {
+        window.open(billingUrl, '_blank');
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: t('common.error') || 'Error',
+        description: 'Failed to open billing history',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleRequestRefund = async () => {
+    try {
+      const confirmMessage = 'Are you sure you want to request a refund? This action cannot be undone.';
+      
+      if (confirm(confirmMessage)) {
+        // Simulate refund request processing
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        toast({
+          title: t('quickActions.refundSuccess') || 'Refund Request Submitted',
+          description: "Your refund request will be processed within 3-5 business days.",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: t('common.error') || 'Error',
+        description: t('quickActions.refundError') || 'Failed to process refund request',
+        variant: 'destructive'
       });
     }
   };
@@ -265,6 +300,8 @@ const SubscriptionManagement = () => {
                         const url = (result as any)?.checkoutUrl;
                         if (url) {
                           localStorage.removeItem('selectedPlan');
+                          // Store return URL for after payment completion
+                          localStorage.setItem('postPaymentRedirect', user ? '/dashboard' : '/login?returnUrl=/dashboard');
                           window.location.assign(url);
                         } else {
                           toast({
@@ -338,9 +375,9 @@ const SubscriptionManagement = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
-                  {t('subscription.quickActions')}
+                  {t('quickActions.title') || t('subscription.quickActions')}
                 </CardTitle>
-                <CardDescription>{t('subscription.commonTasks')}</CardDescription>
+                <CardDescription>{t('quickActions.description') || t('subscription.commonTasks')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button 
@@ -349,7 +386,7 @@ const SubscriptionManagement = () => {
                   onClick={handleUpdatePayment}
                 >
                   <CreditCard className="w-4 h-4 mr-2" />
-                  {t('subscription.updatePaymentMethod')}
+                  {t('quickActions.updatePayment') || t('subscription.updatePaymentMethod')}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -357,7 +394,7 @@ const SubscriptionManagement = () => {
                   onClick={handleViewBilling}
                 >
                   <Receipt className="w-4 h-4 mr-2" />
-                  {t('subscription.viewBillingHistory')}
+                  {t('quickActions.viewBilling') || t('subscription.viewBillingHistory')}
                 </Button>
                 <Button 
                   variant="outline" 
@@ -365,7 +402,7 @@ const SubscriptionManagement = () => {
                   onClick={handleRequestRefund}
                 >
                   <DollarSign className="w-4 h-4 mr-2" />
-                  {t('subscription.requestRefund')}
+                  {t('quickActions.requestRefund') || t('subscription.requestRefund')}
                 </Button>
               </CardContent>
             </Card>

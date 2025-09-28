@@ -15,6 +15,8 @@ import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { QuestionSuggestionsAdmin } from '@/components/QuestionSuggestionsAdmin';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useState, useEffect } from 'react';
 import { 
   Users, 
   Settings, 
@@ -40,6 +42,7 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useLanguage();
   
   // Check if user is admin
   const adminCheck = useQuery(api.auth.isUserAdmin, user ? { userId: user._id } : "skip");
@@ -82,37 +85,37 @@ const AdminPanel = () => {
       name: "Airbus A320 Family", 
       description: "A318, A319, A320, A321",
       categories: [
-        { value: "aircraft-general", label: "Aircraft General", description: "General aircraft knowledge and limitations" },
-        { value: "load-acceleration-limits", label: "Load Acceleration Limits", description: "Aircraft structural and acceleration limitations" },
-        { value: "environment-limits", label: "Environment Limits", description: "Environmental operational limitations" },
-        { value: "weight-limits", label: "Weight Limits", description: "Maximum weights and balance limitations" },
-        { value: "speed-limits", label: "Speed Limits", description: "Aircraft speed limitations and restrictions" },
-        { value: "air-bleed-cond-press-vent", label: "Air Bleed/Cond/Press/Vent", description: "Air conditioning, pressurization, and ventilation" },
-        { value: "autoflight", label: "Autoflight", description: "Autopilot and flight management systems" },
-        { value: "apu", label: "APU", description: "Auxiliary Power Unit operations and limitations" },
-        { value: "engines", label: "Engines", description: "Engine operations, limitations, and procedures" },
-        { value: "flight-controls", label: "Flight Controls", description: "Primary and secondary flight control systems" },
-        { value: "fuel", label: "Fuel", description: "Fuel systems, distribution, and monitoring" },
-        { value: "ice-rain-protection", label: "Ice and Rain Protection", description: "Anti-ice and rain protection systems" },
-        { value: "landing-gear", label: "Landing Gear", description: "Landing gear operation, brakes, and steering" },
-        { value: "oxygen", label: "Oxygen", description: "Oxygen systems and emergency procedures" },
-        { value: "gpws", label: "GPWS", description: "Ground Proximity Warning System" },
-        { value: "navigation", label: "Navigation", description: "Navigation systems and procedures" },
+        { value: "aircraft-general", label: t('admin.categories.aircraftGeneral') || "Aircraft General", description: t('admin.categories.aircraftGeneralDesc') || "General aircraft knowledge and limitations" },
+        { value: "load-acceleration-limits", label: t('admin.categories.loadAccelerationLimits') || "Load Acceleration Limits", description: t('admin.categories.loadAccelerationLimitsDesc') || "Aircraft structural and acceleration limitations" },
+        { value: "environment-limits", label: t('admin.categories.environmentLimits') || "Environment Limits", description: t('admin.categories.environmentLimitsDesc') || "Environmental operational limitations" },
+        { value: "weight-limits", label: t('admin.categories.weightLimits') || "Weight Limits", description: t('admin.categories.weightLimitsDesc') || "Maximum weights and balance limitations" },
+        { value: "speed-limits", label: t('admin.categories.speedLimits') || "Speed Limits", description: t('admin.categories.speedLimitsDesc') || "Aircraft speed limitations and restrictions" },
+        { value: "air-bleed-cond-press-vent", label: t('admin.categories.airBleedCondPressVent') || "Air Bleed/Cond/Press/Vent", description: t('admin.categories.airBleedCondPressVentDesc') || "Air conditioning, pressurization, and ventilation" },
+        { value: "autoflight", label: t('admin.categories.autoflight') || "Autoflight", description: t('admin.categories.autoflightDesc') || "Autopilot and flight management systems" },
+        { value: "apu", label: t('admin.categories.apu') || "APU", description: t('admin.categories.apuDesc') || "Auxiliary Power Unit operations and limitations" },
+        { value: "engines", label: t('admin.categories.engines') || "Engines", description: t('admin.categories.enginesDesc') || "Engine operations, limitations, and procedures" },
+        { value: "flight-controls", label: t('admin.categories.flightControls') || "Flight Controls", description: t('admin.categories.flightControlsDesc') || "Primary and secondary flight control systems" },
+        { value: "fuel", label: t('admin.categories.fuel') || "Fuel", description: t('admin.categories.fuelDesc') || "Fuel systems, distribution, and monitoring" },
+        { value: "ice-rain-protection", label: t('admin.categories.iceRainProtection') || "Ice and Rain Protection", description: t('admin.categories.iceRainProtectionDesc') || "Anti-ice and rain protection systems" },
+        { value: "landing-gear", label: t('admin.categories.landingGear') || "Landing Gear", description: t('admin.categories.landingGearDesc') || "Landing gear operation, brakes, and steering" },
+        { value: "oxygen", label: t('admin.categories.oxygen') || "Oxygen", description: t('admin.categories.oxygenDesc') || "Oxygen systems and emergency procedures" },
+        { value: "gpws", label: t('admin.categories.gpws') || "GPWS", description: t('admin.categories.gpwsDesc') || "Ground Proximity Warning System" },
+        { value: "navigation", label: t('admin.categories.navigation') || "Navigation", description: t('admin.categories.navigationDesc') || "Navigation systems and procedures" },
         // Additional A320-specific categories to match the generated questions
-        { value: "approach-procedures", label: "Approach Procedures", description: "Instrument approach procedures and landing" },
-        { value: "electrical", label: "Electrical", description: "Electrical power generation and distribution" },
-        { value: "emergency-procedures", label: "Emergency Procedures", description: "Emergency and abnormal procedures" },
-        { value: "fire-protection", label: "Fire Protection", description: "Fire detection and suppression systems" },
-        { value: "flight-protection", label: "Flight Protection", description: "Flight envelope protection systems" },
-        { value: "hydraulics", label: "Hydraulics", description: "Hydraulic power systems and components" },
-        { value: "meteorologia", label: "Meteorología", description: "Weather conditions and meteorological information" },
-        { value: "motor-y-apu", label: "Motor y APU", description: "Engine and auxiliary power unit systems" },
-        { value: "navegacion", label: "Navegación", description: "Navigation procedures and systems" },
-        { value: "performance", label: "Performance", description: "Aircraft performance calculations and limitations" },
-        { value: "procedimientos-de-despegue", label: "Procedimientos de Despegue", description: "Takeoff procedures and limitations" },
-        { value: "reglamentacion", label: "Reglamentación", description: "Aviation regulations and requirements" },
-        { value: "sistema-electrico", label: "Sistema Eléctrico", description: "Electrical systems in Spanish" },
-        { value: "sistema-hidraulico", label: "Sistema Hidráulico", description: "Hydraulic systems in Spanish" }
+        { value: "approach-procedures", label: t('admin.categories.approachProcedures') || "Approach Procedures", description: t('admin.categories.approachProceduresDesc') || "Instrument approach procedures and landing" },
+        { value: "electrical", label: t('admin.categories.electrical') || "Electrical", description: t('admin.categories.electricalDesc') || "Electrical power generation and distribution" },
+        { value: "emergency-procedures", label: t('admin.categories.emergencyProcedures') || "Emergency Procedures", description: t('admin.categories.emergencyProceduresDesc') || "Emergency and abnormal procedures" },
+        { value: "fire-protection", label: t('admin.categories.fireProtection') || "Fire Protection", description: t('admin.categories.fireProtectionDesc') || "Fire detection and suppression systems" },
+        { value: "flight-protection", label: t('admin.categories.flightProtection') || "Flight Protection", description: t('admin.categories.flightProtectionDesc') || "Flight envelope protection systems" },
+        { value: "hydraulics", label: t('admin.categories.hydraulics') || "Hydraulics", description: t('admin.categories.hydraulicsDesc') || "Hydraulic power systems and components" },
+        { value: "meteorologia", label: t('admin.categories.meteorologia') || "Meteorología", description: t('admin.categories.meteorologiaDesc') || "Weather conditions and meteorological information" },
+        { value: "motor-y-apu", label: t('admin.categories.motorYApu') || "Motor y APU", description: t('admin.categories.motorYApuDesc') || "Engine and auxiliary power unit systems" },
+        { value: "navegacion", label: t('admin.categories.navegacion') || "Navegación", description: t('admin.categories.navegacionDesc') || "Navigation procedures and systems" },
+        { value: "performance", label: t('admin.categories.performance') || "Performance", description: t('admin.categories.performanceDesc') || "Aircraft performance calculations and limitations" },
+        { value: "procedimientos-de-despegue", label: t('admin.categories.procedimientosDespegue') || "Procedimientos de Despegue", description: t('admin.categories.procedimientosDespegueDesc') || "Takeoff procedures and limitations" },
+        { value: "reglamentacion", label: t('admin.categories.reglamentacion') || "Reglamentación", description: t('admin.categories.reglamentacionDesc') || "Aviation regulations and requirements" },
+        { value: "sistema-electrico", label: t('admin.categories.sistemaElectrico') || "Sistema Eléctrico", description: t('admin.categories.sistemaElectricoDesc') || "Electrical systems in Spanish" },
+        { value: "sistema-hidraulico", label: t('admin.categories.sistemaHidraulico') || "Sistema Hidráulico", description: t('admin.categories.sistemaHidraulicoDesc') || "Hydraulic systems in Spanish" }
       ]
     },
     { 
@@ -120,21 +123,21 @@ const AdminPanel = () => {
       name: "Boeing 737", 
       description: "B737-700, B737-800, B737 MAX",
       categories: [
-        { value: "airplane-general", label: "AIRPLANE GENERAL", description: "General aircraft information and limitations" },
-        { value: "air-systems", label: "AIR SYSTEMS", description: "Pneumatic, pressurization, and air conditioning systems" },
-        { value: "anti-ice-rain", label: "ANTI-ICE AND RAIN", description: "Ice and rain protection systems" },
-        { value: "automatic-flight", label: "AUTOMATIC FLIGHT", description: "Autopilot and flight management systems" },
-        { value: "communication", label: "COMMUNICATION", description: "Radio and communication systems" },
-        { value: "electrical", label: "ELECTRICAL", description: "Electrical power systems" },
-        { value: "engines-apu", label: "ENGINES AND APU", description: "Engine and auxiliary power unit systems" },
-        { value: "fire-protection", label: "FIRE PROTECTION", description: "Fire detection and suppression systems" },
-        { value: "flight-controls", label: "FLIGHT CONTROLS", description: "Primary and secondary flight control systems" },
-        { value: "flight-instruments", label: "FLIGHT INSTRUMENTS AND DISPLAYS", description: "Flight instruments and display systems" },
-        { value: "flight-management", label: "FLIGHT MANAGEMENT AND NAVIGATION", description: "Flight management and navigation systems" },
-        { value: "fuel", label: "FUEL", description: "Fuel storage, distribution, and indication systems" },
-        { value: "hydraulics", label: "HYDRAULICS", description: "Hydraulic power systems" },
-        { value: "landing-gear", label: "LANDING GEAR", description: "Landing gear extension, retraction, and indication" },
-        { value: "warning-systems", label: "WARNING SYSTEMS", description: "Master warning, master caution, and alerting systems" }
+        { value: "airplane-general", label: t('admin.categories.airplaneGeneral') || "AIRPLANE GENERAL", description: t('admin.categories.airplaneGeneralDesc') || "General aircraft information and limitations" },
+        { value: "air-systems", label: t('admin.categories.airSystems') || "AIR SYSTEMS", description: t('admin.categories.airSystemsDesc') || "Pneumatic, pressurization, and air conditioning systems" },
+        { value: "anti-ice-rain", label: t('admin.categories.antiIceRain') || "ANTI-ICE AND RAIN", description: t('admin.categories.antiIceRainDesc') || "Ice and rain protection systems" },
+        { value: "automatic-flight", label: t('admin.categories.automaticFlight') || "AUTOMATIC FLIGHT", description: t('admin.categories.automaticFlightDesc') || "Autopilot and flight management systems" },
+        { value: "communication", label: t('admin.categories.communication') || "COMMUNICATION", description: t('admin.categories.communicationDesc') || "Radio and communication systems" },
+        { value: "electrical", label: t('admin.categories.electrical') || "ELECTRICAL", description: t('admin.categories.electricalDesc') || "Electrical power systems" },
+        { value: "engines-apu", label: t('admin.categories.enginesApu') || "ENGINES AND APU", description: t('admin.categories.enginesApuDesc') || "Engine and auxiliary power unit systems" },
+        { value: "fire-protection", label: t('admin.categories.fireProtection') || "FIRE PROTECTION", description: t('admin.categories.fireProtectionDesc') || "Fire detection and suppression systems" },
+        { value: "flight-controls", label: t('admin.categories.flightControls') || "FLIGHT CONTROLS", description: t('admin.categories.flightControlsDesc') || "Primary and secondary flight control systems" },
+        { value: "flight-instruments", label: t('admin.categories.flightInstruments') || "FLIGHT INSTRUMENTS AND DISPLAYS", description: t('admin.categories.flightInstrumentsDesc') || "Flight instruments and display systems" },
+        { value: "flight-management", label: t('admin.categories.flightManagement') || "FLIGHT MANAGEMENT AND NAVIGATION", description: t('admin.categories.flightManagementDesc') || "Flight management and navigation systems" },
+        { value: "fuel", label: t('admin.categories.fuel') || "FUEL", description: t('admin.categories.fuelDesc') || "Fuel storage, distribution, and indication systems" },
+        { value: "hydraulics", label: t('admin.categories.hydraulics') || "HYDRAULICS", description: t('admin.categories.hydraulicsDesc') || "Hydraulic power systems" },
+        { value: "landing-gear", label: t('admin.categories.landingGear') || "LANDING GEAR", description: t('admin.categories.landingGearDesc') || "Landing gear extension, retraction, and indication" },
+        { value: "warning-systems", label: t('admin.categories.warningSystems') || "WARNING SYSTEMS", description: t('admin.categories.warningSystemsDesc') || "Master warning, master caution, and alerting systems" }
       ]
     }
   ];
@@ -144,8 +147,8 @@ const AdminPanel = () => {
     // Only redirect if we have a definitive answer that the user is not admin
     if (adminCheck && !adminCheck.isAdmin) {
       toast({
-        title: "Acceso Denegado",
-        description: "No tienes permisos de administrador.",
+        title: t('admin.accessDenied') || "Acceso Denegado",
+        description: t('admin.noPermissions') || "No tienes permisos de administrador.",
         variant: "destructive",
       });
       navigate('/dashboard');

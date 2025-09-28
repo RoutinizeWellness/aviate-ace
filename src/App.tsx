@@ -126,12 +126,12 @@ const App = () => {
                   </ProtectedRoute>
                 } />
                 <Route path="/type-rating" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiresSubscription="A320_FAMILY">
                     <TypeRating />
                   </ProtectedRoute>
                 } />
                 <Route path="/b737-type-rating" element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requiresSubscription="B737_FAMILY">
                     <B737TypeRating />
                   </ProtectedRoute>
                 } />

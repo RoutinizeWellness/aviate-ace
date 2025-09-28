@@ -134,8 +134,30 @@ const B737TypeRating = () => {
   };
   
   const isLessonUnlocked = (lessonId: number) => {
-    // For now, all lessons are unlocked
-    return true;
+    // First lesson of fundamentals is always unlocked
+    if (lessonId === 1) return true;
+    
+    // For lessons 2-3 (rest of fundamentals), previous lesson must be completed
+    if (lessonId === 2) {
+      return isLessonCompleted(1);
+    }
+    if (lessonId === 3) {
+      return isLessonCompleted(2);
+    }
+    
+    // For systems lessons (4+), all fundamentals must be completed
+    if (lessonId >= 4) {
+      const fundamentalsCompleted = [1, 2, 3].every(id => isLessonCompleted(id));
+      if (!fundamentalsCompleted) return false;
+      
+      // Systems lessons unlock progressively
+      for (let i = 4; i < lessonId; i++) {
+        if (!isLessonCompleted(i)) return false;
+      }
+      return true;
+    }
+    
+    return false;
   };
   
   const isLessonCompleted = (lessonId: number) => {

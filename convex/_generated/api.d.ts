@@ -26,6 +26,7 @@ import type * as seedA320AirConditioningQuestions from "../seedA320AirConditioni
 import type * as seedA320AutoflightComplete from "../seedA320AutoflightComplete.js";
 import type * as seedA320AutoflightDoorsQuestions from "../seedA320AutoflightDoorsQuestions.js";
 import type * as seedA320AutoflightQuestions from "../seedA320AutoflightQuestions.js";
+import type * as seedB737CompleteQuestions from "../seedB737CompleteQuestions.js";
 import type * as seedQuestions from "../seedQuestions.js";
 import type * as typeRating from "../typeRating.js";
 
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   seedA320AutoflightComplete: typeof seedA320AutoflightComplete;
   seedA320AutoflightDoorsQuestions: typeof seedA320AutoflightDoorsQuestions;
   seedA320AutoflightQuestions: typeof seedA320AutoflightQuestions;
+  seedB737CompleteQuestions: typeof seedB737CompleteQuestions;
   seedQuestions: typeof seedQuestions;
   typeRating: typeof typeRating;
 }>;

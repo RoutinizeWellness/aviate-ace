@@ -242,6 +242,18 @@ const TypeRating = () => {
     if (success) {
       // Update local state to reflect completion
       updateModuleProgress();
+      
+      // Force re-render by triggering a state update
+      setLessonProgress(prev => [...prev]);
+      setModuleProgress(prev => [...prev]);
+      
+      // Show success toast
+      const { toast } = await import('@/hooks/use-toast');
+      toast({
+        title: t('typerating.moduleCompletedSuccess') || 'Module completed successfully!',
+        description: t('typerating.moduleCompletedDesc') || 'You can now proceed to the next module.',
+        duration: 5000,
+      });
     }
   };
   

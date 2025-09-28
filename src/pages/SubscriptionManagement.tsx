@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,17 @@ const SubscriptionManagement = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [publicEmail, setPublicEmail] = useState("");
+  const [publicEmail, setPublicEmail] = useState(() => {
+    // Auto-detect user email if available
+    return user?.email || "";
+  });
+
+  // Update email when user changes
+  useEffect(() => {
+    if (user?.email && user.email !== publicEmail) {
+      setPublicEmail(user.email);
+    }
+  }, [user?.email]);
 
   // Pre-select a plan if user came from landing selection
   const preselectedPlanId = useMemo(() => {

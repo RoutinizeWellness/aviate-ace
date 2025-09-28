@@ -35,7 +35,10 @@ export class ModuleCompletionService {
         'fundamentos': [1],
         'sistemas': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
         'b737_fundamentos': [1, 2, 3],
-        'b737_sistemas': [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        'b737_sistemas': [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+        // Alternative B737 naming
+        'Boeing 737 Fundamentals & Aircraft General': [1, 2, 3],
+        'Boeing 737 Aircraft Systems': [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
       };
       
       const lessonIds = moduleLessonRanges[moduleId] || [];
@@ -161,7 +164,10 @@ export class ModuleCompletionService {
       'fundamentos': 1,
       'sistemas': 14,
       'b737_fundamentos': 3,
-      'b737_sistemas': 12
+      'b737_sistemas': 12,
+      // Alternative B737 naming
+      'Boeing 737 Fundamentals & Aircraft General': 3,
+      'Boeing 737 Aircraft Systems': 12
     };
     
     return moduleLessonCounts[moduleId] || 0;

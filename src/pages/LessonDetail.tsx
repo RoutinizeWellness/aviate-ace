@@ -314,6 +314,7 @@ const LessonDetail = () => {
   // Event handlers
   const handleTheoryComplete = async () => {
     if (user && lessonId && canUseConvex) {
+      // Use Convex if available
       await updateProgress({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">,
@@ -324,12 +325,32 @@ const LessonDetail = () => {
       if (!Number.isNaN(numericId)) {
         try { await mark(numericId, 'theory'); } catch {}
       }
-      setShowTheoryContent(false);
+    } else {
+      // Fallback to localStorage when Convex is not available
+      const userId = user?._id || 'fallback_user';
+      const storageKey = `lesson_progress_${userId}`;
+      const stored = localStorage.getItem(storageKey);
+      const progressData = stored ? JSON.parse(stored) : {};
+      
+      if (!progressData[lessonId]) {
+        progressData[lessonId] = { theoryCompleted: false, flashcardsCompleted: false, quizCompleted: false };
+      }
+      progressData[lessonId].theoryCompleted = true;
+      
+      localStorage.setItem(storageKey, JSON.stringify(progressData));
+      
+      // Also update Type Rating progress for numeric lesson IDs
+      const numericId = Number(lessonId);
+      if (!Number.isNaN(numericId)) {
+        try { await mark(numericId, 'theory'); } catch {}
+      }
     }
+    setShowTheoryContent(false);
   };
 
   const handleFlashcardsComplete = async () => {
     if (user && lessonId && canUseConvex) {
+      // Use Convex if available
       await updateProgress({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">,
@@ -339,12 +360,32 @@ const LessonDetail = () => {
       if (!Number.isNaN(numericId)) {
         try { await mark(numericId, 'flashcards'); } catch {}
       }
-      setShowFlashcards(false);
+    } else {
+      // Fallback to localStorage when Convex is not available
+      const userId = user?._id || 'fallback_user';
+      const storageKey = `lesson_progress_${userId}`;
+      const stored = localStorage.getItem(storageKey);
+      const progressData = stored ? JSON.parse(stored) : {};
+      
+      if (!progressData[lessonId]) {
+        progressData[lessonId] = { theoryCompleted: false, flashcardsCompleted: false, quizCompleted: false };
+      }
+      progressData[lessonId].flashcardsCompleted = true;
+      
+      localStorage.setItem(storageKey, JSON.stringify(progressData));
+      
+      // Also update Type Rating progress for numeric lesson IDs
+      const numericId = Number(lessonId);
+      if (!Number.isNaN(numericId)) {
+        try { await mark(numericId, 'flashcards'); } catch {}
+      }
     }
+    setShowFlashcards(false);
   };
 
   const handleQuizComplete = async () => {
     if (user && lessonId && canUseConvex) {
+      // Use Convex if available
       await updateProgress({
         userId: user._id as Id<"users">,
         lessonId: lessonId as Id<"lessons">,
@@ -354,8 +395,27 @@ const LessonDetail = () => {
       if (!Number.isNaN(numericId)) {
         try { await mark(numericId, 'quiz'); } catch {}
       }
-      alert("Quiz completed! In a real implementation, this would show quiz questions.");
+    } else {
+      // Fallback to localStorage when Convex is not available
+      const userId = user?._id || 'fallback_user';
+      const storageKey = `lesson_progress_${userId}`;
+      const stored = localStorage.getItem(storageKey);
+      const progressData = stored ? JSON.parse(stored) : {};
+      
+      if (!progressData[lessonId]) {
+        progressData[lessonId] = { theoryCompleted: false, flashcardsCompleted: false, quizCompleted: false };
+      }
+      progressData[lessonId].quizCompleted = true;
+      
+      localStorage.setItem(storageKey, JSON.stringify(progressData));
+      
+      // Also update Type Rating progress for numeric lesson IDs
+      const numericId = Number(lessonId);
+      if (!Number.isNaN(numericId)) {
+        try { await mark(numericId, 'quiz'); } catch {}
+      }
     }
+    alert("Quiz completed! In a real implementation, this would show quiz questions.");
   };
 
   const handleResetProgress = async () => {
@@ -380,12 +440,34 @@ const LessonDetail = () => {
   }
 
   // Provide a safe progress object when Convex is skipped
-  const safeProgress = (progress as any) || {
-    theoryCompleted: false,
-    flashcardsCompleted: false,
-    quizCompleted: false,
-    overallProgress: 0,
+  const getSafeProgress = () => {
+    if (canUseConvex && progress) {
+      return progress;
+    }
+    
+    // Fallback to localStorage when Convex is not available
+    const userId = user?._id || 'fallback_user';
+    const storageKey = `lesson_progress_${userId}`;
+    const stored = localStorage.getItem(storageKey);
+    const progressData = stored ? JSON.parse(stored) : {};
+    
+    const lessonProgress = progressData[lessonId] || {
+      theoryCompleted: false,
+      flashcardsCompleted: false,
+      quizCompleted: false
+    };
+    
+    // Calculate overall progress
+    const completedCount = [lessonProgress.theoryCompleted, lessonProgress.flashcardsCompleted, lessonProgress.quizCompleted].filter(Boolean).length;
+    const overallProgress = Math.round((completedCount / 3) * 100);
+    
+    return {
+      ...lessonProgress,
+      overallProgress
+    };
   };
+  
+  const safeProgress = getSafeProgress();
 
   return (
     <div className="min-h-screen bg-background p-4">

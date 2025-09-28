@@ -216,6 +216,8 @@ const Exams = () => {
     params.set('mode', 'timed');
     params.set('timeLimit', '60');
     params.set('questionCount', '75');
+    params.set('aircraft', 'B737_FAMILY'); // Set default aircraft for timed exams
+    params.set('categories', 'airplane-general,air-systems,electrical,engines-apu,flight-controls,fuel,hydraulics,landing-gear'); // Include all B737 categories
     navigate(`/exam?${params.toString()}`);
   };
 
@@ -249,7 +251,7 @@ const Exams = () => {
             <LanguageToggle />
           </div>
           <h1 className="text-4xl font-bold mb-2">{t('exams.title')}</h1>
-          <p className="text-muted-foreground">Practica y toma exámenes para tu certificación de piloto.</p>
+          <p className="text-muted-foreground">{t('exams.subtitle')}</p>
         </header>
 
         {/* Exam Categories */}
@@ -278,7 +280,7 @@ const Exams = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Practica con preguntas reales de examen sin límite de tiempo.
+                      {t('exams.practiceDescription')}
                     </p>
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
@@ -364,7 +366,7 @@ const Exams = () => {
                     
                     {selectedCategories.length > 0 && (
                       <div className="text-xs text-muted-foreground mt-1">
-                        {selectedCategories.length} categoría(s) seleccionada(s)
+                        {selectedCategories.length} {t('exams.categoriesSelected')}
                       </div>
                     )}
                   </div>
@@ -458,7 +460,7 @@ const Exams = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Simulacro de examen real con tiempo limitado y condiciones oficiales.
+                  {t('exams.timedDescription')}
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
@@ -496,7 +498,7 @@ const Exams = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Repasa preguntas que has respondido incorrectamente para mejorar tu conocimiento.
+                      {t('exams.reviewDescription')}
                     </p>
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
@@ -517,15 +519,34 @@ const Exams = () => {
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Configurar Repaso</DialogTitle>
+                  <DialogTitle>{t('exams.configureReview')}</DialogTitle>
                   <DialogDescription>
-                    Selecciona las categorías que quieres repasar. Solo verás preguntas que has respondido incorrectamente.
+                    {t('exams.configureReviewDesc')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
+                    <label className="text-sm font-medium">{t('exams.selectAircraftType')}</label>
+                    <Select value={reviewSelectedAircraft} onValueChange={setReviewSelectedAircraft}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecciona tipo de aeronave" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getAvailableAircraftTypes().map((aircraft) => (
+                          <SelectItem key={aircraft.value} value={aircraft.value}>
+                            <div>
+                              <div className="font-medium">{aircraft.label}</div>
+                              <div className="text-xs text-muted-foreground">{aircraft.description}</div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
                     <div className="flex justify-between items-center">
-                      <label className="text-sm font-medium">Categorías</label>
+                      <label className="text-sm font-medium">{t('exams.categoriesLabel')}</label>
                       {selectedCategories.length > 0 && (
                         <Button 
                           variant="ghost" 
@@ -534,7 +555,7 @@ const Exams = () => {
                           className="text-xs h-6 px-2"
                         >
                           <X className="w-3 h-3 mr-1" />
-                          Limpiar todo
+                          {t('exams.clearAll')}
                         </Button>
                       )}
                     </div>
@@ -563,13 +584,13 @@ const Exams = () => {
                     
                     {selectedCategories.length > 0 && (
                       <div className="text-xs text-muted-foreground mt-1">
-                        {selectedCategories.length} categoría(s) seleccionada(s)
+                        {selectedCategories.length} {t('exams.categoriesSelected')}
                       </div>
                     )}
                   </div>
                   
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Número de Preguntas a Repasar</label>
+                    <label className="text-sm font-medium">{t('exams.numberOfQuestions')}</label>
                     <Select value={selectedReviewQuestionCount} onValueChange={setSelectedReviewQuestionCount}>
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar cantidad" />
@@ -589,19 +610,19 @@ const Exams = () => {
                   <div className="bg-info/10 border border-info/20 rounded-lg p-3">
                     <div className="flex items-center gap-2 text-sm text-info">
                       <AlertCircle className="w-4 h-4" />
-                      <span className="font-medium">Modo Repaso Activado</span>
+                      <span className="font-medium">{t('exams.reviewModeActive')}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Solo verás preguntas que has respondido incorrectamente anteriormente.
+                      {t('exams.reviewModeDesc')}
                     </p>
                   </div>
                   <div className="flex gap-2 pt-4">
                     <Button variant="outline" onClick={() => setShowReviewDialog(false)} className="flex-1">
-                      Cancelar
+                      {t('common.cancel')}
                     </Button>
                     <Button onClick={handleStartReview} className="flex-1" disabled={selectedCategories.length === 0}>
                       <BookOpen className="w-4 h-4 mr-2" />
-                      Comenzar Repaso
+                      {t('exams.startReview')}
                     </Button>
                   </div>
                 </div>
@@ -662,7 +683,7 @@ const Exams = () => {
                   </div>
                   <Button 
                     className="w-full" 
-                    onClick={() => navigate('/exam?mode=timed&timeLimit=60&questionCount=50&aircraft=A320_FAMILY')}
+                    onClick={() => navigate('/exam?mode=timed&timeLimit=60&questionCount=50&aircraft=A320_FAMILY&categories=aircraft-general,air-bleed-cond-press-vent,autoflight,apu,engines,flight-controls,fuel,ice-rain-protection,landing-gear,oxygen,gpws,navigation')}
                   >
                     Iniciar Examen
                   </Button>
@@ -700,7 +721,7 @@ const Exams = () => {
                   </div>
                   <Button 
                     className="w-full" 
-                    onClick={() => navigate('/exam?mode=timed&timeLimit=60&questionCount=50&aircraft=B737_FAMILY')}
+                    onClick={() => navigate('/exam?mode=timed&timeLimit=60&questionCount=50&aircraft=B737_FAMILY&categories=airplane-general,air-systems,electrical,engines-apu,flight-controls,fuel,hydraulics,landing-gear,anti-ice-rain,automatic-flight,communication,fire-protection,flight-instruments,warning-systems')}
                   >
                     Iniciar Examen
                   </Button>

@@ -15,7 +15,8 @@
     "verify:netlify": "node scripts/verify-netlify-convex.js",
     "seed:convex": "node scripts/seed-convex-db.js",
     "test:seed": "node scripts/test-convex-seed.js",
-    "check:convex": "node scripts/check-convex-status.js"
+    "check:convex": "node scripts/check-convex-status.js",
+    "generate:questions": "node scripts/generate-aviation-questions.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

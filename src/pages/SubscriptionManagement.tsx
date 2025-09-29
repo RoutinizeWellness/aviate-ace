@@ -83,19 +83,19 @@ const SubscriptionManagement = () => {
     try {
       toast({
         title: t('quickActions.updating') || 'Updating payment method...',
-        description: "Redirecting to payment update page...",
+        description: "Redirecting to Autumn billing service...",
       });
       
-      // Simulate actual payment update functionality
-      const updateUrl = `https://billing.autumn.com/customer/payment-methods?customer_id=${user?.email || publicEmail}`;
+      // Redirect to the specific Autumn billing service URL
+      const billingUrl = `http://localhost:8081/subscription-management?action=billing`;
       
       setTimeout(() => {
-        window.open(updateUrl, '_blank');
+        window.location.href = billingUrl;
       }, 1000);
     } catch (error) {
       toast({
         title: t('common.error') || 'Error',
-        description: 'Failed to open payment update page',
+        description: 'Failed to redirect to billing service',
         variant: 'destructive'
       });
     }
@@ -105,19 +105,19 @@ const SubscriptionManagement = () => {
     try {
       toast({
         title: t('quickActions.viewingBilling') || 'Opening billing history...',
-        description: "Loading your billing information...",
+        description: "Redirecting to Autumn billing service...",
       });
       
-      // Simulate actual billing history functionality
-      const billingUrl = `https://billing.autumn.com/customer/invoices?customer_id=${user?.email || publicEmail}`;
+      // Redirect to the specific Autumn billing service URL
+      const billingUrl = `http://localhost:8081/subscription-management?action=billing`;
       
       setTimeout(() => {
-        window.open(billingUrl, '_blank');
+        window.location.href = billingUrl;
       }, 1000);
     } catch (error) {
       toast({
         title: t('common.error') || 'Error',
-        description: 'Failed to open billing history',
+        description: 'Failed to redirect to billing service',
         variant: 'destructive'
       });
     }
@@ -125,17 +125,20 @@ const SubscriptionManagement = () => {
 
   const handleRequestRefund = async () => {
     try {
-      const confirmMessage = 'Are you sure you want to request a refund? This action cannot be undone.';
+      const confirmMessage = 'Are you sure you want to request a refund? This will redirect you to the Autumn billing service.';
       
       if (confirm(confirmMessage)) {
-        // Simulate refund request processing
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
         toast({
-          title: t('quickActions.refundSuccess') || 'Refund Request Submitted',
-          description: "Your refund request will be processed within 3-5 business days.",
-          variant: "default",
+          title: t('quickActions.requesting') || 'Processing refund request...',
+          description: "Redirecting to Autumn billing service...",
         });
+        
+        // Redirect to the specific Autumn billing service URL
+        const billingUrl = `http://localhost:8081/subscription-management?action=billing`;
+        
+        setTimeout(() => {
+          window.location.href = billingUrl;
+        }, 1000);
       }
     } catch (error) {
       toast({

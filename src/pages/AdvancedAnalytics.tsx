@@ -35,10 +35,20 @@ const AdvancedAnalytics = () => {
       
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:8081/analytics?userId=${user._id}&timeRange=${timeRange}`);
+        setError(null);
+        
+        // Try to fetch from the analytics service
+        const response = await fetch(`http://localhost:8081/analytics?userId=${user._id}&timeRange=${timeRange}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          mode: 'cors'
+        });
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`Analytics service unavailable (HTTP ${response.status})`);
         }
         
         const data = await response.json();
@@ -46,7 +56,7 @@ const AdvancedAnalytics = () => {
         setError(null);
       } catch (error) {
         console.error('Failed to fetch analytics:', error);
-        setError('Failed to load analytics data');
+        setError('Analytics service is not available. Using demo data.');
         // Fallback to mock data if API is not available
         setAnalyticsData(getMockData());
       } finally {

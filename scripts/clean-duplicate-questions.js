@@ -173,3 +173,57 @@ if (require.main === module) {
 }
 
 module.exports = { analyzeAllQuestionFiles, normalizeQuestionText };
+
+
+// Script to clean duplicate questions from the database
+
+// Function to generate a unique identifier for a question
+function generateQuestionKey(question) {
+  // Normalize the question text for comparison
+  return question.question.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+// Read the question database
+const questionFiles = [
+  './src/data/a320Questions.ts',
+  './src/data/b737AdditionalQuestions.ts',
+  './src/data/practiceQuestions.ts'
+];
+
+console.log('Starting duplicate question cleanup...');
+
+// Process each file
+questionFiles.forEach(file => {
+  try {
+    if (require('fs').existsSync(file)) {
+      console.log(`Processing ${file}...`);
+      const content = require('fs').readFileSync(file, 'utf8');
+      
+      // Extract questions (this is a simplified approach)
+      // In a real scenario, you'd parse the TypeScript properly
+      const questionMatches = content.match(/question:\s*['"`]([^'"`]+)['"`]/g);
+      
+      if (questionMatches) {
+        const seenQuestions = new Set();
+        const duplicates = [];
+        
+        questionMatches.forEach((match, index) => {
+          const questionText = match.replace(/question:\s*['"`]/, '').replace(/['"`]$/, '');
+          const key = generateQuestionKey({ question: questionText });
+          
+          if (seenQuestions.has(key)) {
+            duplicates.push({ index, text: questionText });
+          } else {
+            seenQuestions.add(key);
+          }
+        });
+        
+        console.log(`Found ${duplicates.length} duplicates in ${file}`);
+      }
+    }
+  } catch (error) {
+    console.error(`Error processing ${file}:`, error.message);
+  }
+});
+
+console.log('Duplicate cleanup analysis complete.');

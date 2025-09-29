@@ -364,6 +364,65 @@ export const seedA320TypeRatingExam = mutation({
   },
 });
 
+// Update exam question
+export const updateExamQuestion = mutation({
+  args: {
+    questionId: v.id("examQuestions"),
+    question: v.optional(v.string()),
+    options: v.optional(v.array(v.string())),
+    correctAnswer: v.optional(v.number()),
+    explanation: v.optional(v.string()),
+    aircraftType: v.optional(v.string()),
+    category: v.optional(v.string()),
+    difficulty: v.optional(v.string()),
+    reference: v.optional(v.string()),
+    regulationCode: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { questionId, ...updates } = args;
+    return await ctx.db.patch(questionId, {
+      ...updates,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+// Delete exam question
+export const deleteExamQuestion = mutation({
+  args: {
+    questionId: v.id("examQuestions"),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.delete(args.questionId);
+  },
+});
+
+// Get exam questions count by category
+export const getQuestionCountsByCategory = query({
+  args: {},
+  handler: async (ctx) => {
+    const questions = await ctx.db
+      .query("examQuestions")
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .collect();
+      
+    const counts = questions.reduce((acc, question) => {
+      const key = `${question.aircraftType}_${question.category}`;
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return {
+      total: questions.length,
+      byCategory: counts,
+      byAircraftType: {
+        A320_FAMILY: questions.filter(q => q.aircraftType === 'A320_FAMILY').length,
+        B737_FAMILY: questions.filter(q => q.aircraftType === 'B737_FAMILY').length,
+      }
+    };
+  },
+});
+
 // Seed B737 Type Rating exam and questions
 export const seedB737TypeRating = mutation({
   args: {},

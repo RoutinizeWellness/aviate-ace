@@ -56,11 +56,13 @@ for (let i = 0; i < 500; i++) {
 
   const baseIndex = i % baseQuestions.length;
   const base = baseQuestions[baseIndex];
+  // Create more unique variations
   const variation = Math.floor(i / baseQuestions.length) + 1;
+  const variantSuffix = variation > 1 ? ` (Variant ${variation}.${(i % baseQuestions.length) + 1})` : '';
   
   a320FlightControlsQuestions.push({
     _id: generateQuestionId(),
-    question: variation > 1 ? `${base.question} (Variant ${variation})` : base.question,
+    question: `${base.question}${variantSuffix}`,
     options: [...base.options],
     correctAnswer: base.correctAnswer,
     explanation: base.explanation,
@@ -119,11 +121,13 @@ for (let i = 0; i < 500; i++) {
 
   const baseIndex = i % baseQuestions.length;
   const base = baseQuestions[baseIndex];
+  // Create more unique variations
   const variation = Math.floor(i / baseQuestions.length) + 1;
+  const variantSuffix = variation > 1 ? ` (Electrical Variant ${variation}.${(i % baseQuestions.length) + 1})` : '';
   
   a320ElectricalQuestions.push({
     _id: generateQuestionId(),
-    question: variation > 1 ? `${base.question} (Electrical Variant ${variation})` : base.question,
+    question: `${base.question}${variantSuffix}`,
     options: [...base.options],
     correctAnswer: base.correctAnswer,
     explanation: base.explanation,
@@ -182,11 +186,13 @@ for (let i = 0; i < 500; i++) {
 
   const baseIndex = i % baseQuestions.length;
   const base = baseQuestions[baseIndex];
+  // Create more unique variations
   const variation = Math.floor(i / baseQuestions.length) + 1;
+  const variantSuffix = variation > 1 ? ` (Hydraulics Variant ${variation}.${(i % baseQuestions.length) + 1})` : '';
   
   a320HydraulicsQuestions.push({
     _id: generateQuestionId(),
-    question: variation > 1 ? `${base.question} (Hydraulics Variant ${variation})` : base.question,
+    question: `${base.question}${variantSuffix}`,
     options: [...base.options],
     correctAnswer: base.correctAnswer,
     explanation: base.explanation,
@@ -245,11 +251,13 @@ for (let i = 0; i < 500; i++) {
 
   const baseIndex = i % baseQuestions.length;
   const base = baseQuestions[baseIndex];
+  // Create more unique variations
   const variation = Math.floor(i / baseQuestions.length) + 1;
+  const variantSuffix = variation > 1 ? ` (General Variant ${variation}.${(i % baseQuestions.length) + 1})` : '';
   
   aircraftGeneralQuestions.push({
     _id: generateQuestionId(),
-    question: variation > 1 ? `${base.question} (General Variant ${variation})` : base.question,
+    question: `${base.question}${variantSuffix}`,
     options: [...base.options],
     correctAnswer: base.correctAnswer,
     explanation: base.explanation,

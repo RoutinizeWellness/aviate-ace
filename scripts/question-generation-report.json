@@ -1,0 +1,20 @@
+{
+  "generationDate": "2025-09-28T15:57:49.547Z",
+  "totalQuestions": 18500,
+  "aircraftTypes": 2,
+  "categoriesPerAircraft": [
+    22,
+    15
+  ],
+  "questionsPerCategory": 500,
+  "breakdown": {
+    "A320_FAMILY": {
+      "total": 11000,
+      "categories": 22
+    },
+    "B737_FAMILY": {
+      "total": 7500,
+      "categories": 15
+    }
+  }
+}

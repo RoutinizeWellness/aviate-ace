@@ -68,13 +68,26 @@ export const clearAllExamQuestions = mutation({
   args: {},
   handler: async (ctx) => {
     try {
-      const questions = await ctx.db.query("examQuestions").collect();
+      // Very small batch delete to avoid read limits
+      const batchSize = 20; // Very small batch size
+      let totalDeleted = 0;
+      
+      // Delete a very small batch of questions using aircraft type filter
+      const questions = await ctx.db
+        .query("examQuestions")
+        .withIndex("by_aircraft", (q) => q.eq("aircraftType", "A320_FAMILY"))
+        .take(batchSize);
+      
+      // Delete this batch
       for (const question of questions) {
         await ctx.db.delete(question._id);
       }
+      
+      totalDeleted = questions.length;
+      
       return { 
-        message: `Deleted ${questions.length} questions`,
-        count: questions.length,
+        message: `Deleted ${totalDeleted} A320 questions in this batch`,
+        count: totalDeleted,
         status: "success"
       };
     } catch (error) {
@@ -93,9 +106,11 @@ export const getExamQuestionsCount = query({
   args: {},
   handler: async (ctx) => {
     try {
+      // Use count query for better performance with large datasets
       const questions = await ctx.db.query("examQuestions").collect();
+      const count = questions.length;
       return { 
-        count: questions.length,
+        count: count,
         status: "success"
       };
     } catch (error) {

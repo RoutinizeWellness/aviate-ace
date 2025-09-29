@@ -58,7 +58,7 @@ const AdminPanel = () => {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showQuestionDialog, setShowQuestionDialog] = useState(false); // New state for question dialog
+  const [showQuestionDialog, setShowQuestionDialog] = useState(false);
   const [editForm, setEditForm] = useState({
     role: '',
     accountType: '',
@@ -76,6 +76,27 @@ const AdminPanel = () => {
     category: 'aircraft-general',
     difficulty: 'intermediate'
   });
+  
+  // Question management states
+  const [selectedAircraftFilter, setSelectedAircraftFilter] = useState('ALL');
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
+  const [showQuestionList, setShowQuestionList] = useState(false);
+  
+  // Get questions from Convex
+  const allQuestions = useQuery(
+    api.exams.getExamQuestions,
+    user && adminCheck?.isAdmin ? {} : "skip"
+  );
+  
+  // Get questions count by category
+  const questionCounts = allQuestions?.reduce((acc, question) => {
+    const key = `${question.aircraftType}_${question.category}`;
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>) || {};
+  
+  // Create and update question mutations (simplified for now)
+  const createQuestion = useMutation(api.exams.createExamQuestion);
   
   // Aircraft families and categories data
   const aircraftFamilies = [
@@ -294,26 +315,90 @@ const AdminPanel = () => {
     }));
   };
 
-  // Save question (placeholder for now)
-  const handleSaveQuestion = () => {
-    // In a real implementation, this would call a Convex mutation to save the question
-    console.log('Saving question:', questionForm);
-    toast({
-      title: "Pregunta guardada",
-      description: "La pregunta se ha guardado exitosamente.",
-    });
-    setShowQuestionDialog(false);
-    // Reset form
+  // Save question (simplified - create only for now)
+  const handleSaveQuestion = async () => {
+    if (!user) return;
+    
+    try {
+      // Create new question
+      await createQuestion({
+        question: questionForm.question,
+        options: questionForm.options,
+        correctAnswer: questionForm.correctAnswer,
+        explanation: questionForm.explanation,
+        aircraftType: questionForm.aircraftType,
+        category: questionForm.category,
+        difficulty: questionForm.difficulty
+      });
+      
+      toast({
+        title: "Pregunta creada",
+        description: "La pregunta se ha creado exitosamente.",
+      });
+      
+      setShowQuestionDialog(false);
+      // Reset form
+      setQuestionForm({
+        question: '',
+        options: ['', '', '', ''],
+        correctAnswer: 0,
+        explanation: '',
+        aircraftType: 'A320_FAMILY',
+        category: 'aircraft-general',
+        difficulty: 'intermediate'
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "No se pudo guardar la pregunta.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Edit question handler (opens dialog with data pre-filled)
+  const handleEditQuestion = (question: any) => {
     setQuestionForm({
-      question: '',
-      options: ['', '', '', ''],
-      correctAnswer: 0,
-      explanation: '',
-      aircraftType: 'A320_FAMILY',
-      category: 'aircraft-general',
-      difficulty: 'intermediate'
+      question: question.question,
+      options: question.options,
+      correctAnswer: question.correctAnswer,
+      explanation: question.explanation || '',
+      aircraftType: question.aircraftType,
+      category: question.category,
+      difficulty: question.difficulty
+    });
+    setShowQuestionDialog(true);
+    toast({
+      title: "Modo edición",
+      description: "Modifica la pregunta y guarda los cambios.",
     });
   };
+  
+  // Filter questions based on selected filters
+  const filteredQuestions = allQuestions?.filter(question => {
+    if (selectedAircraftFilter !== 'ALL' && question.aircraftType !== selectedAircraftFilter) {
+      return false;
+    }
+    if (selectedCategoryFilter !== 'ALL' && question.category !== selectedCategoryFilter) {
+      return false;
+    }
+    return true;
+  }) || [];
+  
+  // Get real question statistics
+  const getQuestionStats = () => {
+    if (!allQuestions) return { total: 0, a320: 0, b737: 0 };
+    
+    const stats = {
+      total: allQuestions.length,
+      a320: allQuestions.filter(q => q.aircraftType === 'A320_FAMILY').length,
+      b737: allQuestions.filter(q => q.aircraftType === 'B737_FAMILY').length
+    };
+    
+    return stats;
+  };
+  
+  const questionStats = getQuestionStats();
 
   return (
     <div className="min-h-screen bg-background">
@@ -585,16 +670,124 @@ const AdminPanel = () => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col gap-4">
-              <p className="text-muted-foreground">
-                Agrega y edita preguntas para los exámenes de certificación de piloto.
-              </p>
-              <Button 
-                className="w-fit"
-                onClick={() => setShowQuestionDialog(true)}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar Nueva Pregunta
-              </Button>
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground">
+                  Agrega y edita preguntas para los exámenes de certificación de piloto.
+                </p>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setShowQuestionList(!showQuestionList)}
+                  >
+                    <List className="w-4 h-4 mr-2" />
+                    {showQuestionList ? 'Ocultar Lista' : 'Ver Todas las Preguntas'}
+                  </Button>
+                  <Button 
+                    onClick={() => setShowQuestionDialog(true)}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Agregar Nueva Pregunta
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Question filters */}
+              {showQuestionList && (
+                <div className="flex gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div className="flex flex-col gap-2">
+                    <Label>Filtrar por Aeronave</Label>
+                    <Select value={selectedAircraftFilter} onValueChange={setSelectedAircraftFilter}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Todas las Aeronaves</SelectItem>
+                        <SelectItem value="A320_FAMILY">Airbus A320</SelectItem>
+                        <SelectItem value="B737_FAMILY">Boeing 737</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <Label>Filtrar por Categoría</Label>
+                    <Select value={selectedCategoryFilter} onValueChange={setSelectedCategoryFilter}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ALL">Todas las Categorías</SelectItem>
+                        {aircraftFamilies
+                          .find(f => selectedAircraftFilter === 'ALL' || f.id === selectedAircraftFilter)
+                          ?.categories.map(cat => (
+                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                          )) || aircraftFamilies.flatMap(f => f.categories).map(cat => (
+                            <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                          ))
+                        }
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex flex-col gap-2 justify-end">
+                    <div className="text-sm text-muted-foreground">
+                      Mostrando: {filteredQuestions.length} preguntas
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Question list */}
+              {showQuestionList && (
+                <div className="border rounded-lg">
+                  <div className="max-h-96 overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Pregunta</TableHead>
+                          <TableHead>Aeronave</TableHead>
+                          <TableHead>Categoría</TableHead>
+                          <TableHead>Dificultad</TableHead>
+                          <TableHead>Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredQuestions.map((question) => (
+                          <TableRow key={question._id}>
+                            <TableCell className="max-w-md">
+                              <div className="truncate">{question.question}</div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                {question.aircraftType === 'A320_FAMILY' ? 'A320' : 'B737'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-sm">{question.category}</div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={question.difficulty === 'advanced' ? 'destructive' : 
+                                          question.difficulty === 'intermediate' ? 'default' : 'secondary'}>
+                                {question.difficulty}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  onClick={() => handleEditQuestion(question)}
+                                >
+                                  <Edit className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -610,21 +803,49 @@ const AdminPanel = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="border border-border/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-primary">7,500+</div>
+                <div className="text-2xl font-bold text-primary">{questionStats.total}</div>
                 <div className="text-sm text-muted-foreground">Preguntas totales</div>
               </div>
               <div className="border border-border/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-blue-500">500</div>
-                <div className="text-sm text-muted-foreground">Preguntas por categoría B737</div>
+                <div className="text-2xl font-bold text-blue-500">{questionStats.a320}</div>
+                <div className="text-sm text-muted-foreground">Preguntas A320</div>
               </div>
               <div className="border border-border/50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-green-500">16</div>
-                <div className="text-sm text-muted-foreground">Categorías A320</div>
+                <div className="text-2xl font-bold text-green-500">{questionStats.b737}</div>
+                <div className="text-sm text-muted-foreground">Preguntas B737</div>
               </div>
             </div>
             <div className="mt-4 text-sm text-muted-foreground">
-              <p>• Todas las categorías de Boeing 737 tienen exactamente 500 preguntas cada una</p>
-              <p>• Las categorías de Airbus A320 tienen preguntas distribuidas según los estándares de certificación</p>
+              <p>• Estadísticas en tiempo real desde la base de datos Convex</p>
+              <p>• Cada categoría puede tener diferente número de preguntas según los estándares de certificación</p>
+            </div>
+            
+            {/* Category breakdown */}
+            <div className="mt-6">
+              <h4 className="font-medium mb-3">Preguntas por Categoría</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {aircraftFamilies.map((family) => (
+                  <div key={family.id} className="border border-border/50 rounded-lg p-3">
+                    <h5 className="font-medium mb-2">{family.name}</h5>
+                    <div className="space-y-1 text-sm">
+                      {family.categories.slice(0, 5).map((category) => {
+                        const count = questionCounts[`${family.id}_${category.value}`] || 0;
+                        return (
+                          <div key={category.value} className="flex justify-between">
+                            <span>{category.label}</span>
+                            <span className="font-medium">{count}</span>
+                          </div>
+                        );
+                      })}
+                      {family.categories.length > 5 && (
+                        <div className="text-xs text-muted-foreground pt-1">
+                          ... y {family.categories.length - 5} categorías más
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>

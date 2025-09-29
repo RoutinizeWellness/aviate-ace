@@ -1,0 +1,148 @@
+{
+  "totalQuestions": 93,
+  "totalDuplicates": 8,
+  "results": [
+    {
+      "file": "realAviationQuestions.ts",
+      "exists": true,
+      "questions": 0,
+      "duplicates": 0,
+      "duplicateDetails": []
+    },
+    {
+      "file": "cleanAviationQuestions.ts",
+      "exists": true,
+      "questions": 0,
+      "duplicates": 0,
+      "duplicateDetails": []
+    },
+    {
+      "file": "simpleQuestions.ts",
+      "exists": true,
+      "questions": 12,
+      "duplicates": 1,
+      "duplicateDetails": [
+        {
+          "normalized": "type of flight control system does the  use",
+          "questions": [
+            "What type of flight control system does the A320 use?",
+            "What type of flight control system does the Boeing 737 use?"
+          ],
+          "indices": [
+            2,
+            9
+          ]
+        }
+      ]
+    },
+    {
+      "file": "a320Questions.ts",
+      "exists": true,
+      "questions": 5,
+      "duplicates": 0,
+      "duplicateDetails": []
+    },
+    {
+      "file": "questionDatabase.ts",
+      "exists": true,
+      "questions": 40,
+      "duplicates": 2,
+      "duplicateDetails": [
+        {
+          "normalized": "es la presión normal del sistema hidráulico del",
+          "questions": [
+            "¿Cuál es la presión normal del sistema hidráulico del A320?",
+            "¿Cuál es la presión normal del sistema hidráulico del Boeing 737?"
+          ],
+          "indices": [
+            13,
+            24
+          ]
+        },
+        {
+          "normalized": "cuántos sistemas hidráulicos independientes tiene el",
+          "questions": [
+            "¿Cuántos sistemas hidráulicos independientes tiene el A320?",
+            "¿Cuántos sistemas hidráulicos independientes tiene el Boeing 737?"
+          ],
+          "indices": [
+            9,
+            30
+          ]
+        }
+      ]
+    },
+    {
+      "file": "massiveQuestionSeeding.ts",
+      "exists": true,
+      "questions": 24,
+      "duplicates": 3,
+      "duplicateDetails": [
+        {
+          "normalized": "${basequestion}${variantsuffix}",
+          "questions": [
+            "${base.question}${variantSuffix}",
+            "${base.question}${variantSuffix}"
+          ],
+          "indices": [
+            5,
+            11
+          ]
+        },
+        {
+          "normalized": "${basequestion}${variantsuffix}",
+          "questions": [
+            "${base.question}${variantSuffix}",
+            "${base.question}${variantSuffix}"
+          ],
+          "indices": [
+            5,
+            17
+          ]
+        },
+        {
+          "normalized": "${basequestion}${variantsuffix}",
+          "questions": [
+            "${base.question}${variantSuffix}",
+            "${base.question}${variantSuffix}"
+          ],
+          "indices": [
+            5,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "file": "practiceQuestions.ts",
+      "exists": true,
+      "questions": 12,
+      "duplicates": 2,
+      "duplicateDetails": [
+        {
+          "normalized": "es el procedimiento correcto para manejar una",
+          "questions": [
+            "¿Cuál es el procedimiento correcto para manejar una ",
+            "¿Cuál es el procedimiento correcto para manejar una "
+          ],
+          "indices": [
+            3,
+            7
+          ]
+        },
+        {
+          "normalized": "es la diferencia entre",
+          "questions": [
+            "¿Cuál es la diferencia entre ",
+            "¿Cuál es la diferencia entre "
+          ],
+          "indices": [
+            8,
+            10
+          ]
+        }
+      ]
+    }
+  ],
+  "duplicateRate": 8.60215053763441
+}

@@ -70,7 +70,7 @@ export const createExamQuestion = mutation({
   },
 });
 
-// Get exam questions
+// Get exam questions with pagination to avoid Convex response size limit
 export const getExamQuestions = query({
   args: { 
     examId: v.optional(v.id("exams")),
@@ -78,74 +78,178 @@ export const getExamQuestions = query({
     category: v.optional(v.string()),
     difficulty: v.optional(v.string()),
     limit: v.optional(v.number()),
+    offset: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    let questions;
+    const DEFAULT_LIMIT = 100; // Reduced from unlimited to prevent size limit
+    const actualLimit = args.limit || DEFAULT_LIMIT;
+    const offset = args.offset || 0;
+    
+    let query;
     
     if (args.examId) {
-      questions = await ctx.db
+      query = ctx.db
         .query("examQuestions")
         .withIndex("by_exam", (q) => q.eq("examId", args.examId!))
-        .filter((q) => q.eq(q.field("isActive"), true))
-        .collect();
+        .filter((q) => q.eq(q.field("isActive"), true));
     } else if (args.aircraftType) {
-      questions = await ctx.db
+      query = ctx.db
         .query("examQuestions")
         .withIndex("by_aircraft", (q) => q.eq("aircraftType", args.aircraftType!))
-        .filter((q) => q.eq(q.field("isActive"), true))
-        .collect();
+        .filter((q) => q.eq(q.field("isActive"), true));
     } else if (args.category) {
-      questions = await ctx.db
+      query = ctx.db
         .query("examQuestions")
         .withIndex("by_category", (q) => q.eq("category", args.category!))
-        .filter((q) => q.eq(q.field("isActive"), true))
-        .collect();
+        .filter((q) => q.eq(q.field("isActive"), true));
     } else if (args.difficulty) {
-      questions = await ctx.db
+      query = ctx.db
         .query("examQuestions")
         .withIndex("by_difficulty", (q) => q.eq("difficulty", args.difficulty!))
-        .filter((q) => q.eq(q.field("isActive"), true))
-        .collect();
+        .filter((q) => q.eq(q.field("isActive"), true));
     } else {
-      questions = await ctx.db
+      query = ctx.db
         .query("examQuestions")
-        .filter((q) => q.eq(q.field("isActive"), true))
-        .collect();
+        .filter((q) => q.eq(q.field("isActive"), true));
     }
     
-    // Shuffle questions and limit if specified
-    questions = questions.sort(() => Math.random() - 0.5);
+    // Use take() to limit response size and prevent Convex limit errors
+    const questions = await query
+      .order("desc")
+      .take(Math.min(actualLimit + offset, 500)); // Max 500 to stay under limit
     
-    if (args.limit) {
-      questions = questions.slice(0, args.limit);
+    // Apply pagination
+    const paginatedQuestions = questions.slice(offset, offset + actualLimit);
+    
+    // Shuffle questions if we have a specific limit (for exams)
+    if (args.limit && args.limit < 100) {
+      return paginatedQuestions.sort(() => Math.random() - 0.5);
     }
     
-    return questions;
+    return paginatedQuestions;
   },
 });
 
-// Get random exam questions
+// Get random exam questions with deduplication
 export const getRandomExamQuestions = query({
   args: {
     aircraftType: v.string(),
     count: v.number(),
     categories: v.optional(v.array(v.string())),
+    difficulty: v.optional(v.string()),
+    excludeIds: v.optional(v.array(v.id("examQuestions"))),
   },
   handler: async (ctx, args) => {
     let questions = await ctx.db
       .query("examQuestions")
       .withIndex("by_aircraft", (q) => q.eq("aircraftType", args.aircraftType))
       .filter((q) => q.eq(q.field("isActive"), true))
-      .collect();
+      .take(1000); // Limit to prevent size issues
     
     // Filter by categories if provided
     if (args.categories && args.categories.length > 0) {
       questions = questions.filter(q => args.categories!.includes(q.category));
     }
     
+    // Filter by difficulty if provided
+    if (args.difficulty && args.difficulty !== 'all') {
+      questions = questions.filter(q => q.difficulty === args.difficulty);
+    }
+    
+    // Exclude previously selected questions to avoid duplicates
+    if (args.excludeIds && args.excludeIds.length > 0) {
+      questions = questions.filter(q => !args.excludeIds!.includes(q._id));
+    }
+    
+    // Remove duplicates by question text (in case of data issues)
+    const uniqueQuestions = new Map();
+    questions.forEach(q => {
+      const key = q.question.trim().toLowerCase();
+      if (!uniqueQuestions.has(key)) {
+        uniqueQuestions.set(key, q);
+      }
+    });
+    
+    const deduplicatedQuestions = Array.from(uniqueQuestions.values());
+    
     // Shuffle and return requested count
-    questions = questions.sort(() => Math.random() - 0.5);
-    return questions.slice(0, args.count);
+    const shuffled = deduplicatedQuestions.sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, Math.min(args.count, shuffled.length));
+  },
+});
+
+// Get exam questions for timed exams with proper count (50-75 questions)
+export const getTimedExamQuestions = query({
+  args: {
+    aircraftType: v.string(),
+    questionCount: v.number(), // Should be 50-75 for official exams
+    categories: v.optional(v.array(v.string())),
+    difficulty: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Ensure we get the requested number of questions
+    const requestedCount = args.questionCount || 50;
+    
+    let questions = await ctx.db
+      .query("examQuestions")
+      .withIndex("by_aircraft", (q) => q.eq("aircraftType", args.aircraftType))
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .take(2000); // Get more questions to ensure we have enough unique ones
+    
+    // Filter by categories if provided
+    if (args.categories && args.categories.length > 0) {
+      questions = questions.filter(q => args.categories!.includes(q.category));
+    }
+    
+    // Filter by difficulty if provided  
+    if (args.difficulty && args.difficulty !== 'all') {
+      questions = questions.filter(q => q.difficulty === args.difficulty);
+    }
+    
+    // Remove exact duplicates by question text and options
+    const uniqueQuestions = new Map();
+    questions.forEach(q => {
+      const key = `${q.question.trim().toLowerCase()}_${q.options.join('|').toLowerCase()}`;
+      if (!uniqueQuestions.has(key)) {
+        uniqueQuestions.set(key, q);
+      }
+    });
+    
+    const deduplicatedQuestions = Array.from(uniqueQuestions.values());
+    
+    // If we don't have enough questions, try to get more from similar categories
+    if (deduplicatedQuestions.length < requestedCount) {
+      console.log(`Warning: Only ${deduplicatedQuestions.length} unique questions found for ${args.aircraftType}, requested ${requestedCount}`);
+      
+      // Try to get additional questions from any category for this aircraft
+      const additionalQuestions = await ctx.db
+        .query("examQuestions")
+        .withIndex("by_aircraft", (q) => q.eq("aircraftType", args.aircraftType))
+        .filter((q) => q.eq(q.field("isActive"), true))
+        .take(3000);
+      
+      // Add questions that aren't already in our unique set
+      additionalQuestions.forEach(q => {
+        const key = `${q.question.trim().toLowerCase()}_${q.options.join('|').toLowerCase()}`;
+        if (!uniqueQuestions.has(key)) {
+          uniqueQuestions.set(key, q);
+        }
+      });
+      
+      const finalQuestions = Array.from(uniqueQuestions.values());
+      console.log(`Found ${finalQuestions.length} total unique questions after expanding search`);
+    }
+    
+    const finalDeduplicatedQuestions = Array.from(uniqueQuestions.values());
+    
+    // Shuffle questions to ensure randomness
+    const shuffled = finalDeduplicatedQuestions.sort(() => Math.random() - 0.5);
+    
+    // Return the requested number of questions (or all available if less)
+    const result = shuffled.slice(0, Math.min(requestedCount, shuffled.length));
+    console.log(`Returning ${result.length} questions for timed exam`);
+    
+    return result;
   },
 });
 

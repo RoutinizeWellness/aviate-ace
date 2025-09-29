@@ -86,12 +86,12 @@ const SubscriptionManagement = () => {
         description: "Redirecting to Autumn billing service...",
       });
       
-      // Redirect to the specific Autumn billing service URL
-      const billingUrl = `http://localhost:8081/subscription-management?action=billing`;
-      
-      setTimeout(() => {
-        window.location.href = billingUrl;
-      }, 1000);
+              // Redirect to the correct Autumn billing service URL
+              const billingUrl = `https://autumn.dev/billing?action=update-payment`;
+              
+              setTimeout(() => {
+                window.open(billingUrl, '_blank');
+              }, 1000);
     } catch (error) {
       toast({
         title: t('common.error') || 'Error',
@@ -108,12 +108,12 @@ const SubscriptionManagement = () => {
         description: "Redirecting to Autumn billing service...",
       });
       
-      // Redirect to the specific Autumn billing service URL
-      const billingUrl = `http://localhost:8081/subscription-management?action=billing`;
-      
-      setTimeout(() => {
-        window.location.href = billingUrl;
-      }, 1000);
+              // Redirect to the correct Autumn billing service URL
+              const billingUrl = `https://autumn.dev/billing?action=view-history`;
+              
+              setTimeout(() => {
+                window.open(billingUrl, '_blank');
+              }, 1000);
     } catch (error) {
       toast({
         title: t('common.error') || 'Error',
@@ -133,12 +133,12 @@ const SubscriptionManagement = () => {
           description: "Redirecting to Autumn billing service...",
         });
         
-        // Redirect to the specific Autumn billing service URL
-        const billingUrl = `http://localhost:8081/subscription-management?action=billing`;
-        
-        setTimeout(() => {
-          window.location.href = billingUrl;
-        }, 1000);
+              // Redirect to the correct Autumn billing service URL
+              const billingUrl = `https://autumn.dev/billing?action=request-refund`;
+              
+              setTimeout(() => {
+                window.open(billingUrl, '_blank');
+              }, 1000);
       }
     } catch (error) {
       toast({

@@ -284,17 +284,17 @@ const Exams = () => {
                     </p>
                     <div className="space-y-2 mb-4">
                       <div className="flex justify-between text-sm">
-                        <span>Preguntas reales disponibles:</span>
+                        <span>{t('exams.questionsAvailable')}:</span>
                         <span className="font-medium">3,000+</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span>Simulación de examen oficial</span>
+                        <span>{t('exams.officialExamSimulation')}</span>
                         <CheckCircle2 className="w-4 h-4 text-success" />
                       </div>
                     </div>
                     <Button className="w-full">
                       <Play className="w-4 h-4 mr-2" />
-                      Comenzar Práctica
+                      {t('exams.startPractice')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -303,7 +303,7 @@ const Exams = () => {
                 <DialogHeader>
 <DialogTitle>{t('exams.configurePractice')}</DialogTitle>
                   <DialogDescription>
-                    Selecciona las categorías y dificultad para personalizar tu sesión de práctica.
+                    {t('exams.configureDescription')}
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -311,7 +311,7 @@ const Exams = () => {
 <label className="text-sm font-medium">{t('exams.selectAircraftType')}</label>
                     <Select value={selectedAircraft} onValueChange={setSelectedAircraft}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecciona tipo de aeronave" />
+                        <SelectValue placeholder={t('exams.selectAircraftType')} />
                       </SelectTrigger>
                       <SelectContent>
                         {aircraftTypes.map((aircraft) => (
@@ -375,13 +375,13 @@ const Exams = () => {
 <label className="text-sm font-medium">{t('exams.difficulty')}</label>
                     <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar dificultad" />
+                        <SelectValue placeholder={t('exams.selectDifficulty')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">
                           <div>
 <div className="font-medium">{t('exams.allDifficulties')}</div>
-                            <div className="text-xs text-muted-foreground">Preguntas de todos los niveles</div>
+                            <div className="text-xs text-muted-foreground">{t('exams.allLevels')}</div>
                           </div>
                         </SelectItem>
                         {difficulties.map((difficulty) => (
@@ -436,7 +436,7 @@ const Exams = () => {
                   
                   <div className="flex gap-2 pt-4">
                     <Button variant="outline" onClick={() => setShowPracticeDialog(false)} className="flex-1">
-                      Cancelar
+                      {t('exams.cancel')}
                     </Button>
                     <Button onClick={handleStartPractice} className="flex-1" disabled={selectedCategories.length === 0}>
                       <Play className="w-4 h-4 mr-2" />
@@ -454,7 +454,7 @@ const Exams = () => {
                   <div className="w-12 h-12 bg-warning/10 rounded-lg flex items-center justify-center">
                     <Clock className="w-6 h-6 text-warning" />
                   </div>
-                  <Badge className="bg-warning/10 text-warning">Cronometrado</Badge>
+                  <Badge className="bg-warning/10 text-warning">{t('exams.timed')}</Badge>
                 </div>
 <CardTitle className="text-lg">{t('exams.timedMode')}</CardTitle>
               </CardHeader>
@@ -464,15 +464,15 @@ const Exams = () => {
                 </p>
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span>Tiempo límite:</span>
-                    <span className="font-medium">60 minutos</span>
+                    <span>{t('exams.timeLimit')}:</span>
+                    <span className="font-medium">60 {t('exams.minutes')}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Preguntas:</span>
+                    <span>{t('exams.questionsCount')}:</span>
                     <span className="font-medium">75</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Puntuación mínima:</span>
+                    <span>{t('exams.minimumScore')}:</span>
                     <span className="font-medium">75%</span>
                   </div>
                 </div>
@@ -492,7 +492,7 @@ const Exams = () => {
                       <div className="w-12 h-12 bg-info/10 rounded-lg flex items-center justify-center">
                         <BookOpen className="w-6 h-6 text-info" />
                       </div>
-                      <Badge className="bg-info/10 text-info">Repaso</Badge>
+                      <Badge className="bg-info/10 text-info">{t('exams.review')}</Badge>
                     </div>
 <CardTitle className="text-lg">{t('exams.reviewMode')}</CardTitle>
                   </CardHeader>

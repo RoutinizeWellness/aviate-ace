@@ -39,6 +39,7 @@ import NotFound from "./pages/NotFound";
 import FreeTrialDemo from "./pages/FreeTrialDemo";
 import { useLanguage } from "./contexts/LanguageContext";
 import { FreeTrialProvider } from "./contexts/FreeTrialContext";
+import { ConvexQuestionLoader } from "./services/ConvexQuestionLoader";
 
 // Initialize Convex client with better error handling
 let convex: ConvexReactClient;
@@ -58,6 +59,9 @@ try {
   
   convex = new ConvexReactClient(convexUrl);
   console.log("✅ Convex client initialized successfully");
+  
+  // Initialize ConvexQuestionLoader with the client
+  ConvexQuestionLoader.setConvexClient(convex);
 } catch (error) {
   console.error("❌ Failed to initialize Convex client:", error);
   console.warn("⚠️ Using fallback mode - some features may not work properly");

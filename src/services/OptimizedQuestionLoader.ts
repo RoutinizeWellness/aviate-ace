@@ -1,6 +1,7 @@
 import type { RealAviationQuestion } from '@/data/realAviationQuestions';
 import { QuestionFilterService, type FilterCriteria } from '@/services/QuestionFilterService';
 import { CategoryNormalizationService } from '@/services/CategoryNormalizationService';
+import { ConvexQuestionLoader } from '@/services/ConvexQuestionLoader';
 import { performanceMonitor } from '@/utils/performance';
 
 interface QuestionLoadOptions {
@@ -46,7 +47,28 @@ export class OptimizedQuestionLoader {
         return cachedResult;
       }
 
-      // Load questions from data sources
+      let filteredQuestions: RealAviationQuestion[];
+
+      // Try to load from Convex first (better performance and deduplication)
+      if (ConvexQuestionLoader.isAvailable()) {
+        try {
+          filteredQuestions = await ConvexQuestionLoader.loadQuestions({
+            mode: options.mode,
+            category: normalizedCategory || 'all',
+            aircraft: options.aircraft,
+            difficulty: options.difficulty,
+            questionCount: options.questionCount
+          });
+          
+          // Cache the result
+          this.cacheQuestions(cacheKey, filteredQuestions);
+          return filteredQuestions;
+        } catch (error) {
+          console.warn('Convex question loading failed, falling back to local data:', error);
+        }
+      }
+
+      // Fallback to local data sources
       const allQuestions = await this.loadAllQuestions();
       
       // Filter questions
@@ -59,7 +81,7 @@ export class OptimizedQuestionLoader {
       };
 
       const filterService = new QuestionFilterService(allQuestions);
-      const filteredQuestions = filterService.filterQuestions(filterCriteria);
+      filteredQuestions = filterService.filterQuestions(filterCriteria);
 
       // Cache the result
       this.cacheQuestions(cacheKey, filteredQuestions);

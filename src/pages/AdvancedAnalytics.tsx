@@ -37,15 +37,22 @@ const AdvancedAnalytics = () => {
         setLoading(true);
         setError(null);
         
-        // Try to fetch from the analytics service
-        const response = await fetch(`http://localhost:8081/analytics?userId=${user._id}&timeRange=${timeRange}`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          mode: 'cors'
-        });
+        // Check if analytics service is available first
+        let response;
+        try {
+          response = await fetch(`http://localhost:8081/analytics?userId=${user._id}&timeRange=${timeRange}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            mode: 'cors',
+            signal: AbortSignal.timeout(5000) // 5 second timeout
+          });
+        } catch (networkError) {
+          console.log('Analytics service not available (network error)');
+          throw new Error('Analytics service unavailable');
+        }
         
         if (!response.ok) {
           throw new Error(`Analytics service unavailable (HTTP ${response.status})`);
@@ -55,10 +62,10 @@ const AdvancedAnalytics = () => {
         setAnalyticsData(data);
         setError(null);
       } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-        setError('Analytics service is not available. Using demo data.');
-        // Fallback to mock data if API is not available
-        setAnalyticsData(getMockData());
+        console.log('Analytics service unavailable, showing empty data');
+        setError('Analytics service is not available.');
+        // Show zero data instead of demo data when service is unavailable
+        setAnalyticsData(getEmptyData());
       } finally {
         setLoading(false);
       }
@@ -101,7 +108,41 @@ const AdvancedAnalytics = () => {
     ]
   });
   
-  const data = analyticsData || getMockData();
+  // Empty data function for when service is unavailable
+  const getEmptyData = () => ({
+    performanceData: {
+      overallScore: 0,
+      rank: 'No Data',
+      studyStreak: 0,
+      hoursStudied: 0,
+      modulesCompleted: 0,
+      totalModules: 0
+    },
+    categoryPerformance: [
+      { name: 'Aircraft Systems', score: 0, progress: 0, color: 'bg-blue-500' },
+      { name: 'Flight Operations', score: 0, progress: 0, color: 'bg-green-500' },
+      { name: 'Navigation', score: 0, progress: 0, color: 'bg-yellow-500' },
+      { name: 'Meteorology', score: 0, progress: 0, color: 'bg-purple-500' },
+      { name: 'Regulations', score: 0, progress: 0, color: 'bg-red-500' }
+    ],
+    weeklyProgress: [
+      { day: 'Mon', score: 0 },
+      { day: 'Tue', score: 0 },
+      { day: 'Wed', score: 0 },
+      { day: 'Thu', score: 0 },
+      { day: 'Fri', score: 0 },
+      { day: 'Sat', score: 0 },
+      { day: 'Sun', score: 0 }
+    ],
+    achievements: [
+      { id: 1, title: 'Quick Learner', description: 'Complete 5 modules in one day', earned: false },
+      { id: 2, title: 'Perfect Score', description: 'Score 100% on a quiz', earned: false },
+      { id: 3, title: 'Streak Master', description: 'Maintain a 7-day study streak', earned: false },
+      { id: 4, title: 'Subject Expert', description: 'Score 95%+ in all Systems modules', earned: false }
+    ]
+  });
+  
+  const data = analyticsData || getEmptyData();
   const { performanceData, categoryPerformance, weeklyProgress, achievements } = data;
 
   return (

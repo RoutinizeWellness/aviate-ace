@@ -82,10 +82,10 @@ const AdminPanel = () => {
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('ALL');
   const [showQuestionList, setShowQuestionList] = useState(false);
   
-  // Get questions from Convex
+  // Get questions from Convex with pagination to avoid size limit
   const allQuestions = useQuery(
     api.exams.getExamQuestions,
-    user && adminCheck?.isAdmin ? {} : "skip"
+    user && adminCheck?.isAdmin ? { limit: 50, offset: 0 } : "skip"
   );
   
   // Get questions count by category

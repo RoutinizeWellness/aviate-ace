@@ -19,6 +19,7 @@ import type * as addA320AirConditioningQuestions from "../addA320AirConditioning
 import type * as auth from "../auth.js";
 import type * as autumn from "../autumn.js";
 import type * as courses from "../courses.js";
+import type * as duplicateCleanup from "../duplicateCleanup.js";
 import type * as exams from "../exams.js";
 import type * as lessons from "../lessons.js";
 import type * as questionSuggestions from "../questionSuggestions.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   autumn: typeof autumn;
   courses: typeof courses;
+  duplicateCleanup: typeof duplicateCleanup;
   exams: typeof exams;
   lessons: typeof lessons;
   questionSuggestions: typeof questionSuggestions;
